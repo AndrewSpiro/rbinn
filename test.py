@@ -50,6 +50,7 @@ def main():
         eps = 0.2
         eps_iter = 0.071
         nb_iter = 7
+    print("dataset loaded")
 
     log_acc_path = args.csv_dir
     evalmethod = args.test
@@ -72,7 +73,6 @@ def main():
         model1 = CNNF(10, 0, 0, 0.0).to(device)
         model1.load_state_dict(torch.load(model1_path))
 
-
     # Model to evaluate
     if args.dataset=='cifar10':
         model_name = 'CNNF_2_cifar.pt'
@@ -80,29 +80,32 @@ def main():
     elif args.dataset == 'fashion':
         model_name = 'CNNF_1_fmnist.pt'
         model = CNNF(10, ind=2, cycles=1, res_param=0.1).to(device)    
+    print("model loaded")
 
     model_path = os.path.join(model_dir, model_name)
     model.load_state_dict(torch.load(model_path))
     eval = Evaluator(device, model)
+    print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
+    print(f"clean accuracy: {clean_acc}")
     
-    # adv attack
-    pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
-    pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
+    # # adv attack
+    # pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
+    # pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
 
-    spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
-    spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
+    # spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
+    # spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
 
-    transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
+    # transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
 
     with open(log_acc_path, 'a') as f:
         f.write('%s,' % model_name)
         f.write('%0.2f,' % (100. * clean_acc))
-        f.write('%0.2f,' % (100. * pgd_acc_first))
-        f.write('%0.2f,' % (100. * pgd_acc_ete))
-        f.write('%0.2f,' % (100. * spsa_acc_first))
-        f.write('%0.2f,' % (100. * spsa_acc_ete))
-        f.write('%0.2f,' % (100. * transfer_acc))
+        # f.write('%0.2f,' % (100. * pgd_acc_first))
+        # f.write('%0.2f,' % (100. * pgd_acc_ete))
+        # f.write('%0.2f,' % (100. * spsa_acc_first))
+        # f.write('%0.2f,' % (100. * spsa_acc_ete))
+        # f.write('%0.2f,' % (100. * transfer_acc))
         f.write('\n')
 
 if __name__ == '__main__':
