@@ -15,7 +15,7 @@ python train.py --data 'cifar10' \
                 --epochs 500 \
                 --seed 0 \
                 --grad-clip \
-                --save-model 'CNNF_2_cifar' \
+                --save-model 'CNNF_2_cifar_acs' \
                 --model-dir 'models'
 
 
