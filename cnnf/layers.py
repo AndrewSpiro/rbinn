@@ -62,7 +62,8 @@ class Conv2d(nn.Module):
             return self.conv(x)
 
         elif 'backward' in step:
-            return self.conv_t(x)
+            with torch.backends.cudnn.flags(enabled=False):
+                return self.conv_t(x)
 
         else:
             raise ValueError("step must be 'forward' or 'backward'")
