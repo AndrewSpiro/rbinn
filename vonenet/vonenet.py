@@ -10,7 +10,7 @@ import numpy as np
 def VOneNet(sf_corr=0.75, sf_max=9, sf_min=0, rand_param=False, gabor_seed=0,
             simple_channels=256, complex_channels=256,
             noise_mode='neuronal', noise_scale=0.35, noise_level=0.07, k_exc=25,
-            model_arch='resnet50', image_size=224, visual_degrees=8, ksize=25, stride=4):
+            model_arch='resnet50', image_size=224, visual_degrees=8, ksize=25, stride=4, num_classes=1000):
 
 
     out_channels = simple_channels + complex_channels
@@ -43,19 +43,14 @@ def VOneNet(sf_corr=0.75, sf_max=9, sf_min=0, rand_param=False, gabor_seed=0,
 
         if model_arch.lower() == 'resnet50':
             print('Model: ', 'VOneResnet50')
-            model_back_end = ResNetBackEnd(block=Bottleneck, layers=[3, 4, 6, 3])
+            model_back_end = ResNetBackEnd(block=Bottleneck, layers=[3, 4, 6, 3], num_classes=num_classes)
         elif model_arch.lower() == 'alexnet':
             print('Model: ', 'VOneAlexNet')
-            model_back_end = AlexNetBackEnd()
+            model_back_end = AlexNetBackEnd(num_classes=num_classes)
         elif model_arch.lower() == 'cornets':
             print('Model: ', 'VOneCORnet-S')
-            model_back_end = CORnetSBackEnd()
+            model_back_end = CORnetSBackEnd(num_classes=num_classes)
 
-        model = nn.Sequential(OrderedDict([
-            ('vone_block', vone_block),
-            ('bottleneck', bottleneck),
-            ('model', model_back_end),
-        ]))
     else:
         print('Model: ', 'VOneNet')
         model = vone_block

@@ -5,16 +5,17 @@ import numpy as np
 import tqdm
 import fire
 
-parser = argparse.ArgumentParser(description='ImageNet Training')
+parser = argparse.ArgumentParser(description='ImageNet / CIFAR-10 Training')
 ## General parameters
 parser.add_argument('--in_path', required=True,
-                    help='path to ImageNet folder that contains train and val folders')
+                    help='for ImageNet: path to folder that contains train and val folders; for CIFAR-10: root path where the dataset will be downloaded/stored')
 parser.add_argument('-o', '--output_path', default=None,
                     help='path for storing ')
 parser.add_argument('-restore_epoch', '--restore_epoch', default=0, type=int,
                     help='epoch number for restoring model training ')
 parser.add_argument('-restore_path', '--restore_path', default=None, type=str,
                     help='path of folder containing specific epoch file for restoring model training')
+parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='imagenet', help='dataset to train on')
 
 ## Training parameters
 parser.add_argument('--ngpus', default=0, type=int,
@@ -137,17 +138,27 @@ elif FLAGS.normalization == 'imagenet':
 def load_model():
     map_location = None if FLAGS.ngpus > 0 else 'cpu'
     print('Getting VOneNet')
+
+     # Adjust image size and number of classes based on dataset
+    if FLAGS.dataset == 'cifar10':
+        image_size = 32
+        num_classes = 10
+    else:
+        image_size = 224
+        num_classes = 1000
+
     model = get_model(map_location=map_location, model_arch=FLAGS.model_arch, pretrained=False,
                       visual_degrees=FLAGS.visual_degrees, stride=FLAGS.stride, ksize=FLAGS.ksize,
                       sf_corr=FLAGS.sf_corr, sf_max=FLAGS.sf_max, sf_min=FLAGS.sf_min, rand_param=FLAGS.rand_param,
                       gabor_seed=FLAGS.gabor_seed, simple_channels=FLAGS.simple_channels,
                       complex_channels=FLAGS.simple_channels, noise_mode=FLAGS.noise_mode,
-                      noise_scale=FLAGS.noise_scale, noise_level=FLAGS.noise_level, k_exc=FLAGS.k_exc)
+                      noise_scale=FLAGS.noise_scale, noise_level=FLAGS.noise_level, k_exc=FLAGS.k_exc,
+                      image_size=image_size, num_classes=num_classes)
 
     if FLAGS.ngpus > 0 and torch.cuda.device_count() > 1:
         print('We have multiple GPUs detected')
         model = model.to(device)
-    elif FLAGS.ngpus > 0 and torch.cuda.device_count() is 1:
+    elif FLAGS.ngpus > 0 and torch.cuda.device_count() == 1:
         print('We run on GPU')
         model = model.to(device)
     else:
@@ -283,14 +294,28 @@ class ImageNetTrain(object):
             self.loss = self.loss.cuda()
 
     def data(self):
-        dataset = torchvision.datasets.ImageFolder(
-            os.path.join(FLAGS.in_path, 'train'),
-            torchvision.transforms.Compose([
-                torchvision.transforms.RandomResizedCrop(224),
+        if FLAGS.dataset == 'cifar10':
+            transform = torchvision.transforms.Compose([
+                torchvision.transforms.RandomCrop(32, padding=4),
                 torchvision.transforms.RandomHorizontalFlip(),
                 torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize(mean=norm_mean, std=norm_std)
-            ]))
+                torchvision.transforms.Normalize(mean=norm_mean, std=norm_std),
+            ])
+            dataset = torchvision.datasets.CIFAR10(
+                root=FLAGS.in_path,
+                train=True,
+                download=True,
+                transform=transform,
+            )
+        else:
+            dataset = torchvision.datasets.ImageFolder(
+                os.path.join(FLAGS.in_path, 'train'),
+                torchvision.transforms.Compose([
+                    torchvision.transforms.RandomResizedCrop(224),
+                    torchvision.transforms.RandomHorizontalFlip(),
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Normalize(mean=norm_mean, std=norm_std)
+                ]))
         data_loader = torch.utils.data.DataLoader(dataset,
                                                   batch_size=FLAGS.batch_size,
                                                   shuffle=True,
@@ -303,6 +328,7 @@ class ImageNetTrain(object):
         start = time.time()
         if FLAGS.optimizer == 'stepLR':
             self.lr.step(epoch=frac_epoch)
+        inp = inp.to(device)
         target = target.to(device)
 
         output = self.model(inp)
@@ -333,14 +359,26 @@ class ImageNetVal(object):
         self.loss = self.loss.to(device)
 
     def data(self):
-        dataset = torchvision.datasets.ImageFolder(
-            os.path.join(FLAGS.in_path, 'val'),
-            torchvision.transforms.Compose([
-                torchvision.transforms.Resize(256),
-                torchvision.transforms.CenterCrop(224),
+        if FLAGS.dataset == 'cifar10':
+            transform = torchvision.transforms.Compose([
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize(mean=norm_mean, std=norm_std),
-            ]))
+            ])
+            dataset = torchvision.datasets.CIFAR10(
+                root=FLAGS.in_path,
+                train=False,
+                download=True,
+                transform=transform,
+            )
+        else:
+            dataset = torchvision.datasets.ImageFolder(
+                os.path.join(FLAGS.in_path, 'val'),
+                torchvision.transforms.Compose([
+                    torchvision.transforms.Resize(256),
+                    torchvision.transforms.CenterCrop(224),
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Normalize(mean=norm_mean, std=norm_std),
+                ]))
         data_loader = torch.utils.data.DataLoader(dataset,
                                                   batch_size=FLAGS.batch_size,
                                                   shuffle=False,
@@ -355,6 +393,7 @@ class ImageNetVal(object):
         record = {'loss': 0, 'top1': 0, 'top5': 0}
         with torch.no_grad():
             for (inp, target) in tqdm.tqdm(self.data_loader, desc=self.name):
+                inp = inp.to(device)
                 target = target.to(device)
                 output = self.model(inp)
 
