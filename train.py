@@ -296,7 +296,7 @@ class ImageNetTrain(object):
     def data(self):
         if FLAGS.dataset == 'cifar10':
             transform = torchvision.transforms.Compose([
-                torchvision.transforms.RandomCrop(32, padding=4),
+                torchvision.transforms.Resize(224),
                 torchvision.transforms.RandomHorizontalFlip(),
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize(mean=norm_mean, std=norm_std),
@@ -361,6 +361,7 @@ class ImageNetVal(object):
     def data(self):
         if FLAGS.dataset == 'cifar10':
             transform = torchvision.transforms.Compose([
+                torchvision.transforms.Resize(224),
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Normalize(mean=norm_mean, std=norm_std),
             ])
