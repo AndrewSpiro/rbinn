@@ -155,6 +155,7 @@ def load_model():
                       noise_scale=FLAGS.noise_scale, noise_level=FLAGS.noise_level, k_exc=FLAGS.k_exc,
                       image_size=image_size, num_classes=num_classes)
 
+    print(f"gpu info: {FLAGS.ngpus} {torch.cuda.device_count()}")
     if FLAGS.ngpus > 0 and torch.cuda.device_count() > 1:
         print('We have multiple GPUs detected')
         model = model.to(device)
@@ -162,7 +163,7 @@ def load_model():
         print('We run on GPU')
         model = model.to(device)
     else:
-        print('No GPU detected!')
+        print('No GPU detected! :(')
         model = model.module
 
     return model

@@ -55,6 +55,7 @@ device = torch.device("cuda" if FLAGS.ngpus > 0 else "cpu")
 def val():
     model = get_model(model_arch=FLAGS.model_arch, pretrained=True)
 
+    print(f"ngpus = {FLAGS.ngpus}")
     if FLAGS.ngpus == 0:
         print('Running on CPU')
     if FLAGS.ngpus > 0 and torch.cuda.device_count() > 1:
