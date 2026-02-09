@@ -51,6 +51,12 @@ def VOneNet(sf_corr=0.75, sf_max=9, sf_min=0, rand_param=False, gabor_seed=0,
             print('Model: ', 'VOneCORnet-S')
             model_back_end = CORnetSBackEnd(num_classes=num_classes)
 
+        model = nn.Sequential(OrderedDict([
+        ('vone_block', vone_block),
+        ('bottleneck', bottleneck),
+        ('model', model_back_end),
+        ]))
+
     else:
         print('Model: ', 'VOneNet')
         model = vone_block

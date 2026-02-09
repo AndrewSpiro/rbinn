@@ -403,7 +403,7 @@ class ImageNetVal(object):
                 record['top5'] += p5
 
         for key in record:
-            record[key] /= len(self.data_loader.dataset.samples)
+            record[key] /= len(self.data_loader.dataset)
         record['dur'] = (time.time() - start) / len(self.data_loader)
 
         return record
