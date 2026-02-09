@@ -60,7 +60,7 @@ def val():
     if FLAGS.ngpus > 0 and torch.cuda.device_count() > 1:
         print('Running on multiple GPUs')
         model = model.to(device)
-    elif FLAGS.ngpus > 0 and torch.cuda.device_count() is 1:
+    elif FLAGS.ngpus > 0 and torch.cuda.device_count() == 1:
         print('Running on single GPU')
         model = model.to(device)
     else:
