@@ -28,8 +28,6 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
         home_dir = os.path.join(os.environ['HOME'], 'Thesis/vonenet')
         vonenet_dir = os.path.join(home_dir, '.vonenet')
         weightsdir_path = os.path.join(vonenet_dir, FILE_WEIGHTS[model_arch.lower()])
-        print(vonenet_dir)
-        print(weightsdir_path)
         if not os.path.exists(vonenet_dir):
             raise Warning("vonenet_dir does not exist") #acs
             os.makedirs(vonenet_dir)
@@ -50,12 +48,12 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
         noise_scale = ckpt_data['flags']['noise_scale']
         noise_level = ckpt_data['flags']['noise_level']
 
-        print(ckpt_data['flags'].keys())
         model_id = ckpt_data['flags']['model_arch'].replace('_','').lower()
 
         model = globals()[f'VOneNet'](model_arch=model_id, stride=stride, k_exc=k_exc,
                                       simple_channels=simple_channels, complex_channels=complex_channels,
-                                      noise_mode=noise_mode, noise_scale=noise_scale, noise_level=noise_level)
+                                      noise_mode=noise_mode, noise_scale=noise_scale, noise_level=noise_level,
+                                      num_classes=10)
 
         if model_arch.lower() == 'resnet50_at':
             ckpt_data['state_dict'].pop('vone_block.div_u.weight')
@@ -63,6 +61,7 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
             model.load_state_dict(ckpt_data['state_dict'])
         else:
             model = Wrapper(model)
+            print("wrapped model")
             model.load_state_dict(ckpt_data['state_dict'])
             model = model.module
 
