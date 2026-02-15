@@ -86,15 +86,20 @@ class ImageNetVal(object):
         self.loss = self.loss.to(device)
 
     def data(self):
-        dataset = torchvision.datasets.ImageFolder(
-            os.path.join(FLAGS.in_path, 'val'),
-            torchvision.transforms.Compose([
-                torchvision.transforms.Resize(256),
-                torchvision.transforms.CenterCrop(224),
-                torchvision.transforms.ToTensor(),
-                torchvision.transforms.Normalize(mean=[0.5, 0.5, 0.5],
-                                                 std=[0.5, 0.5, 0.5]),
-            ]))
+        if FLAGS.dataset == 'cifar10':
+            print('loading for cifar10')
+            
+        else:
+            print('loading for imagenet')
+            dataset = torchvision.datasets.ImageFolder(
+                os.path.join(FLAGS.in_path, 'val'),
+                torchvision.transforms.Compose([
+                    torchvision.transforms.Resize(256),
+                    torchvision.transforms.CenterCrop(224),
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Normalize(mean=[0.5, 0.5, 0.5],
+                                                    std=[0.5, 0.5, 0.5]),
+                ]))
         data_loader = torch.utils.data.DataLoader(dataset,
                                                   batch_size=FLAGS.batch_size,
                                                   shuffle=False,
