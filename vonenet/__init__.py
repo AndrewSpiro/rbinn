@@ -51,7 +51,7 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
         noise_level = ckpt_data['flags']['noise_level']
 
         print(ckpt_data['flags'].keys())
-        model_id = ckpt_data['flags']['arch'].replace('_','').lower()
+        model_id = ckpt_data['flags']['model_arch'].replace('_','').lower()
 
         model = globals()[f'VOneNet'](model_arch=model_id, stride=stride, k_exc=k_exc,
                                       simple_channels=simple_channels, complex_channels=complex_channels,
