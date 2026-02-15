@@ -87,8 +87,18 @@ class ImageNetVal(object):
 
     def data(self):
         if FLAGS.dataset == 'cifar10':
-            print('loading for cifar10')
-            
+            transform = torchvision.transforms.Compose([
+                torchvision.transforms.Resize(224),
+                torchvision.transforms.RandomHorizontalFlip(),
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+            ])
+            dataset = torchvision.datasets.CIFAR10(
+                root=FLAGS.in_path,
+                train=True,
+                download=True,
+                transform=transform,
+            )
         else:
             print('loading for imagenet')
             dataset = torchvision.datasets.ImageFolder(
