@@ -15,6 +15,8 @@ parser.add_argument('--ngpus', default=1, type=int,
                     help='number of GPUs to use; 0 if you want to run on CPU')
 parser.add_argument('--model_arch', choices=['alexnet', 'resnet50', 'resnet50_at', 'cornets'], default='resnet50',
                     help='back-end model architecture to load')
+parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='cifar10',
+                    help='dataset to train or validate on')
 
 FLAGS, FIRE_FLAGS = parser.parse_known_args()
 
@@ -29,7 +31,8 @@ def set_gpus(n=2):
             'nvidia-smi --query-gpu=index,memory.free,memory.total --format=csv,nounits'), check=True,
             stdout=subprocess.PIPE).stdout
         gpus = pd.read_csv(io.BytesIO(gpus), sep=', ', engine='python')
-        gpus = gpus[gpus['memory.total [MiB]'] > 10000]  # only above 10 GB
+        # gpus = gpus[gpus['memory.total [MiB]'] > 10000]  # only above 10 GB
+        gpus = gpus[gpus['memory.total [MiB]'] > 5000]  # only above 10 GB
         if os.environ.get('CUDA_VISIBLE_DEVICES') is not None:
             visible = [int(i)
                        for i in os.environ['CUDA_VISIBLE_DEVICES'].split(',')]
@@ -149,4 +152,5 @@ def accuracy(output, target, topk=(1,)):
 
 
 if __name__ == '__main__':
+    print(f"Devices available: {torch.cuda.device_count()}")
     val()
