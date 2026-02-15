@@ -94,7 +94,8 @@ def set_gpus(n=2):
             'nvidia-smi --query-gpu=index,memory.free,memory.total --format=csv,nounits'), check=True,
             stdout=subprocess.PIPE).stdout
         gpus = pd.read_csv(io.BytesIO(gpus), sep=', ', engine='python')
-        gpus = gpus[gpus['memory.total [MiB]'] > 10000]  # only above 10 GB
+        # gpus = gpus[gpus['memory.total [MiB]'] > 10000]  # only above 10 GB
+        gpus = gpus[gpus['memory.total [MiB]'] > 5000]  # only above 5 GB
         if os.environ.get('CUDA_VISIBLE_DEVICES') is not None:
             visible = [int(i)
                        for i in os.environ['CUDA_VISIBLE_DEVICES'].split(',')]
@@ -108,6 +109,7 @@ def set_gpus(n=2):
 
 
 if FLAGS.ngpus > 0:
+    print("setting gpus")
     set_gpus(FLAGS.ngpus)
 
 import torch
