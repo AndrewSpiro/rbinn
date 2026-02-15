@@ -25,12 +25,16 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
     """
     if pretrained and model_arch:
         url = f'https://vonenet-models.s3.us-east-2.amazonaws.com/{FILE_WEIGHTS[model_arch.lower()]}'
-        home_dir = os.environ['HOME']
+        home_dir = os.path.join(os.environ['HOME'], 'Thesis/vonenet')
         vonenet_dir = os.path.join(home_dir, '.vonenet')
         weightsdir_path = os.path.join(vonenet_dir, FILE_WEIGHTS[model_arch.lower()])
+        print(vonenet_dir)
+        print(weightsdir_path)
         if not os.path.exists(vonenet_dir):
+            raise Warning("vonenet_dir does not exist") #acs
             os.makedirs(vonenet_dir)
         if not os.path.exists(weightsdir_path):
+            raise Warning("weightsdir path does not exist") #acs
             print('Downloading model weights to ', weightsdir_path)
             r = requests.get(url, allow_redirects=True)
             open(weightsdir_path, 'wb').write(r.content)
@@ -46,6 +50,7 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
         noise_scale = ckpt_data['flags']['noise_scale']
         noise_level = ckpt_data['flags']['noise_level']
 
+        print(ckpt_data['flags'].keys())
         model_id = ckpt_data['flags']['arch'].replace('_','').lower()
 
         model = globals()[f'VOneNet'](model_arch=model_id, stride=stride, k_exc=k_exc,
