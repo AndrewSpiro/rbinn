@@ -11,13 +11,28 @@ import sys
 sys.path.append('../network_training/')
 import cmd_parser
 sys.path.append(os.path.abspath('./'))
-DEFAULT_RESULTCACHING_HOME = '/data5/chengxuz/Dataset/unsup_vvs_datasets/.result_caching'
+# DEFAULT_RESULTCACHING_HOME = '/data5/chengxuz/Dataset/unsup_vvs_datasets/.result_caching'
+DEFAULT_RESULTCACHING_HOME = '/vol/home/s4015355/Thesis/unsup_vvs/storage/result_caching'
 os.environ['RESULTCACHING_HOME'] = DEFAULT_RESULTCACHING_HOME
 import importlib
 import pdb
 import numpy as np
 import json
 from collections import OrderedDict
+
+import pandas as pd
+
+# List of attributes introduced in Pandas 1.0+ that older versions lack
+missing_attributes = ['StringDtype', 'BooleanDtype', 'Int64Dtype', 'Float64Dtype']
+
+for attr in missing_attributes:
+    if not hasattr(pd, attr):
+        # Create a dummy class so the 'isinstance' or 'hasattr' checks pass
+        class DummyType: pass
+        setattr(pd, attr, DummyType)
+
+# Now proceed with your imports
+import candidate_models
 
 from model_tools.activations.pytorch import \
         load_images, load_preprocess_images, PytorchWrapper

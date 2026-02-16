@@ -14,7 +14,8 @@ import math
 
 import tensorflow as tf
 
-DEFAULT_MODEL_CACHE_DIR = '/data5/chengxuz/Dataset/unsup_vvs_datasets/brainscore_model_caches'
+# DEFAULT_MODEL_CACHE_DIR = '/data5/chengxuz/Dataset/unsup_vvs_datasets/brainscore_model_caches'
+DEFAULT_MODEL_CACHE_DIR = '/vol/home/s4015355/Thesis/unsup_vvs/storage/model_cache'
 
 
 class TfutilsReader(object):
