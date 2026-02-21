@@ -1,3 +1,6 @@
+aspiro: first run `export PYTHONPATH=$PYTHONPATH:~/Thesis/unsup_vvs`
+then  `sh brainscore_mask/run_v1_v4_it.sh 1 la.res18_la_s0`
+
 Unsupervised deep convolutional neural network model for the ventral visual stream.
 
 # Prerequisites
