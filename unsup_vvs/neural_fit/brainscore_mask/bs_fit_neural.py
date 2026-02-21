@@ -33,6 +33,7 @@ for attr in missing_attributes:
 
 # Now proceed with your imports
 import candidate_models
+import json
 
 from model_tools.activations.pytorch import \
         load_images, load_preprocess_images, PytorchWrapper
