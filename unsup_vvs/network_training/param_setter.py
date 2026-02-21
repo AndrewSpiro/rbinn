@@ -155,7 +155,7 @@ class ParamSetter(object):
                     'dbname': args.load_dbname or self.dbname,
                     'collname': args.load_collname or self.collname,
                     'exp_id': loadexpId,
-                    'do_restore': True,
+                    'do_restore': False,
                     'query': load_query,
                     'from_ckpt': args.ckpt_file,
                     'restore_global_step': not args.drop_global_step,
