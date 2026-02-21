@@ -8,6 +8,8 @@ Before starting, please modify the value of `DEFAULT_MODEL_CACHE_DIR` at line 17
 The first value is where the network model caches will be hosted.
 The second value is where the neural evaluation results will be hosted.
 
+andrew: continue from here
+
 To get neural fitting results to V1, V4, and IT areas, you need to run `sh brainscore_mask/run_v1_v4_it.sh [gpu_number] [set_func_name]` (Currently, certain credentials may be needed).
 
 ## Supervised
