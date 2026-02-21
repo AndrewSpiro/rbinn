@@ -159,7 +159,7 @@ def get_load_settings_from_func(args):
 
 def load_set_func(args):
     all_paths = args.set_func.split('.')
-    module_name = '.'.join(['settings'] + all_paths[:-1])
+    module_name = '.'.join(['unsup_vvs.network_training.exp_settings'] + all_paths[:-1])
     load_setting_module = importlib.import_module(module_name)
     set_func = all_paths[-1]
     set_func = getattr(load_setting_module, set_func)
