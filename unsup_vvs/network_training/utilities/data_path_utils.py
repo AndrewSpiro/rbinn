@@ -28,6 +28,12 @@ def get_data_path(localimagenet=None, overall_local=None):
     # Pathes for all the datasets
     DATA_PATH = {}
 
+    if not overall_local is None:
+            cifar_prefix = os.path.join("..","..",overall_local,'cifar10')
+
+    DATA_PATH['cifar10/train'] = os.path.join(cifar_prefix, 'train')
+    DATA_PATH['cifar10/val'] = os.path.join(cifar_prefix, 'val')
+    
     pbrnet_prefix = '/mnt/fs1/Dataset/pbrnet'
     if not overall_local is None:
         pbrnet_prefix = '%s/pbrnet' % overall_local
@@ -50,8 +56,10 @@ def get_data_path(localimagenet=None, overall_local=None):
         imagenet_prefix = overall_local
 
     # ImageNet
+#     DATA_PATH['imagenet/image_label_full'] \
+#             = '%s/TFRecord_Imagenet_standard/image_label_full_widx' % imagenet_prefix
     DATA_PATH['imagenet/image_label_full'] \
-            = '%s/TFRecord_Imagenet_standard/image_label_full_widx' % imagenet_prefix
+            = os.path.join(cifar_prefix, 'train')
     DATA_PATH['imagenet/image_label_part1_balanced'] \
             = '%s/TFRecord_Imagenet_standard/image_label_p01_balanced' % imagenet_prefix
     DATA_PATH['imagenet/image_label_part2_balanced'] \
@@ -70,9 +78,10 @@ def get_data_path(localimagenet=None, overall_local=None):
             = '%s/TFRecord_Imagenet_standard/image_label_p20_balanced' % imagenet_prefix
     DATA_PATH['imagenet/image_label_part50_balanced'] \
             = '%s/TFRecord_Imagenet_standard/image_label_p50_balanced' % imagenet_prefix
+#     DATA_PATH['imagenet/image_label_full_widx'] \
+#             = '%s/TFRecord_Imagenet_standard/image_label_full_widx' % imagenet_prefix
     DATA_PATH['imagenet/image_label_full_widx'] \
-            = '%s/TFRecord_Imagenet_standard/image_label_full_widx' % imagenet_prefix
-
+            = os.path.join(cifar_prefix, 'train')
     DATA_PATH['saycam/frames'] = '/mnt/fs4/chengxuz/Dataset/saycam_frames_tfr'
     DATA_PATH['saycam/all_frames'] = '/mnt/fs4/chengxuz/Dataset/saycam_all_frames_tfr'
     return DATA_PATH
