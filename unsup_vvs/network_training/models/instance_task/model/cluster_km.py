@@ -21,11 +21,12 @@ def run_kmeans(x, nmb_clusters, verbose=False, seed=DEFAULT_SEED):
     clus.niter = 20
     clus.max_points_per_centroid = 10000000
     clus.seed = seed
-    res = faiss.StandardGpuResources()
-    flat_config = faiss.GpuIndexFlatConfig()
-    flat_config.useFloat16 = False
-    flat_config.device = 0
-    index = faiss.GpuIndexFlatL2(res, d, flat_config)
+    index = faiss.IndexFlatL2(d)
+    # res = faiss.StandardGpuResources()
+    # flat_config = faiss.GpuIndexFlatConfig()
+    # flat_config.useFloat16 = False
+    # flat_config.device = 0
+    # index = faiss.GpuIndexFlatL2(res, d, flat_config)
 
     # perform the training
     clus.train(x, index)
