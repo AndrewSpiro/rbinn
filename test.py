@@ -7,6 +7,21 @@ from shutil import copyfile
 from datetime import datetime
 from cnnf.model_cifar import WideResNet
 from cnnf.model_mnist import CNNF
+
+# version issue- resolving manuall -aspiro
+import sys
+def zero_gradients(x):
+    if isinstance(x, torch.Tensor):
+        if x.grad is not None:
+            x.grad.detach_()
+            x.grad.zero_()
+    elif isinstance(x, (list, tuple)):
+        for v in x:
+            zero_gradients(v)
+
+import torch.autograd.gradcheck
+sys.modules['torch.autograd.gradcheck'].zero_gradients = zero_gradients
+
 from eval import Evaluator
 import numpy as np
 import os
@@ -17,7 +32,7 @@ def main():
                         default='cifar10', help='the dataset for training the model')
     parser.add_argument('--test', choices=['average', 'last'],
                         default='average', help='output averaged logits or logits from the last iteration')
-    parser.add_argument('--csv-dir', default='results.csv',
+    parser.add_argument('--csv-dir', default='results_temp.csv',
                         help='Directory for Saving the Evaluation results')
     parser.add_argument('--model-dir', default='models',
                         help='Directory for Saved Models')
