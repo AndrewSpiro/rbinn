@@ -49,7 +49,7 @@ def main():
                 transforms.ToTensor(),
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
             ])),
-            batch_size=64, shuffle=True,
+            batch_size=1, shuffle=False,
             num_workers=4, pin_memory=True)
         eps = 0.063
         eps_iter = 0.02
@@ -103,6 +103,7 @@ def main():
     print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
     print(f"clean accuracy: {clean_acc}")
+    breakpoint()
     
     # # adv attack
     # pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
