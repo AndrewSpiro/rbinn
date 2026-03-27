@@ -7,6 +7,7 @@ from shutil import copyfile
 from datetime import datetime
 from cnnf.model_cifar import WideResNet
 from cnnf.model_mnist import CNNF
+from utils import seed_torch
 
 # version issue- resolving manuall -aspiro
 import sys
@@ -27,6 +28,7 @@ import numpy as np
 import os
 
 def main():
+
     parser = argparse.ArgumentParser(description='CNNF testing')
     parser.add_argument('--dataset', choices=['cifar10', 'fashion'],
                         default='cifar10', help='the dataset for training the model')
@@ -36,8 +38,12 @@ def main():
                         help='Directory for Saving the Evaluation results')
     parser.add_argument('--model-dir', default='models',
                         help='Directory for Saved Models')
+    parser.add_argument('--seed', type=int, default=0) # for variance in tests -acs
 
     args = parser.parse_args()
+    
+    seed_torch(seed=args.seed)
+
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
     clean_dir = 'data/'
@@ -49,7 +55,7 @@ def main():
                 transforms.ToTensor(),
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
             ])),
-            batch_size=1, shuffle=False,
+            batch_size=16, shuffle=False,
             num_workers=4, pin_memory=True)
         eps = 0.063
         eps_iter = 0.02
@@ -102,26 +108,26 @@ def main():
     eval = Evaluator(device, model)
     print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
-    print(f"clean accuracy: {clean_acc}")
-    breakpoint()
+    # print(f"clean accuracy: {clean_acc}")
+    # breakpoint()
     
-    # # adv attack
-    # pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
-    # pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
+    # adv attack
+    pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
+    pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
 
-    # spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
-    # spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
+    spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
+    spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
 
-    # transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
+    transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
 
     with open(log_acc_path, 'a') as f:
         f.write('%s,' % model_name)
         f.write('%0.2f,' % (100. * clean_acc))
-        # f.write('%0.2f,' % (100. * pgd_acc_first))
-        # f.write('%0.2f,' % (100. * pgd_acc_ete))
-        # f.write('%0.2f,' % (100. * spsa_acc_first))
-        # f.write('%0.2f,' % (100. * spsa_acc_ete))
-        # f.write('%0.2f,' % (100. * transfer_acc))
+        f.write('%0.2f,' % (100. * pgd_acc_first))
+        f.write('%0.2f,' % (100. * pgd_acc_ete))
+        f.write('%0.2f,' % (100. * spsa_acc_first))
+        f.write('%0.2f,' % (100. * spsa_acc_ete))
+        f.write('%0.2f,' % (100. * transfer_acc))
         f.write('\n')
 
 if __name__ == '__main__':
