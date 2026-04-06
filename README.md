@@ -1,3 +1,22 @@
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+This repository extends the original implementation to automate multiple seeded training and evaluation runs.
+
+## Quick Start
+I have provied an `environment.yml` which contains the exact versions used in this thesis.
+
+To recreate the environment:
+```bash
+conda env create -f environment.yml
+conda activate pixelreg
+```
+
+To reproduce the results, run
+```bash
+bash repro.sh
+```
+
+## New Features
+---
 # A Brain-Inspired Regularizer for Adversarial Robustness
 
 This repository is the official implementation of [**A Brain-Inspired Regularizer for Adversarial Robustness**](https://arxiv.org/abs/2410.03952).
