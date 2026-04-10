@@ -214,7 +214,8 @@ def get_configs(code_name, args):
         }
 
         train_config = {
-            "seed": args.seed if code_name == "train_resnet" else None,
+            # "seed": args.seed if code_name == "train_resnet" else None,
+            "seed": args.seed,
             "valid_portion": args.valid_portion,
             "resnet_batch_size": args.resnet_batch_size,
             "lr": args.lr,
