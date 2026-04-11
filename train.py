@@ -68,7 +68,7 @@ def main(
         wandb.run.name = name_wandb_run(task_config, reg_config)
 
 
-    utils.set_seed(train_config["seed"])
+    utils.set_seed(train_config["train_seed"])
 
     # create dataloaders for classification pathway
     resnet_loader_train, resnet_loader_valid, resnet_loader_test = (

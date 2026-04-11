@@ -63,12 +63,10 @@ def main(
     if wandb_log:
         wandb.run.name = name_wandb_run(saved_task_config, saved_reg_config) + "_attack"
 
-    # 2. Set the seed specifically for the attacks (Critical for your Gaussian noise)
-    current_seed = attack_config.get("seed", saved_train_config.get("seed"))
+    current_seed = attack_config["attack_seed"]
     utils.set_seed(current_seed)
     print(f"Random seed set to: {current_seed}")
 
-    # 3. Create ONLY the test dataloader 
     _, _, resnet_loader_test = utils.create_resnet_loaders(
         data_dir, saved_task_config, saved_train_config
     )

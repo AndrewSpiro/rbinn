@@ -87,7 +87,8 @@ def runtime_parser(code_name):
             help="base channel number for ResNet",
         )
 
-        parser.add_argument("--seed", default=0, type=int)
+        parser.add_argument("--train_seed", default=0, type=int)
+        parser.add_argument("--attack_seed", default=0, type=int)
         parser.add_argument("--valid_portion", default=0.01, type=float)
         parser.add_argument("--resnet_batch_size", default=64, type=int)
 
@@ -222,7 +223,7 @@ def get_configs(code_name, args):
 
         train_config = {
             # "seed": args.seed if code_name == "train_resnet" else None,
-            "seed": args.seed,
+            "train_seed": args.train_seed,
             "valid_portion": args.valid_portion,
             "resnet_batch_size": args.resnet_batch_size,
             "lr": args.lr,
@@ -234,6 +235,7 @@ def get_configs(code_name, args):
             "epoch_num": args.epoch_num,
         }
         attack_config = {
+            "attack_seed": args.attack_seed,
             "attack": args.attack,
             "num_epsilons": args.num_epsilons,
             "epsilon_range": args.epsilon_range,
