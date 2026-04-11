@@ -66,7 +66,7 @@ do
             --epoch_num $EPOCHS \
             --save_dir $MODEL_DIR \
             --attack_list "$TYPE" \
-            --epsilon_range $Range \
+            --epsilon_range $RANGE \
             >> "${MODEL_DIR}/train.log" 2>&1
         done
 
