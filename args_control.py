@@ -37,6 +37,13 @@ def runtime_parser(code_name):
         parser.add_argument("--save_period", default=1, type=int)
 
     if code_name in ["train_resnet", "attack_resnet"]:
+        parser.add_argument('--attack_list', nargs='*', default=[
+            "Gaussian",
+            "Uniform",
+            "SaltPepper",
+            # "TransferredFGSM", make sure an unregularized model is trained first
+            "BoundaryAttack",])
+        parser.add_argument('--epsilon_range', nargs='*', type=float, default = None)
         parser.add_argument("--task", default="CIFAR10")
         parser.add_argument("--rgb", type=str2bool, default=False)
 
@@ -70,7 +77,7 @@ def runtime_parser(code_name):
         parser.add_argument("--start_fine_tune", default=0, type=int)
         parser.add_argument("--fine_tune_epochs", default=0, type=int)
 
-        parser.add_argument("--attack", default=True, type=bool)
+        parser.add_argument("--attack", default=True, type=str2bool)
 
         parser.add_argument("--archi", default="ResNet18")
         parser.add_argument(
@@ -229,6 +236,8 @@ def get_configs(code_name, args):
         attack_config = {
             "attack": args.attack,
             "num_epsilons": args.num_epsilons,
+            "epsilon_range": args.epsilon_range,
+            "attack_list": args.attack_list,
         }
 
     if code_name in ["create_jobs", "process_jobs", "clean_jobs"]:
@@ -261,7 +270,16 @@ def get_configs(code_name, args):
         )
 
     if code_name == "attack_resnet":
-        return data_dir, save_dir, train_config, task_config, reg_config, attack_config
+        return (
+            data_dir, 
+            save_dir,
+            run_config, 
+            task_config,
+            r_model_config,
+            train_config,  
+            reg_config, 
+            attack_config
+            )
     if code_name == "create_jobs":
         return data_dir, save_dir, job_config
     if code_name == "process_jobs":
