@@ -54,7 +54,6 @@ def main(
             "r_model_config": r_model_config,
             "train_config": train_config,
             "reg_config": reg_config,
-            "attack_config": attack_config,
         }
     )
     print(f"training id: {r_training_id}")
@@ -68,7 +67,6 @@ def main(
     if wandb_log:
         wandb.run.name = name_wandb_run(task_config, reg_config)
 
-    attack_config["training_id"] = r_training_id
 
     utils.set_seed(train_config["seed"])
 
@@ -140,7 +138,6 @@ def main(
                 "r_model_config": r_model_config,
                 "train_config": train_config,
                 "reg_config": reg_config,
-                "attack_config": attack_config,
                 "image_idxs": image_idxs,
                 "epoch_num": epoch_num,
                 "best_idx": best_idx,
@@ -159,7 +156,6 @@ def main(
                 "train_config": train_config,
                 "best_state": resnet_states[best_idx],
                 "reg_config": reg_config,
-                "attack_config": attack_config,
             },
         )
         print("training progress saved")
@@ -246,6 +242,8 @@ def main(
                 r_training_id,
                 {attack_type: result},
             )
+    else:
+        print("skipping attacks")
 
     return r_training_id, results
 
