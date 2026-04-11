@@ -210,16 +210,12 @@ def main(
         resnet_states.append(model_state(resnet))
         print(f"elapsed time {utils.time_str(time.time()-tic_epoch)}")
 
-    attacks = [
-        "Gaussian",
-        "Uniform",
-        "SaltPepper",
-        # "TransferredFGSM", make sure an unregularized model is trained first
-        "BoundaryAttack",
-    ]
+    attacks = attack_config["attack_list"]
+
     resnet, train_config, task_config, reg_config = utils.load_model(
         save_dir, r_training_id
     )
+    results = {}
     if attack_config["attack"]:
 
         results = {}
@@ -227,9 +223,12 @@ def main(
             print(f"\nPerforming {attack_type} attack")
 
             attack_config["attack_type"] = attack_type
-            attack_config["epsilon_range"] = get_epsilon_range(
+            if attack_config["epsilon_range"]:
+                continue
+            else:
+                attack_config["epsilon_range"] = get_epsilon_range(
                 task_config["task"], attack_type
-            )
+                )
 
             result = attack_resnet(
                 data_dir,
