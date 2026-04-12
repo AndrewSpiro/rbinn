@@ -2,9 +2,32 @@
 This repository extends the original implementation to automate multiple seeded training and evaluation runs.
 
 ## Quick Start
+In your root, run
+```bash
+git clone https://github.com/elieattias1/pixel-reg.git # todo: update with my own repo
+cd pixel-reg/
+```
+
 I have provied an `environment.yml` which contains the exact versions used in this thesis.
 
 To recreate the environment:
+
+For ALICE:
+```bash
+module load Miniconda3/24.7.1-0
+conda init
+```
+
+Then restart the shell and run
+```bash
+conda ---version
+```
+output should be 
+```bash
+conda 24.7.1
+```
+
+From `pixel-reg`, run
 ```bash
 conda env create -f environment.yml
 conda activate pixelreg
