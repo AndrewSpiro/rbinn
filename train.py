@@ -166,7 +166,7 @@ def main(
             save_progress()
 
         if finished:
-            print(f"training {r_training_id} finishes")
+            print(f"training {r_training_id} finishes in {time.time()-t_start} seconds")
             break
 
         tic_epoch = time.time()

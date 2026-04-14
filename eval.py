@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import os, time
 import utils
+import json
+import torch
 
 from dotenv import load_dotenv
 
@@ -137,5 +139,18 @@ if __name__ == "__main__":
     r_training_id, accuracies = main(*config)
     print(f"Completed attacks on training id: {r_training_id}")
     print(f"accuracies: {accuracies}")
+    acc_list = {
+        k: v.cpu().numpy().tolist() if isinstance(v, torch.Tensor) else v
+        for k, v in accuracies.items()
+    }
+    save_dir = config[1]
+    attack_config = config[-1]
+    attack_type = attack_config['attack_type']
+    attack_seed = attack_config['attack_seed']
+    results_path = os.path.join(save_dir, f"attack_{attack_type}_seed_{attack_seed}", "results.json")
+
+    with open(results_path, "w") as f:
+        json.dump(acc_list,f)
+
     if wandb_log:
         wandb.finish()

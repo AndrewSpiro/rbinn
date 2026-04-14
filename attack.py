@@ -127,6 +127,11 @@ if __name__ == "__main__":
     data_dir, save_dir, train_config, task_config, reg_config, attack_config = (
         get_configs("attack_resnet", parser.parse_args())
     )
+
+    current_seed = train_config.get("seed")
+    utils.set_seed(current_seed)
+    print(f"Random seed set to {current_seed}")
+
     # load_dotenv()
     if wandb_log:
         # wandb.login(key=os.environ["WANDB_API_KEY"])
