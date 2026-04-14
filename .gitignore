@@ -378,7 +378,14 @@ data/
 *.csv
 
 #### binn5_vonenet ####
-# also did not have a .gitignore
+**/.vonenet/
+**/build/
+.vscode/
+**/data/
+**/dist/
+**/output_test
+__pycache__/
+**/vonenet.egg-info
 
 #### binn6_unsupvvs ####
 # Byte-compiled / optimized / DLL files
