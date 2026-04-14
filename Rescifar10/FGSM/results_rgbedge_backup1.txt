@@ -1,0 +1,10 @@
+Accuracy of original model on clean images: 0.754200 
+eps_t=8 
+Accuracy of clean model on adversarial images: 0.393300 
+Accuracy of clean model on adversarial images with redetect_edge: 0.388400 
+Accuracy of robust model on clean images: 0.747200 
+Accuracy of robust model on adversarial images: 0.535300 
+Accuracy of robust  model on adversarial images with redetect_edge: 0.543500 
+Accuracy of robust redetect model on clean images: 0.725000 
+Accuracy of robust redetect  model on adversarial images: 0.523800 
+Accuracy of robust redetect model on adversarial images with redetect_edge: 0.562500 

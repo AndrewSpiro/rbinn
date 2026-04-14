@@ -1,0 +1,28 @@
+Accuracy of original model on clean images: 0.887200 
+eps_t=8 
+Accuracy of clean model on adversarial images: 0.322300 
+Accuracy of clean model on adversarial images with redetect_edge: 0.296300 
+Accuracy of robust model on clean images: 0.855100 
+Accuracy of robust model on adversarial images: 0.622100 
+Accuracy of robust  model on adversarial images with redetect_edge: 0.640300 
+Accuracy of robust redetect model on clean images: 0.846100 
+Accuracy of robust redetect  model on adversarial images: 0.586500 
+Accuracy of robust redetect model on adversarial images with redetect_edge: 0.663000 
+eps_t=32 
+Accuracy of clean model on adversarial images: 0.237700 
+Accuracy of clean model on adversarial images with redetect_edge: 0.223600 
+Accuracy of robust model on clean images: 0.819100 
+Accuracy of robust model on adversarial images: 0.475900 
+Accuracy of robust  model on adversarial images with redetect_edge: 0.403800 
+Accuracy of robust redetect model on clean images: 0.828300 
+Accuracy of robust redetect  model on adversarial images: 0.460100 
+Accuracy of robust redetect model on adversarial images with redetect_edge: 0.490500 
+eps_t=64 
+Accuracy of clean model on adversarial images: 0.204000 
+Accuracy of clean model on adversarial images with redetect_edge: 0.178800 
+Accuracy of robust model on clean images: 0.786100 
+Accuracy of robust model on adversarial images: 0.390300 
+Accuracy of robust  model on adversarial images with redetect_edge: 0.357600 
+Accuracy of robust redetect model on clean images: 0.806700 
+Accuracy of robust redetect  model on adversarial images: 0.334700 
+Accuracy of robust redetect model on adversarial images with redetect_edge: 0.393100 

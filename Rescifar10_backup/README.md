@@ -1,0 +1,1 @@
+this is the original output from running (i think) python train.py --net_type rgbedge --model cifar10 --sigmas 8 32 64  --data_dir cifar10  --classes 10 --epochs 10 --inp_size 28

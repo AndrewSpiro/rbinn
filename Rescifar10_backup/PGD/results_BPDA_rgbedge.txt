@@ -1,0 +1,8 @@
+eps_t=8 
+ResCIFAR10/PGD/cifar10_rgbedge_8_robust_8.pth 
+eps_t=8 
+ResCIFAR10/PGD/cifar10_rgbedge_8_robust_8_redetect.pth 
+eps_t=32 
+ResCIFAR10/PGD/cifar10_rgbedge_32_robust_32.pth 
+eps_t=32 
+ResCIFAR10/PGD/cifar10_rgbedge_32_robust_32_redetect.pth 
