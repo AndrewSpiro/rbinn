@@ -5,3 +5,5 @@ save/
 __pycache__/
 ./vscode/
 environment_copy.yml
+.venv
+*.onnx
