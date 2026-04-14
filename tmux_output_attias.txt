@@ -1,0 +1,945 @@
+s4015355@u0065015:~/Thesis/pixel-reg$ conda activate pixelreg
+(pixelreg) s4015355@u0065015:~/Thesis/pixel-reg$ python train.py --task=CIFAR10 --archi=ResNet18 --reg_data=CIFAR1
+0 --reg_alpha=10 --reg_thresh=0.8 --rgb=True --attack=True
+/vol/home/s4015355/.local/lib/python3.10/site-packages/wandb/sdk/launch/builder/build.py:11: UserWarning: pkg_reso
+urces is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources pack
+age is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources
+run_config = {'device': 'cuda', 'disp_num': 6, 'save_period': 1, 'ignore_existing': False}
+
+task_config = {'task': 'CIFAR10', 'rgb': True, 'select_criterion': 'random', 'core_shared': False, 'conditioning':
+ None, 'max_best': 5}
+
+r_model_config = {'archi': 'ResNet18', 'base_channels': 64}
+
+train_config = {'seed': 0, 'valid_portion': 0.01, 'resnet_batch_size': 64, 'lr': 0.1, 'momentum': 0.9, 'weight_dec
+ay': 0, 'phase_num': 5, 'phase_duration': 4, 'decay_rate': 0.3, 'epoch_num': 40}
+
+reg_config = {'reg_thresh': 0.8, 'reg_thresh_2': None, 'reg_range': 'all', 'reg_data': 'CIFAR10', 'reg_boosting':
+True, 'reg_alpha': 10.0, 'reg_image_num': 5000, 'reg_type': 'pixel', 'reg_batch_size': 16, 'reg_grab': False, 'reg
+_boost_val_1': 1.0, 'start_fine_tune': 0, 'fine_tune_epochs': 0, 'reg_boosting_val': 1.0, 'arctanh': True}
+
+attack_config = {'attack': True, 'num_epsilons': 10}
+training id: B7A86935
+classifying : CIFAR10
+Files already downloaded and verified
+regularizing on CIFAR10
+Files already downloaded and verified
+num_images : torch.Size([5000, 3, 32, 32]), range : 0.0, 1.0
+RGB regularization images
+torch.Size([5000, 32, 32])
+pixel representations of images
+similarity matrix built. Has shape : torch.Size([5000, 5000])
+Selecting all indices for regularization.
+proportion of selected indices :  100.0 %
+boosting regularization with threshold : 0.8
+resnet model initialized
+evaluating ...
+train dataset
+cross entropy loss: 2.3026, accuracy:  12.16%
+valid dataset
+cross entropy loss: 2.3027, accuracy:  10.40%
+test dataset
+cross entropy loss: 2.3026, accuracy:  12.26%
+training progress saved
+
+epoch 1
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+/vol/home/s4015355/.conda/envs/pixelreg/lib/python3.10/site-packages/numpy/lib/function_base.py:2854: RuntimeWarni
+ng: invalid value encountered in divide
+  c /= stddev[:, None]
+/vol/home/s4015355/.conda/envs/pixelreg/lib/python3.10/site-packages/numpy/lib/function_base.py:2855: RuntimeWarni
+ng: invalid value encountered in divide
+  c /= stddev[None, :]
+129 ( 16.7%): [cls loss: 2.0163] [acc: 25.00%] [reg loss: 0.0792] [corr:     nan] (0m10.57s)
+258 ( 33.4%): [cls loss: 1.5510] [acc: 34.38%] [reg loss: 0.0143] [corr:     nan] (0m20.62s)
+387 ( 50.0%): [cls loss: 1.9941] [acc: 23.44%] [reg loss: 0.0369] [corr:     nan] (0m30.67s)
+516 ( 66.7%): [cls loss: 1.6049] [acc: 42.19%] [reg loss: 0.0414] [corr:     nan] (0m40.73s)
+645 ( 83.4%): [cls loss: 1.8767] [acc: 31.25%] [reg loss: 0.1041] [corr:     nan] (0m50.80s)
+774 (100.0%): [cls loss: 1.7747] [acc: 25.00%] [reg loss: 0.0669] [corr:     nan] (1m00.83s)
+evaluating ...
+train dataset
+cross entropy loss: 1.6517, accuracy:  38.74%
+valid dataset
+cross entropy loss: 1.5289, accuracy:  45.40%
+test dataset
+cross entropy loss: 1.6115, accuracy:  39.68%
+elapsed time 1m13.39s
+training progress saved
+
+epoch 2
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 1.5778] [acc: 46.88%] [reg loss: 0.0430] [corr:     nan] (0m10.43s)
+258 ( 33.4%): [cls loss: 1.7706] [acc: 40.62%] [reg loss: 0.0798] [corr:     nan] (0m20.50s)
+387 ( 50.0%): [cls loss: 1.6104] [acc: 43.75%] [reg loss: 0.0427] [corr:     nan] (0m30.57s)
+516 ( 66.7%): [cls loss: 1.6540] [acc: 40.62%] [reg loss: 0.0849] [corr:     nan] (0m40.65s)
+645 ( 83.4%): [cls loss: 1.7027] [acc: 43.75%] [reg loss: 0.0212] [corr:     nan] (0m50.73s)
+774 (100.0%): [cls loss: 1.6615] [acc: 50.00%] [reg loss: 0.0595] [corr:     nan] (1m00.78s)
+evaluating ...
+train dataset
+cross entropy loss: 1.4321, accuracy:  48.41%
+valid dataset
+cross entropy loss: 1.3553, accuracy:  52.40%
+test dataset
+cross entropy loss: 1.3715, accuracy:  51.03%
+elapsed time 1m13.33s
+training progress saved
+
+epoch 3
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 1.4235] [acc: 42.19%] [reg loss: 0.0344] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 1.3849] [acc: 53.12%] [reg loss: 0.0225] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 1.2371] [acc: 54.69%] [reg loss: 0.0349] [corr:     nan] (0m30.59s)
+516 ( 66.7%): [cls loss: 1.2129] [acc: 57.81%] [reg loss: 0.0281] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 1.0145] [acc: 65.62%] [reg loss: 0.0219] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 1.2004] [acc: 60.71%] [reg loss: 0.0399] [corr:     nan] (1m00.79s)
+evaluating ...
+train dataset
+cross entropy loss: 1.2541, accuracy:  54.58%
+valid dataset
+cross entropy loss: 1.1720, accuracy:  59.60%
+test dataset
+cross entropy loss: 1.2110, accuracy:  56.25%
+elapsed time 1m13.38s
+training progress saved
+
+epoch 4
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 1.1099] [acc: 62.50%] [reg loss: 0.0247] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 1.1615] [acc: 56.25%] [reg loss: 0.0902] [corr:     nan] (0m20.51s)
+387 ( 50.0%): [cls loss: 1.0478] [acc: 65.62%] [reg loss: 0.0268] [corr:     nan] (0m30.58s)
+516 ( 66.7%): [cls loss: 1.1703] [acc: 65.62%] [reg loss: 0.0175] [corr:     nan] (0m40.66s)
+645 ( 83.4%): [cls loss: 1.1760] [acc: 60.94%] [reg loss: 8.4424] [corr:  0.7536] (0m50.74s)
+774 (100.0%): [cls loss: 1.0254] [acc: 71.43%] [reg loss: 0.0168] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 1.0241, accuracy:  63.62%
+valid dataset
+cross entropy loss: 0.9937, accuracy:  63.20%
+test dataset
+cross entropy loss: 0.9974, accuracy:  64.36%
+elapsed time 1m13.64s
+training progress saved
+
+epoch 5
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 1.0287] [acc: 67.19%] [reg loss: 0.0154] [corr:     nan] (0m10.48s)
+258 ( 33.4%): [cls loss: 1.0676] [acc: 57.81%] [reg loss: 0.0385] [corr:     nan] (0m20.58s)
+387 ( 50.0%): [cls loss: 0.8993] [acc: 67.19%] [reg loss: 0.0578] [corr:     nan] (0m30.69s)
+516 ( 66.7%): [cls loss: 0.8339] [acc: 65.62%] [reg loss: 0.0374] [corr:     nan] (0m40.76s)
+645 ( 83.4%): [cls loss: 0.9445] [acc: 67.19%] [reg loss: 0.0321] [corr:     nan] (0m50.83s)
+774 (100.0%): [cls loss: 0.7225] [acc: 71.43%] [reg loss: 0.0111] [corr:     nan] (1m00.88s)
+evaluating ...
+train dataset
+cross entropy loss: 0.8364, accuracy:  70.39%
+valid dataset
+cross entropy loss: 0.8147, accuracy:  71.00%
+test dataset
+cross entropy loss: 0.8276, accuracy:  70.21%
+elapsed time 1m13.51s
+training progress saved
+
+epoch 6
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.8505] [acc: 62.50%] [reg loss: 0.0141] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.6854] [acc: 79.69%] [reg loss: 0.0320] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.7003] [acc: 71.88%] [reg loss: 0.0421] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.8613] [acc: 67.19%] [reg loss: 0.0328] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.8475] [acc: 70.31%] [reg loss: 0.0265] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.8106] [acc: 67.86%] [reg loss: 8.1318] [corr:  0.7177] (1m00.79s)
+evaluating ...
+train dataset
+cross entropy loss: 0.7821, accuracy:  72.32%
+valid dataset
+cross entropy loss: 0.7686, accuracy:  72.20%
+test dataset
+cross entropy loss: 0.7753, accuracy:  72.38%
+elapsed time 1m13.43s
+training progress saved
+
+epoch 7
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.6732] [acc: 75.00%] [reg loss: 0.0271] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.7014] [acc: 84.38%] [reg loss: 0.0268] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.5384] [acc: 82.81%] [reg loss: 0.0288] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.6628] [acc: 73.44%] [reg loss: 0.0220] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.7271] [acc: 81.25%] [reg loss: 0.0260] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 0.6023] [acc: 78.57%] [reg loss: 0.0437] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.7310, accuracy:  74.32%
+valid dataset
+cross entropy loss: 0.7616, accuracy:  73.20%
+test dataset
+cross entropy loss: 0.7586, accuracy:  73.26%
+elapsed time 1m13.38s
+training progress saved
+
+epoch 8
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.7536] [acc: 71.88%] [reg loss: 0.0351] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.6697] [acc: 75.00%] [reg loss: 0.0310] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.8985] [acc: 68.75%] [reg loss: 0.0126] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.6668] [acc: 73.44%] [reg loss: 9.0738] [corr:  0.2546] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.6646] [acc: 79.69%] [reg loss: 0.0633] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 1.0792] [acc: 53.57%] [reg loss: 0.0144] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.6822, accuracy:  76.03%
+valid dataset
+cross entropy loss: 0.7090, accuracy:  75.20%
+test dataset
+cross entropy loss: 0.7109, accuracy:  75.54%
+elapsed time 1m13.41s
+training progress saved
+
+epoch 9
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.7184] [acc: 78.12%] [reg loss: 0.0192] [corr:     nan] (0m10.46s)
+258 ( 33.4%): [cls loss: 0.6475] [acc: 73.44%] [reg loss: 0.0190] [corr:     nan] (0m20.54s)
+387 ( 50.0%): [cls loss: 0.5711] [acc: 82.81%] [reg loss: 0.0233] [corr:     nan] (0m30.63s)
+516 ( 66.7%): [cls loss: 0.6719] [acc: 76.56%] [reg loss: 0.0436] [corr:     nan] (0m40.70s)
+645 ( 83.4%): [cls loss: 0.6288] [acc: 79.69%] [reg loss: 0.0186] [corr:     nan] (0m50.79s)
+774 (100.0%): [cls loss: 0.8213] [acc: 78.57%] [reg loss: 0.0170] [corr:     nan] (1m00.85s)
+evaluating ...
+train dataset
+cross entropy loss: 0.5903, accuracy:  79.41%
+valid dataset
+cross entropy loss: 0.6405, accuracy:  75.40%
+test dataset
+cross entropy loss: 0.6364, accuracy:  78.23%
+elapsed time 1m13.45s
+training progress saved
+
+epoch 10
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.3774] [acc: 87.50%] [reg loss: 0.0300] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.5253] [acc: 81.25%] [reg loss: 0.0336] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.6455] [acc: 76.56%] [reg loss: 0.0492] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 1.0384] [acc: 64.06%] [reg loss: 0.0314] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.6902] [acc: 73.44%] [reg loss: 0.0400] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 0.7613] [acc: 71.43%] [reg loss: 0.0216] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.5766, accuracy:  79.52%
+valid dataset
+cross entropy loss: 0.6530, accuracy:  76.80%
+test dataset
+cross entropy loss: 0.6273, accuracy:  78.00%
+elapsed time 1m13.39s
+training progress saved
+
+epoch 11
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.4500] [acc: 82.81%] [reg loss: 0.0249] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.5876] [acc: 78.12%] [reg loss: 0.0176] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.5653] [acc: 79.69%] [reg loss: 0.0125] [corr:     nan] (0m30.59s)
+516 ( 66.7%): [cls loss: 0.6829] [acc: 76.56%] [reg loss: 0.0201] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.6257] [acc: 79.69%] [reg loss: 0.0218] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.9890] [acc: 67.86%] [reg loss: 0.0272] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.5568, accuracy:  80.45%
+valid dataset
+cross entropy loss: 0.6340, accuracy:  77.00%
+test dataset
+cross entropy loss: 0.6289, accuracy:  78.08%
+elapsed time 1m13.44s
+training progress saved
+
+epoch 12
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.7530] [acc: 71.88%] [reg loss: 0.0084] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.6078] [acc: 81.25%] [reg loss: 0.0232] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.7508] [acc: 73.44%] [reg loss: 0.0217] [corr:     nan] (0m30.59s)
+516 ( 66.7%): [cls loss: 0.4652] [acc: 81.25%] [reg loss: 0.0189] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.3735] [acc: 85.94%] [reg loss: 0.0096] [corr:     nan] (0m50.74s)
+774 (100.0%): [cls loss: 0.9964] [acc: 82.14%] [reg loss: 0.0152] [corr:     nan] (1m00.78s)
+evaluating ...
+train dataset
+cross entropy loss: 0.5406, accuracy:  80.91%
+valid dataset
+cross entropy loss: 0.6384, accuracy:  77.60%
+test dataset
+cross entropy loss: 0.6196, accuracy:  78.74%
+elapsed time 1m13.39s
+training progress saved
+
+epoch 13
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.4809] [acc: 82.81%] [reg loss: 0.0052] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.3406] [acc: 87.50%] [reg loss: 0.0252] [corr:     nan] (0m20.54s)
+387 ( 50.0%): [cls loss: 0.6632] [acc: 79.69%] [reg loss: 0.0271] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.5752] [acc: 84.38%] [reg loss: 0.0234] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.7303] [acc: 73.44%] [reg loss: 0.0266] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 0.6150] [acc: 67.86%] [reg loss: 0.0209] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4984, accuracy:  82.31%
+valid dataset
+cross entropy loss: 0.6033, accuracy:  78.80%
+test dataset
+cross entropy loss: 0.5887, accuracy:  79.81%
+elapsed time 1m13.39s
+training progress saved
+
+epoch 14
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.5263] [acc: 79.69%] [reg loss: 0.0254] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.6232] [acc: 75.00%] [reg loss: 0.0346] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.5731] [acc: 79.69%] [reg loss: 0.0228] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.4747] [acc: 81.25%] [reg loss: 0.0270] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.4824] [acc: 84.38%] [reg loss: 0.0183] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.2738] [acc: 89.29%] [reg loss: 0.0218] [corr:     nan] (1m00.82s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4860, accuracy:  82.87%
+valid dataset
+cross entropy loss: 0.6141, accuracy:  78.80%
+test dataset
+cross entropy loss: 0.5869, accuracy:  79.90%
+elapsed time 1m13.42s
+training progress saved
+
+epoch 15
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.5030] [acc: 82.81%] [reg loss: 0.0533] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.5182] [acc: 85.94%] [reg loss: 0.0278] [corr:     nan] (0m20.50s)
+387 ( 50.0%): [cls loss: 0.5097] [acc: 82.81%] [reg loss: 0.0210] [corr:     nan] (0m30.58s)
+516 ( 66.7%): [cls loss: 0.5676] [acc: 76.56%] [reg loss: 0.0208] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.4713] [acc: 81.25%] [reg loss: 0.0303] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.5917] [acc: 75.00%] [reg loss: 0.0813] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4735, accuracy:  83.28%
+valid dataset
+cross entropy loss: 0.5917, accuracy:  79.60%
+test dataset
+cross entropy loss: 0.5834, accuracy:  80.13%
+elapsed time 1m13.42s
+training progress saved
+
+epoch 16
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.5197] [acc: 84.38%] [reg loss: 0.0191] [corr:     nan] (0m10.43s)
+258 ( 33.4%): [cls loss: 0.5354] [acc: 81.25%] [reg loss: 8.1215] [corr:  0.9200] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.5160] [acc: 84.38%] [reg loss: 0.0241] [corr:     nan] (0m30.59s)
+516 ( 66.7%): [cls loss: 0.6082] [acc: 81.25%] [reg loss: 0.0325] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.5693] [acc: 84.38%] [reg loss: 0.0294] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.6890] [acc: 75.00%] [reg loss: 0.0680] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4751, accuracy:  83.14%
+valid dataset
+cross entropy loss: 0.5972, accuracy:  79.40%
+test dataset
+cross entropy loss: 0.5819, accuracy:  79.96%
+elapsed time 1m13.41s
+training progress saved
+
+epoch 17
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.5760] [acc: 75.00%] [reg loss: 0.0493] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.4606] [acc: 82.81%] [reg loss: 0.0615] [corr:     nan] (0m20.50s)
+387 ( 50.0%): [cls loss: 0.4304] [acc: 85.94%] [reg loss: 0.0311] [corr:     nan] (0m30.58s)
+516 ( 66.7%): [cls loss: 0.3937] [acc: 81.25%] [reg loss: 0.0234] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.5184] [acc: 84.38%] [reg loss: 0.0832] [corr:     nan] (0m50.77s)
+774 (100.0%): [cls loss: 0.6438] [acc: 75.00%] [reg loss: 0.0203] [corr:     nan] (1m00.83s)
+evaluating ...
+train dataset
+^[[Bcross entropy loss: 0.4554, accuracy:  83.89%
+valid dataset
+cross entropy loss: 0.5945, accuracy:  79.40%
+test dataset
+cross entropy loss: 0.5723, accuracy:  80.34%
+elapsed time 1m13.74s
+training progress saved
+
+epoch 18
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.5354] [acc: 81.25%] [reg loss: 0.0456] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.5622] [acc: 78.12%] [reg loss: 0.0286] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.4052] [acc: 84.38%] [reg loss: 0.0481] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.3831] [acc: 87.50%] [reg loss: 0.0626] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.3125] [acc: 90.62%] [reg loss: 0.0588] [corr:     nan] (0m50.74s)
+774 (100.0%): [cls loss: 0.4770] [acc: 85.71%] [reg loss: 0.0177] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4557, accuracy:  83.73%
+valid dataset
+cross entropy loss: 0.5990, accuracy:  79.00%
+test dataset
+cross entropy loss: 0.5709, accuracy:  80.58%
+elapsed time 1m13.43s
+training progress saved
+
+epoch 19
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.3578] [acc: 85.94%] [reg loss: 0.0486] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.4027] [acc: 85.94%] [reg loss: 0.0449] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.5169] [acc: 82.81%] [reg loss: 8.4256] [corr:  0.5257] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.5434] [acc: 87.50%] [reg loss: 0.0160] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.4473] [acc: 89.06%] [reg loss: 0.0336] [corr:     nan] (0m50.74s)
+774 (100.0%): [cls loss: 0.2884] [acc: 89.29%] [reg loss: 0.0317] [corr:     nan] (1m00.79s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4488, accuracy:  84.14%
+valid dataset
+cross entropy loss: 0.5933, accuracy:  79.20%
+test dataset
+cross entropy loss: 0.5702, accuracy:  80.47%
+elapsed time 1m13.44s
+training progress saved
+
+epoch 20
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.4364] [acc: 84.38%] [reg loss: 0.0269] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.5167] [acc: 81.25%] [reg loss: 0.0284] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.5021] [acc: 81.25%] [reg loss: 0.0268] [corr:     nan] (0m30.59s)
+516 ( 66.7%): [cls loss: 0.4740] [acc: 82.81%] [reg loss: 0.0208] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.4246] [acc: 84.38%] [reg loss: 0.0354] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.5189] [acc: 82.14%] [reg loss: 0.0338] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.4485, accuracy:  84.08%
+valid dataset
+cross entropy loss: 0.6003, accuracy:  78.80%
+test dataset
+cross entropy loss: 0.5650, accuracy:  80.48%
+elapsed time 1m13.44s
+training progress saved
+
+epoch 21
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.9492] [acc: 75.00%] [reg loss: 0.0165] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 1.0037] [acc: 62.50%] [reg loss: 0.0493] [corr:     nan] (0m20.51s)
+387 ( 50.0%): [cls loss: 0.6860] [acc: 75.00%] [reg loss: 0.0118] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.7595] [acc: 67.19%] [reg loss: 0.0217] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.5618] [acc: 79.69%] [reg loss: 0.0112] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.8310] [acc: 64.29%] [reg loss: 0.0196] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.7296, accuracy:  74.39%
+valid dataset
+cross entropy loss: 0.7753, accuracy:  73.60%
+test dataset
+cross entropy loss: 0.7616, accuracy:  73.97%
+elapsed time 1m13.44s
+training progress saved
+
+epoch 22
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.6919] [acc: 73.44%] [reg loss: 0.0398] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.7713] [acc: 73.44%] [reg loss: 0.0579] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.6923] [acc: 75.00%] [reg loss: 8.5440] [corr:  0.6012] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.8043] [acc: 78.12%] [reg loss: 0.0231] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.6639] [acc: 82.81%] [reg loss: 0.0403] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.4688] [acc: 92.86%] [reg loss: 0.0250] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.6455, accuracy:  77.50%
+valid dataset
+cross entropy loss: 0.6910, accuracy:  76.00%
+test dataset
+cross entropy loss: 0.7062, accuracy:  76.16%
+elapsed time 1m13.49s
+training progress saved
+
+epoch 23
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.6171] [acc: 76.56%] [reg loss: 0.0414] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.6702] [acc: 79.69%] [reg loss: 0.0577] [corr:     nan] (0m20.51s)
+387 ( 50.0%): [cls loss: 0.7323] [acc: 76.56%] [reg loss: 0.0220] [corr:     nan] (0m30.59s)
+516 ( 66.7%): [cls loss: 0.5753] [acc: 81.25%] [reg loss: 0.0212] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.5458] [acc: 79.69%] [reg loss: 0.0303] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 0.7733] [acc: 71.43%] [reg loss: 0.0103] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.5664, accuracy:  80.05%
+valid dataset
+cross entropy loss: 0.7020, accuracy:  77.60%
+test dataset
+cross entropy loss: 0.6190, accuracy:  79.01%
+elapsed time 1m13.47s
+training progress saved
+
+epoch 24
+learning rate 0.1
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.6107] [acc: 85.94%] [reg loss: 0.0191] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.6860] [acc: 79.69%] [reg loss: 0.0243] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.7225] [acc: 73.44%] [reg loss: 0.0423] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.7048] [acc: 78.12%] [reg loss: 0.0089] [corr:     nan] (0m40.69s)
+645 ( 83.4%): [cls loss: 0.3607] [acc: 89.06%] [reg loss: 0.0189] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.7359] [acc: 71.43%] [reg loss: 0.0127] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.5599, accuracy:  80.23%
+valid dataset
+cross entropy loss: 0.6217, accuracy:  79.20%
+test dataset
+cross entropy loss: 0.6395, accuracy:  77.88%
+elapsed time 1m13.46s
+training progress saved
+
+epoch 25
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.6115] [acc: 81.25%] [reg loss: 0.0335] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.3622] [acc: 87.50%] [reg loss: 0.0415] [corr:     nan] (0m20.51s)
+387 ( 50.0%): [cls loss: 0.5342] [acc: 81.25%] [reg loss: 0.0277] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.6186] [acc: 79.69%] [reg loss: 0.0226] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.5914] [acc: 79.69%] [reg loss: 0.0290] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.3620] [acc: 89.29%] [reg loss: 0.0655] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.3866, accuracy:  86.37%
+valid dataset
+cross entropy loss: 0.5254, accuracy:  81.00%
+test dataset
+cross entropy loss: 0.4882, accuracy:  83.18%
+elapsed time 1m13.46s
+training progress saved
+
+epoch 26
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.4028] [acc: 89.06%] [reg loss: 0.0266] [corr:     nan] (0m10.46s)
+258 ( 33.4%): [cls loss: 0.3989] [acc: 81.25%] [reg loss: 0.0141] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.3937] [acc: 89.06%] [reg loss: 0.0158] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.1747] [acc: 95.31%] [reg loss: 0.0382] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.3227] [acc: 85.94%] [reg loss: 0.0079] [corr:     nan] (0m50.77s)
+774 (100.0%): [cls loss: 0.5205] [acc: 82.14%] [reg loss: 0.0397] [corr:     nan] (1m00.82s)
+evaluating ...
+train dataset
+cross entropy loss: 0.3546, accuracy:  87.48%
+valid dataset
+cross entropy loss: 0.5284, accuracy:  81.40%
+test dataset
+cross entropy loss: 0.4735, accuracy:  83.77%
+elapsed time 1m13.49s
+training progress saved
+
+epoch 27
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.3177] [acc: 87.50%] [reg loss: 0.0335] [corr:     nan] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.2583] [acc: 87.50%] [reg loss: 0.0328] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.5431] [acc: 81.25%] [reg loss: 0.0160] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.5493] [acc: 82.81%] [reg loss: 0.0188] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.3218] [acc: 89.06%] [reg loss: 0.0203] [corr:     nan] (0m50.77s)
+774 (100.0%): [cls loss: 0.3604] [acc: 85.71%] [reg loss: 0.0719] [corr:     nan] (1m00.82s)
+evaluating ...
+train dataset
+cross entropy loss: 0.3358, accuracy:  88.18%
+valid dataset
+cross entropy loss: 0.5410, accuracy:  84.20%
+test dataset
+cross entropy loss: 0.4784, accuracy:  84.27%
+elapsed time 1m13.46s
+training progress saved
+
+epoch 28
+learning rate 0.03
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.3539] [acc: 85.94%] [reg loss: 0.0388] [corr:     nan] (0m10.46s)
+258 ( 33.4%): [cls loss: 0.2642] [acc: 90.62%] [reg loss: 0.0152] [corr:     nan] (0m20.54s)
+^[[A^[[A^[[A^[[A^[[A387 ( 50.0%): [cls loss: 0.2152] [acc: 96.88%] [reg loss: 0.0665] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.3055] [acc: 92.19%] [reg loss: 0.0869] [corr:     nan] (0m40.70s)
+645 ( 83.4%): [cls loss: 0.4782] [acc: 85.94%] [reg loss: 0.0159] [corr:     nan] (0m50.78s)
+774 (100.0%): [cls loss: 0.4840] [acc: 78.57%] [reg loss: 0.0241] [corr:     nan] (1m00.82s)
+evaluating ...
+train dataset
+cross entropy loss: 0.3244, accuracy:  88.71%
+valid dataset
+cross entropy loss: 0.5171, accuracy:  82.60%
+test dataset
+cross entropy loss: 0.4676, accuracy:  84.35%
+elapsed time 1m13.48s
+training progress saved
+
+epoch 29
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.3156] [acc: 90.62%] [reg loss: 0.0208] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.3473] [acc: 85.94%] [reg loss: 0.0256] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.3222] [acc: 87.50%] [reg loss: 0.0426] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.2914] [acc: 93.75%] [reg loss: 0.0564] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.4038] [acc: 84.38%] [reg loss: 0.0208] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.4076] [acc: 82.14%] [reg loss: 0.0620] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2745, accuracy:  90.25%
+valid dataset
+cross entropy loss: 0.5182, accuracy:  82.60%
+test dataset
+cross entropy loss: 0.4450, accuracy:  85.27%
+elapsed time 1m13.46s
+training progress saved
+
+epoch 30
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.3716] [acc: 89.06%] [reg loss: 0.0362] [corr:     nan] (0m10.47s)
+258 ( 33.4%): [cls loss: 0.2772] [acc: 89.06%] [reg loss: 0.0249] [corr:     nan] (0m20.56s)
+387 ( 50.0%): [cls loss: 0.4821] [acc: 84.38%] [reg loss: 0.0346] [corr:     nan] (0m30.65s)
+516 ( 66.7%): [cls loss: 0.2758] [acc: 92.19%] [reg loss: 0.0229] [corr:     nan] (0m40.75s)
+645 ( 83.4%): [cls loss: 0.2179] [acc: 93.75%] [reg loss: 0.0249] [corr:     nan] (0m50.84s)
+774 (100.0%): [cls loss: 0.1240] [acc: 92.86%] [reg loss: 0.0228] [corr:     nan] (1m00.89s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2603, accuracy:  90.80%
+valid dataset
+cross entropy loss: 0.5033, accuracy:  84.00%
+test dataset
+cross entropy loss: 0.4451, accuracy:  85.52%
+elapsed time 1m13.60s
+training progress saved
+
+epoch 31
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.2994] [acc: 85.94%] [reg loss: 0.0280] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.2747] [acc: 90.62%] [reg loss: 0.0127] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.2727] [acc: 89.06%] [reg loss: 0.0140] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.2977] [acc: 87.50%] [reg loss: 0.0182] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.2280] [acc: 90.62%] [reg loss: 0.0133] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 0.1833] [acc: 96.43%] [reg loss: 7.2012] [corr:  0.7907] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2472, accuracy:  91.40%
+valid dataset
+cross entropy loss: 0.4901, accuracy:  84.40%
+test dataset
+cross entropy loss: 0.4321, accuracy:  85.56%
+elapsed time 1m13.53s
+training progress saved
+
+epoch 32
+learning rate 0.009
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.2776] [acc: 89.06%] [reg loss: 8.3491] [corr:  0.5601] (0m10.44s)
+258 ( 33.4%): [cls loss: 0.3624] [acc: 84.38%] [reg loss: 0.0200] [corr:     nan] (0m20.51s)
+387 ( 50.0%): [cls loss: 0.4335] [acc: 85.94%] [reg loss: 0.0153] [corr:     nan] (0m30.58s)
+516 ( 66.7%): [cls loss: 0.1506] [acc: 96.88%] [reg loss: 0.0386] [corr:     nan] (0m40.65s)
+645 ( 83.4%): [cls loss: 0.1896] [acc: 90.62%] [reg loss: 0.0343] [corr:     nan] (0m50.73s)
+774 (100.0%): [cls loss: 0.2081] [acc: 92.86%] [reg loss: 7.9737] [corr:  0.8005] (1m00.77s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2428, accuracy:  91.33%
+valid dataset
+cross entropy loss: 0.5185, accuracy:  83.60%
+test dataset
+cross entropy loss: 0.4374, accuracy:  85.66%
+elapsed time 1m13.48s
+training progress saved
+
+epoch 33
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.1736] [acc: 92.19%] [reg loss: 0.0241] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.1002] [acc: 96.88%] [reg loss: 0.0572] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.1786] [acc: 90.62%] [reg loss: 0.0169] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.3132] [acc: 89.06%] [reg loss: 0.0252] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.2870] [acc: 90.62%] [reg loss: 0.0552] [corr:     nan] (0m50.77s)
+774 (100.0%): [cls loss: 0.1978] [acc: 89.29%] [reg loss: 0.0345] [corr:     nan] (1m00.83s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2326, accuracy:  91.84%
+valid dataset
+cross entropy loss: 0.5174, accuracy:  83.40%
+test dataset
+cross entropy loss: 0.4383, accuracy:  85.84%
+elapsed time 1m13.51s
+training progress saved
+
+epoch 34
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.1837] [acc: 95.31%] [reg loss: 0.0219] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.5332] [acc: 81.25%] [reg loss: 0.0429] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.2817] [acc: 89.06%] [reg loss: 0.0197] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.2246] [acc: 93.75%] [reg loss: 0.0162] [corr:     nan] (0m40.69s)
+645 ( 83.4%): [cls loss: 0.2415] [acc: 92.19%] [reg loss: 8.6383] [corr:  0.4425] (0m50.77s)
+774 (100.0%): [cls loss: 0.1183] [acc: 96.43%] [reg loss: 0.0492] [corr:     nan] (1m00.82s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2221, accuracy:  92.25%
+valid dataset
+cross entropy loss: 0.5162, accuracy:  83.60%
+test dataset
+cross entropy loss: 0.4329, accuracy:  85.87%
+elapsed time 1m13.51s
+training progress saved
+
+epoch 35
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.2239] [acc: 93.75%] [reg loss: 0.0257] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.3185] [acc: 90.62%] [reg loss: 7.0916] [corr:  0.8698] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.3269] [acc: 84.38%] [reg loss: 0.0100] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.2258] [acc: 89.06%] [reg loss: 0.0615] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.3320] [acc: 92.19%] [reg loss: 0.0284] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.1784] [acc: 96.43%] [reg loss: 0.0401] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2194, accuracy:  92.40%
+valid dataset
+cross entropy loss: 0.5187, accuracy:  83.00%
+test dataset
+cross entropy loss: 0.4317, accuracy:  85.85%
+elapsed time 1m13.46s
+training progress saved
+
+epoch 36
+learning rate 0.0027
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.1876] [acc: 92.19%] [reg loss: 0.0165] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.2495] [acc: 92.19%] [reg loss: 0.0364] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.1394] [acc: 93.75%] [reg loss: 8.2217] [corr:  0.6843] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.2006] [acc: 93.75%] [reg loss: 0.0251] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.3233] [acc: 84.38%] [reg loss: 0.0175] [corr:     nan] (0m50.74s)
+774 (100.0%): [cls loss: 0.2138] [acc: 96.43%] [reg loss: 0.0105] [corr:     nan] (1m00.79s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2161, accuracy:  92.39%
+valid dataset
+cross entropy loss: 0.5044, accuracy:  84.60%
+test dataset
+cross entropy loss: 0.4285, accuracy:  86.23%
+elapsed time 1m13.46s
+training progress saved
+
+epoch 37
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.1927] [acc: 92.19%] [reg loss: 0.0158] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.2723] [acc: 90.62%] [reg loss: 0.0210] [corr:     nan] (0m20.53s)
+387 ( 50.0%): [cls loss: 0.4399] [acc: 84.38%] [reg loss: 0.0306] [corr:     nan] (0m30.60s)
+516 ( 66.7%): [cls loss: 0.2555] [acc: 85.94%] [reg loss: 0.0167] [corr:     nan] (0m40.67s)
+645 ( 83.4%): [cls loss: 0.2117] [acc: 90.62%] [reg loss: 0.0072] [corr:     nan] (0m50.75s)
+774 (100.0%): [cls loss: 0.3153] [acc: 85.71%] [reg loss: 0.0205] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2122, accuracy:  92.55%
+valid dataset
+cross entropy loss: 0.5063, accuracy:  85.00%
+test dataset
+cross entropy loss: 0.4299, accuracy:  86.22%
+elapsed time 1m13.50s
+training progress saved
+
+epoch 38
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.2758] [acc: 87.50%] [reg loss: 0.0336] [corr:     nan] (0m10.46s)
+258 ( 33.4%): [cls loss: 0.2748] [acc: 90.62%] [reg loss: 0.0416] [corr:     nan] (0m20.54s)
+387 ( 50.0%): [cls loss: 0.2179] [acc: 93.75%] [reg loss: 0.0422] [corr:     nan] (0m30.62s)
+516 ( 66.7%): [cls loss: 0.2230] [acc: 93.75%] [reg loss: 0.0155] [corr:     nan] (0m40.69s)
+645 ( 83.4%): [cls loss: 0.2700] [acc: 92.19%] [reg loss: 0.0227] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.3000] [acc: 82.14%] [reg loss: 0.0142] [corr:     nan] (1m00.80s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2116, accuracy:  92.62%
+valid dataset
+cross entropy loss: 0.5014, accuracy:  84.40%
+test dataset
+cross entropy loss: 0.4251, accuracy:  86.19%
+elapsed time 1m13.48s
+training progress saved
+
+epoch 39
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.2198] [acc: 93.75%] [reg loss: 0.0477] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.3841] [acc: 84.38%] [reg loss: 0.0102] [corr:     nan] (0m20.54s)
+387 ( 50.0%): [cls loss: 0.0877] [acc: 96.88%] [reg loss: 0.0137] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.2107] [acc: 89.06%] [reg loss: 0.0232] [corr:     nan] (0m40.68s)
+645 ( 83.4%): [cls loss: 0.2147] [acc: 90.62%] [reg loss: 0.0067] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.1693] [acc: 96.43%] [reg loss: 0.0135] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2083, accuracy:  92.81%
+valid dataset
+cross entropy loss: 0.5132, accuracy:  84.40%
+test dataset
+cross entropy loss: 0.4312, accuracy:  86.13%
+elapsed time 1m13.51s
+training progress saved
+
+epoch 40
+learning rate 0.00081
+training ...
+Using Arctanh^2 as regularization criterion
+129 ( 16.7%): [cls loss: 0.2629] [acc: 89.06%] [reg loss: 0.0283] [corr:     nan] (0m10.45s)
+258 ( 33.4%): [cls loss: 0.1096] [acc: 96.88%] [reg loss: 0.0441] [corr:     nan] (0m20.52s)
+387 ( 50.0%): [cls loss: 0.1133] [acc: 96.88%] [reg loss: 0.0287] [corr:     nan] (0m30.61s)
+516 ( 66.7%): [cls loss: 0.2257] [acc: 87.50%] [reg loss: 0.0121] [corr:     nan] (0m40.69s)
+645 ( 83.4%): [cls loss: 0.1205] [acc: 95.31%] [reg loss: 0.0681] [corr:     nan] (0m50.76s)
+774 (100.0%): [cls loss: 0.1311] [acc:100.00%] [reg loss: 0.0445] [corr:     nan] (1m00.81s)
+evaluating ...
+train dataset
+cross entropy loss: 0.2082, accuracy:  92.74%
+valid dataset
+cross entropy loss: 0.5124, accuracy:  83.20%
+test dataset
+cross entropy loss: 0.4380, accuracy:  85.81%
+elapsed time 1m13.49s
+training progress saved
+training B7A86935 finishes
+Model with training id : B7A86935 is being loaded and attacked
+<All keys matched successfully>
+
+Performing Gaussian attack
+Epsilon: 0.0. Total Accuracy: 0.8556
+Epsilon: 0.011111111111111112. Total Accuracy: 0.8564
+Epsilon: 0.022222222222222223. Total Accuracy: 0.8559
+Epsilon: 0.03333333333333333. Total Accuracy: 0.8452
+Epsilon: 0.044444444444444446. Total Accuracy: 0.835
+Epsilon: 0.05555555555555556. Total Accuracy: 0.8215
+Epsilon: 0.06666666666666667. Total Accuracy: 0.8065
+Epsilon: 0.07777777777777778. Total Accuracy: 0.7836
+Epsilon: 0.08888888888888889. Total Accuracy: 0.7501
+Epsilon: 0.1. Total Accuracy: 0.7236
+
+Accuracies under Gaussian attack:  tensor([[0.8556, 0.8564, 0.8559, 0.8452, 0.8350, 0.8215, 0.8065, 0.7836, 0.7501
+,
+         0.7236]])
+
+Function 'attack_resnet' executed in 0 hours, 0 minutes, 24.78 seconds
+
+Performing Uniform attack
+Epsilon: 0.0. Total Accuracy: 0.8556
+Epsilon: 0.011111111111111112. Total Accuracy: 0.8557
+Epsilon: 0.022222222222222223. Total Accuracy: 0.8566
+Epsilon: 0.03333333333333333. Total Accuracy: 0.8572
+Epsilon: 0.044444444444444446. Total Accuracy: 0.8538
+Epsilon: 0.05555555555555556. Total Accuracy: 0.8473
+Epsilon: 0.06666666666666667. Total Accuracy: 0.8424
+Epsilon: 0.07777777777777778. Total Accuracy: 0.8345
+Epsilon: 0.08888888888888889. Total Accuracy: 0.8302
+Epsilon: 0.1. Total Accuracy: 0.8217
+
+Accuracies under Uniform attack:  tensor([[0.8556, 0.8557, 0.8566, 0.8572, 0.8538, 0.8473, 0.8424, 0.8345, 0.8302,
+         0.8217]])
+
+Function 'attack_resnet' executed in 0 hours, 0 minutes, 24.50 seconds
+
+Performing SaltPepper attack
+Epsilon: 0.0. Total Accuracy: 0.8556
+Epsilon: 0.011111111111111112. Total Accuracy: 0.8371
+Epsilon: 0.022222222222222223. Total Accuracy: 0.7992
+Epsilon: 0.03333333333333333. Total Accuracy: 0.7565
+Epsilon: 0.044444444444444446. Total Accuracy: 0.7106
+Epsilon: 0.05555555555555556. Total Accuracy: 0.6682
+Epsilon: 0.06666666666666667. Total Accuracy: 0.6212
+Epsilon: 0.07777777777777778. Total Accuracy: 0.5759
+Epsilon: 0.08888888888888889. Total Accuracy: 0.5271
+Epsilon: 0.1. Total Accuracy: 0.4816
+
+Accuracies under SaltPepper attack:  tensor([[0.8556, 0.8371, 0.7992, 0.7565, 0.7106, 0.6682, 0.6212, 0.5759, 0.52
+71,
+         0.4816]])
+
+Function 'attack_resnet' executed in 0 hours, 0 minutes, 24.59 seconds
+
+Performing BoundaryAttack attack
+10000 images, range : [0.0, 1.0]
+
+Repeat: 0.
+Squared median L2 distance between adversarial and original image per pixel: 0.01668219082057476
+
+
+Repeat: 1.
+Squared median L2 distance between adversarial and original image per pixel: 0.016064763069152832
+
+
+Repeat: 2.
+Squared median L2 distance between adversarial and original image per pixel: 0.016850093379616737
+
+
+Repeat: 3.
+Squared median L2 distance between adversarial and original image per pixel: 0.01604597270488739
+
+
+Repeat: 4.
+Squared median L2 distance between adversarial and original image per pixel: 0.01644327864050865
+
+
+Accuracies under BoundaryAttack attack:  (0.01641726, array([0.01668219, 0.01606476, 0.01685009, 0.01604597, 0.016
+44328],
+      dtype=float32))
+
+Function 'attack_resnet' executed in 0 hours, 18 minutes, 1.44 seconds
+Function 'main' executed in 1 hours, 9 minutes, 18.32 seconds
+training id: B7A86935
+accuracies: {'Gaussian': tensor([[0.8556, 0.8564, 0.8559, 0.8452, 0.8350, 0.8215, 0.8065, 0.7836, 0.7501,
+         0.7236]]), 'Uniform': tensor([[0.8556, 0.8557, 0.8566, 0.8572, 0.8538, 0.8473, 0.8424, 0.8345, 0.8302,
+         0.8217]]), 'SaltPepper': tensor([[0.8556, 0.8371, 0.7992, 0.7565, 0.7106, 0.6682, 0.6212, 0.5759, 0.5271,
+         0.4816]]), 'BoundaryAttack': (0.01641726, array([0.01668219, 0.01606476, 0.01685009, 0.01604597, 0.016443
+28],
+      dtype=float32))}
+(pixelreg) s4015355@u0065015:~/Thesis/pixel-reg$ tmux capture-pane -S -100000
+
