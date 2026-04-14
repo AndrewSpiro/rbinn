@@ -1,0 +1,8 @@
+**/.vonenet/
+**/build/
+.vscode/
+**/data/
+**/dist/
+**/output_test
+__pycache__
+**/vonenet.egg-info
