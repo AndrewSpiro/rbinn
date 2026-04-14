@@ -490,6 +490,9 @@ output
 all_label.pkl
 *octave-workspace*
 
+# other
+**/datasets
+
 #### binn7_neurcotrain ####
 # do not track anything from this folder at all.
 # i am only keeping it for arhcival reasons.
