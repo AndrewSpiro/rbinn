@@ -1,0 +1,85 @@
+(pixelreg) s4015355@u0065078:~/Thesis/pixel-reg$ python train.py --task=CIFAR10 --archi=ResNet18 --reg_data=CIFAR10 --reg_alpha=10 --reg_thresh=0.8 --rgb=True --
+attack=True                                                                                                                                                      
+/vol/home/s4015355/.local/lib/python3.10/site-packages/wandb/sdk/launch/builder/build.py:11: UserWarning: pkg_resources is deprecated as an API. See https://setu
+ptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Se
+tuptools<81.                                                                                                                                                     
+  import pkg_resources                                                                                                                                           
+run_config = {'device': 'cuda', 'disp_num': 6, 'save_period': 1, 'ignore_existing': False}                                                                       
+                                                                                                                                                                 
+task_config = {'task': 'CIFAR10', 'rgb': True, 'select_criterion': 'random', 'core_shared': False, 'conditioning': None, 'max_best': 5}                          
+                                                                                                                                                                 
+r_model_config = {'archi': 'ResNet18', 'base_channels': 64}                                                                                                      
+                                                                                                                                                                 
+train_config = {'seed': 0, 'valid_portion': 0.01, 'resnet_batch_size': 64, 'lr': 0.1, 'momentum': 0.9, 'weight_decay': 0, 'phase_num': 5, 'phase_duration': 4, 'd
+ecay_rate': 0.3, 'epoch_num': 40}                                                                                                                                
+                                                                                                                                                                 
+reg_config = {'reg_thresh': 0.8, 'reg_thresh_2': None, 'reg_range': 'all', 'reg_data': 'CIFAR10', 'reg_boosting': True, 'reg_alpha': 10.0, 'reg_image_num': 5000,
+ 'reg_type': 'pixel', 'reg_batch_size': 16, 'reg_grab': False, 'reg_boost_val_1': 1.0, 'start_fine_tune': 0, 'fine_tune_epochs': 0, 'reg_boosting_val': 1.0, 'arc
+tanh': True}                                                                                                                                                     
+                                                                                                                                                                 
+attack_config = {'attack': True, 'num_epsilons': 10}                                                                                                             
+training id: B7A86935                                                                                                                                            
+Loading pre-trained model: B7A86935                                                                                                                              
+Model with training id : B7A86935 is being loaded and attacked                                                                                                   
+<All keys matched successfully>                                                                                                                                  
+Files already downloaded and verified                                                                                                                            
+Model with training id : B7A86935 is being loaded and attacked
+<All keys matched successfully>                                                                                                                         [29/1153]
+                                                                                                                                                                 
+Performing Gaussian attack                                                                                                                                       
+[0, 0.3]                                                                                                                                                         
+Epsilon: 0.0. Total Accuracy: 0.8556                                                                                                                             
+Epsilon: 0.03333333333333333. Total Accuracy: 0.8477                                                                                                             
+Epsilon: 0.06666666666666667. Total Accuracy: 0.8034                                                                                                             
+Epsilon: 0.1. Total Accuracy: 0.7217                                                                                                                             
+Epsilon: 0.13333333333333333. Total Accuracy: 0.617                                                                                                              
+Epsilon: 0.16666666666666666. Total Accuracy: 0.5177                                                                                                             
+Epsilon: 0.2. Total Accuracy: 0.4136                                                                                                                             
+Epsilon: 0.23333333333333334. Total Accuracy: 0.327                                                                                                              
+Epsilon: 0.26666666666666666. Total Accuracy: 0.2588                                                                                                             
+Epsilon: 0.3. Total Accuracy: 0.2104                                                                                                                             
+                                                                                                                                                                 
+Accuracies under Gaussian attack:  tensor([[0.8556, 0.8477, 0.8034, 0.7217, 0.6170, 0.5177, 0.4136, 0.3270, 0.2588,                                              
+         0.2104]])                                                                                                                                               
+                                                                                                                                                                 
+Function 'attack_resnet' executed in 0 hours, 5 minutes, 4.78 seconds                                                                                            
+                                                                                                                                                                 
+Performing Uniform attack                                                                                                                                        
+Skipping Uniform                                                                                                                                                 
+                                                                                                                                                                 
+Performing SaltPepper attack                                                                                                                                     
+Skipping SaltPepper                                                                                                                                              
+                                                                                                                                                                 
+Performing BoundaryAttack attack                                                                                                                                 
+[0, 0.3]                                                                                                                                                         
+10000 images, range : [0.0, 1.0]                                                                                                                                 
+                              
+Repeat: 0.                              
+Squared median L2 distance between adversarial and original image per pixel: 0.016954153776168823                                                                
+
+
+Repeat: 1.                              
+Squared median L2 distance between adversarial and original image per pixel: 0.016898805275559425                                                                
+
+
+Repeat: 2. 
+Squared median L2 distance between adversarial and original image per pixel: 0.01714165508747101
+
+
+Repeat: 3. 
+Squared median L2 distance between adversarial and original image per pixel: 0.01660190150141716
+
+
+Repeat: 4. 
+Squared median L2 distance between adversarial and original image per pixel: 0.016660412773489952
+
+
+Accuracies under BoundaryAttack attack:  (0.016851384, array([0.01695415, 0.01689881, 0.01714166, 0.0166019 , 0.01666041],
+      dtype=float32)) 
+
+Function 'attack_resnet' executed in 0 hours, 52 minutes, 1.19 seconds
+Function 'main' executed in 0 hours, 57 minutes, 8.51 seconds
+training id: B7A86935
+accuracies: {'Gaussian': tensor([[0.8556, 0.8477, 0.8034, 0.7217, 0.6170, 0.5177, 0.4136, 0.3270, 0.2588,
+         0.2104]]), 'BoundaryAttack': (0.016851384, array([0.01695415, 0.01689881, 0.01714166, 0.0166019 , 0.01666041],
+      dtype=float32))}
