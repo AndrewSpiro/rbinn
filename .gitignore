@@ -373,8 +373,8 @@ __pycache__/
 **/__pycache__/
 data/
 *.pt
-models/CNNF_2_cifar/
-models/CNNF_2_cifar_acs/
+**/models/CNNF_2_cifar/
+**/models/CNNF_2_cifar_acs/
 *.csv
 
 #### binn5_vonenet ####
