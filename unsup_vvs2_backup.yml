@@ -270,4 +270,3 @@ dependencies:
       - y-py==0.6.2
       - ypy-websocket==0.8.4
       - zipp==3.15.0
-prefix: /vol/home/s4015355/.conda/envs/unsup_vvs2
