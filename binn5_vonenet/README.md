@@ -1,3 +1,5 @@
+# Thesis Repro
+* Note on environment: either dapello or vonenet. Delete the wrong one.
 
 # VOneNet: CNNs with a Primary Visual Cortex Front-End
 
