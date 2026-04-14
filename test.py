@@ -32,7 +32,7 @@ def main():
     parser = argparse.ArgumentParser(description='CNNF testing')
     parser.add_argument('--dataset', choices=['cifar10', 'fashion'],
                         default='cifar10', help='the dataset for training the model')
-    parser.add_argument('--test', choices=['average', 'last'],
+    parser.add_argument('--test', choices=['average', 'last','other'],
                         default='average', help='output averaged logits or logits from the last iteration')
     parser.add_argument('--csv-dir', default='results_temp.csv',
                         help='Directory for Saving the Evaluation results')
@@ -55,7 +55,7 @@ def main():
                 transforms.ToTensor(),
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
             ])),
-            batch_size=16, shuffle=False,
+            batch_size=1, shuffle=False,
             num_workers=4, pin_memory=True)
         eps = 0.063
         eps_iter = 0.02
@@ -108,6 +108,7 @@ def main():
     eval = Evaluator(device, model)
     print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
+    return
     # print(f"clean accuracy: {clean_acc}")
     # breakpoint()
     
