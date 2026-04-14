@@ -31,7 +31,9 @@ def run_kmeans(x, nmb_clusters, verbose=False, seed=DEFAULT_SEED):
     # perform the training
     clus.train(x, index)
     _, I = index.search(x, 1)
-    losses = faiss.vector_to_array(clus.obj)
+    # losses = faiss.vector_to_array(clus.obj)
+    # Modern Faiss uses iteration_stats to get the objective values
+    losses = np.array([clus.iteration_stats.at(i).obj for i in range(clus.iteration_stats.size())])
     if verbose:
         print('k-means loss evolution: {0}'.format(losses))
 
@@ -57,7 +59,13 @@ class Kmeans:
         end = time.time()
 
         data = sess.run(self.memory_bank.as_tensor())
-
+        bool_debug = False
+        if bool_debug:
+            breakpoint()
+            print("Debugging")
+            data = data[:1000]
+            self.k = [100]
+        self.k = [1250]*10
         all_lables = []
         for k_idx, each_k in enumerate(self.k):
             # cluster the data
