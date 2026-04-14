@@ -12,6 +12,10 @@ import os
 from torch.optim import lr_scheduler
 from time import time
 
+# hybrid hulz imports
+from hulz.context import *
+from hulz.LocalLearning.src.LocalLearning import FKHL3, KHModel
+# from hulz.LocalLearning import Data
 
 
 def model_dispatcher(whichModel, *argv):
@@ -498,6 +502,16 @@ def build_model_resNet_CIFAR10(net_type='rgb', data_dir='', inp_size='32', n_cla
 
     # Build model
     resnet = models.resnet18(pretrained=True)
+
+    # # Build Hulz model for hybrid testing
+    # hulz_path = "hulz/data/repro/models"
+    # layer_info = torch.load(hulz_path + "/fkhl3_cifar10_pruned.pty")
+    # layer_state_dict = layer_info['model_state_dict']
+    # khlayer = FKHL3(layer_state_dict)
+    # khmodel = KHModel(khlayer, no_classes = 10)
+    # model_info = torch.load(hulz_path + "/khmodel_cifar10_pruned.pty")
+    # khmodel.load_state_dict(model_info)
+    # resnet = khmodel # 
 
     # import pdb; pdb.set_trace()
     if net_type == 'rgb':
