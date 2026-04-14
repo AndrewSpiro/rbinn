@@ -129,7 +129,8 @@ if __name__ == "__main__":
 
     ###############################################
     # GENERATE FIGURE 1
-    plt.style.use(['seaborn-paper', "../stlsheets/IJoCV.mplstyle"]) # load corresponding style sheet
+    # plt.style.use(['seaborn-paper', "../stlsheets/IJoCV.mplstyle"]) # load corresponding style sheet
+    # plt.style.use(['seaborn-paper', "stlsheets/IJoCV.mplstyle"]) # load corresponding style sheet
 
     # load test data sets
     cifar10Test = LpUnitCIFAR10(
@@ -194,6 +195,7 @@ if __name__ == "__main__":
     }
 
     # plot Figure 1
+    print("Plotting Figure 1")
     fig = plt.figure(constrained_layout=True)
     #fig.tight_layout()
     fig.set_figheight(3.3)
@@ -202,6 +204,7 @@ if __name__ == "__main__":
     gs = mpl.gridspec.GridSpec(3, 5, width_ratios=width_ratios, height_ratios=height_ratios)
 
     # plot the image collections
+    print("Plotting the image collections")
     img_ax = fig.add_subplot(gs[0, 0])
     img_ax = plot_model_weights(img_ax, model, Kx=4, Ky=4, x0=190, y0=1)
     img_ax.set_title(r"Raw")
@@ -243,6 +246,7 @@ if __name__ == "__main__":
     spec_ax_2.set_title(r"$\xi(t)$")
 
     # legend
+    print("Creating the legend")
     lines = [
         mpl.lines.Line2D([0], [0], color="#000000", linestyle=":"),
         mpl.lines.Line2D([0], [0], color="#000000", linestyle="-"),
@@ -258,6 +262,7 @@ if __name__ == "__main__":
     fig.text(0.1, 0.9, r"a)", ha='center')
     fig.text(0.35, 0.9, r"b)", ha='center')
     fig.text(0.35, 0.45, r"c)", ha='center')
-
+    print("Saving the figure")
     fig.savefig(figure_path / Path("FigureA1-FKHL3Spectra.eps"))
+    print("Figure saved")
 
