@@ -1,6 +1,7 @@
 # ignore data
 data/**
 *.pth
+old_data/**
 
 # ignore figures
 *.pdf
@@ -183,3 +184,6 @@ tmp
 
 # Jupyter lab/notebook checkpoints
 .ipynb_checkpoints
+
+# Ignore models
+*.onnx
