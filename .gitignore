@@ -386,6 +386,7 @@ data/
 **/output_test
 __pycache__/
 **/vonenet.egg-info
+*.tar
 
 #### binn6_unsupvvs ####
 # Byte-compiled / optimized / DLL files
