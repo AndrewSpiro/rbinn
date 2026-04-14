@@ -8,14 +8,14 @@ python train.py --data 'cifar10' \
                 --clean 'supclean' \
                 --clean-parameter 0.05 \
                 --lr 0.05 \
-                --batch-size 256 \
+                --batch-size 64 \
                 --eps 0.063 \
                 --eps-iter 0.02 \
                 --schedule 'poly' \
                 --epochs 500 \
                 --seed 0 \
                 --grad-clip \
-                --save-model 'CNNF_2_cifar' \
+                --save-model 'CNNF_2_cifar_acs' \
                 --model-dir 'models'
 
 

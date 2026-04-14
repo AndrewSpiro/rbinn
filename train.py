@@ -6,6 +6,21 @@ import random
 import math
 import argparse
 import torch
+
+# version issue- resolving manually -aspiro
+import sys
+def zero_gradients(x):
+    if isinstance(x, torch.Tensor):
+        if x.grad is not None:
+            x.grad.detach_()
+            x.grad.zero_()
+    elif isinstance(x, (list, tuple)):
+        for v in x:
+            zero_gradients(v)
+
+import torch.autograd.gradcheck
+sys.modules['torch.autograd.gradcheck'].zero_gradients = zero_gradients
+
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
