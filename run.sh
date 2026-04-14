@@ -61,14 +61,14 @@
 
 
 
-for S in 8 32 64
-do
-	# python test.py --net_type gray --model FashionMNIST  --sigma 0 --data_dir FashionMNIST --classes 10 --inp_size 28 --load_model ResFashionMNIST/FGSM/mnistfashion_edge_${S}_robust_${S}.pth --attack pgd	
-	# python test.py --net_type gray --model FashionMNIST  --sigma $S --data_dir FashionMNIST --classes 10 --inp_size 28 --load_model ResFashionMNIST/FGSM/mnistfashion_edge_${S}_robust_${S}.pth --attack pgd
-	python test.py --net_type gray --model MNIST  --sigma 0 --data_dir MNIST --classes 10 --inp_size 28 --load_model ResMNIST/FGSM/mnist_edge_${S}_robust_${S}.pth --attack pgd	
-	python test.py --net_type gray --model MNIST  --sigma $S --data_dir MNIST --classes 10 --inp_size 28 --load_model ResMNIST/FGSM/mnist_edge_${S}_robust_${S}.pth --attack pgd
+# for S in 8 32 64
+# do
+# 	# python test.py --net_type gray --model FashionMNIST  --sigma 0 --data_dir FashionMNIST --classes 10 --inp_size 28 --load_model ResFashionMNIST/FGSM/mnistfashion_edge_${S}_robust_${S}.pth --attack pgd	
+# 	# python test.py --net_type gray --model FashionMNIST  --sigma $S --data_dir FashionMNIST --classes 10 --inp_size 28 --load_model ResFashionMNIST/FGSM/mnistfashion_edge_${S}_robust_${S}.pth --attack pgd
+# 	python test.py --net_type gray --model MNIST  --sigma 0 --data_dir MNIST --classes 10 --inp_size 28 --load_model ResMNIST/FGSM/mnist_edge_${S}_robust_${S}.pth --attack pgd	
+# 	python test.py --net_type gray --model MNIST  --sigma $S --data_dir MNIST --classes 10 --inp_size 28 --load_model ResMNIST/FGSM/mnist_edge_${S}_robust_${S}.pth --attack pgd
 
-done	
+# done	
 
 
 # image-grid --folder ./sampleRobustness/ --n 75 --rows 15 --width 1000 --fill -bs 5
