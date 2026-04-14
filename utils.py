@@ -784,9 +784,10 @@ def evaluate(loader, resnet, run_config, task_config):
 
     loss_total, count_total, count_correct = 0.0, 0, 0
     for batch in loader:
-        inputs, labels = preprocess(
-            task_config["task"], batch, device, task=task_config["task"]
-        )
+        # inputs, labels = preprocess(
+        #     task_config["task"], batch, device, task=task_config["task"]
+        # ) andrew: commented out
+        inputs, labels = batch
         inputs = inputs.to(device)
         labels = labels.to(device)
         with torch.no_grad():
@@ -880,12 +881,12 @@ def find_correctly_classified(resnet, loader, task, device):
         for i, batch in enumerate(loader):  # Added enumeration to track the batch index
             X, Y = batch
             # Assuming utils.preprocess is defined and properly processing the input and labels
-            X, Y = preprocess(
-                dataset=task,
-                batch=(X, Y),
-                device=device,
-                task=task,
-            )
+            # X, Y = preprocess(
+            #     dataset=task,
+            #     batch=(X, Y),
+            #     device=device,
+            #     task=task,
+            # ) #  andrew: commented-out
             X, Y = X.to(device), Y.to(device)
 
             # Get model output
@@ -929,10 +930,10 @@ attack_ranges_cifar10 = {
     "BoundaryAttack": None,
 }
 attack_ranges_cifar100 = {
-    "Gaussian": [0, 0.1],
+    "Gaussian": [0, 0.3],
     "Uniform": [0, 0.1],
     "SaltPepper": [0, 0.1],
-    "TransferredFGSM": [0, 0.005],
+    "TransferredFGSM": [0, 0.03],
     "BoundaryAttack": None,
 }
 
