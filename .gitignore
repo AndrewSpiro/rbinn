@@ -369,8 +369,13 @@ dmypy.json
 
 
 #### binn4_cnnf ####
-# did not have a .gitignore
-
+__pycache__/
+**/__pycache__/
+data/
+*.pt
+models/CNNF_2_cifar/
+models/CNNF_2_cifar_acs/
+*.csv
 
 #### binn5_vonenet ####
 # also did not have a .gitignore
