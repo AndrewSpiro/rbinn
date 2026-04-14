@@ -135,3 +135,6 @@ dmypy.json
 
 # models
 *.pth
+
+# hulz integration
+hulz/**
