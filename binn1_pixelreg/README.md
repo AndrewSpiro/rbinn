@@ -4,7 +4,7 @@ This repository extends the original implementation to automate multiple seeded 
 ## Quick Start
 In your root, run
 ```bash
-git clone https://github.com/elieattias1/pixel-reg.git # todo: update with my own repo
+git clone https://github.com/AndrewSpiro/rbinn.git
 cd pixel-reg/
 ```
 
@@ -38,7 +38,6 @@ To reproduce the results, run
 bash repro.sh
 ```
 
-## New Features
 ---
 # A Brain-Inspired Regularizer for Adversarial Robustness
 
