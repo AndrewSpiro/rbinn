@@ -32,7 +32,7 @@ def aggregate_hierarchical(root_dir="save"):
                             hierarchy[t_seed][attack_type] = []
                         hierarchy[t_seed][attack_type].append(runs)
 
-    # 2. Process and Print Stats
+    # Process and Print Stats
     all_train_seed_means = [] # store averages for the final global mean
 
     for t_seed, attacks in hierarchy.items():
@@ -52,7 +52,7 @@ def aggregate_hierarchical(root_dir="save"):
             
             all_train_seed_means.append(means)
 
-    # 3. global average (average of the trainings)
+    # global average (average of the trainings)
     if all_train_seed_means:
         print("\n=== GLOBAL AVERAGE (OVER ALL SEEDS) ===")
         global_transposed = list(zip(*all_train_seed_means))
@@ -62,7 +62,7 @@ def aggregate_hierarchical(root_dir="save"):
         print(f"  Global Means: {[round(m, 4) for m in global_means]}")
         print(f"  Global Stds:  {[round(s, 4) for s in global_stds]}")
 
-    
+        return global_means, global_stds
 
 if __name__ == "__main__":
     aggregate_hierarchical()
