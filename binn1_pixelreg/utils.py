@@ -784,10 +784,10 @@ def evaluate(loader, resnet, run_config, task_config):
 
     loss_total, count_total, count_correct = 0.0, 0, 0
     for batch in loader:
-        # inputs, labels = preprocess(
-        #     task_config["task"], batch, device, task=task_config["task"]
-        # ) andrew: commented out
-        inputs, labels = batch
+        inputs, labels = preprocess(
+            task_config["task"], batch, device, task=task_config["task"]
+        ) #andrew: commented out
+        # inputs, labels = batch
         inputs = inputs.to(device)
         labels = labels.to(device)
         with torch.no_grad():
@@ -881,12 +881,12 @@ def find_correctly_classified(resnet, loader, task, device):
         for i, batch in enumerate(loader):  # Added enumeration to track the batch index
             X, Y = batch
             # Assuming utils.preprocess is defined and properly processing the input and labels
-            # X, Y = preprocess(
-            #     dataset=task,
-            #     batch=(X, Y),
-            #     device=device,
-            #     task=task,
-            # ) #  andrew: commented-out
+            X, Y = preprocess(
+                dataset=task,
+                batch=(X, Y),
+                device=device,
+                task=task,
+            ) #  andrew: commented-out
             X, Y = X.to(device), Y.to(device)
 
             # Get model output
