@@ -5,8 +5,8 @@ source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate pixelreg
 
-DEBUG=false
-RUN_TRAINING=true
+DEBUG=true
+RUN_TRAINING=false
 
 TASK=CIFAR10
 ARCHI=ResNet18
@@ -21,17 +21,20 @@ if [ "$DEBUG" = true ]; then
     EPOCHS=1
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
+    SAVE_DIR="save/debug"
     echo "--- RUNNING IN DEBUG MODE ---"
 else
     EPOCHS=40
     TRAIN_SEEDS=(2)
     ATTACK_SEEDS=(100 101 102)
+    SAVE_DIR="save"
 fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
 
-    MODEL_DIR="save/model_seed_$T_SEED"
+
+    MODEL_DIR="${SAVE_DIR}/model_seed_$T_SEED"
     mkdir -p "$MODEL_DIR"
 
     if [ "$RUN_TRAINING" = true ]; then
