@@ -5,8 +5,8 @@ source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate pixelreg
 
-DEBUG=true
-RUN_TRAINING=false
+DEBUG=false
+RUN_TRAINING=true
 
 TASK=CIFAR10
 ARCHI=ResNet18
@@ -20,12 +20,12 @@ ATTACK_TYPES=(Gaussian)
 if [ "$DEBUG" = true ]; then
     EPOCHS=1
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(100)
+    ATTACK_SEEDS=(101)
     SAVE_DIR="save/debug"
     echo "--- RUNNING IN DEBUG MODE ---"
 else
     EPOCHS=40
-    TRAIN_SEEDS=(2)
+    TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
     SAVE_DIR="save"
 fi
