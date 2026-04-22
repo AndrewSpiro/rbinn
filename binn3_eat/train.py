@@ -10,6 +10,7 @@ from lib import *
 from config import *
 from model import model_dispatcher
 from utils import * 
+
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
@@ -167,6 +168,7 @@ for eps_t in sigmas: #[8,32,64]:
     acc, images = test_model_clean(net_robust, dataloader_dict)
     print('Accuracy of robust model on clean images: %f %%' % acc)
     fo.write('Accuracy of robust model on clean images: %f \n' % acc)
+    results_data["experiments"][eps_key]["robust_model"]["clean_accuracy"] = acc
 
     # Test robust model with attack seeds
     for a_seed in opt.attack_seeds:
@@ -202,6 +204,7 @@ for eps_t in sigmas: #[8,32,64]:
     acc, images = test_model_clean(net_redetect, dataloader_dict)
     print('Accuracy of robust redetect model on clean images: %f %%' % acc)
     fo.write('Accuracy of robust redetect model on clean images: %f \n' % acc)
+    results_data["experiments"][eps_key]["robust_redetect_model"]["clean_accuracy"] = acc
 
     for a_seed in opt.attack_seeds:
         set_seed(a_seed)
