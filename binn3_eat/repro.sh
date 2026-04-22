@@ -2,6 +2,9 @@
 
 DEBUG=true
 
+NET_TYPE=rgbedge
+DATA_DIR=cifar10
+
 if [ "$DEBUG" = true ] ; then
     ROOT="./debug"
     TRAIN_SEEDS=(0)
@@ -19,10 +22,10 @@ do
     echo "Running training with seed $T_SEED"
 
     python train.py \
-        --net_type rgbedge \
+        --net_type $NET_TYPE \
         --model cifar10 \
         --sigmas 8 \
-        --data_dir cifar10  \
+        --data_dir $DATA_DIR  \
         --classes 10 \
         --epochs $EPOCHS \
         --inp_size 28 \
@@ -31,3 +34,10 @@ do
         --attack_seeds ${ATTACK_SEEDS[@]}
 done
 
+
+SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
+python compute_stats.py \
+    --root_dir $ROOT \
+    --data_dir $DATA_DIR \
+    --seeds $TRAIN_SEEDS \
+    --out "${ROOT}/Res${DATA_DIR}/seeds_$SEED_STRING.json"
