@@ -4,6 +4,7 @@ import os
 import torch
 import random
 import numpy as np
+import json
 
 from lib import *
 from config import *
@@ -76,6 +77,11 @@ if not os.path.exists(attack_base_path):
 
 fo = open(f'{attack_base_path}/results_{net_type}.txt', 'a+')
 
+results_data = {
+    "meta": vars(opt),
+    "experiments": {}
+}
+
 # --------------------------------------------------------------------------------------------------------------------------------------------
 # Train a model first
 
@@ -98,6 +104,7 @@ else:
 acc, images = test_model_clean(net, dataloader_dict)
 print('Accuracy of original model on clean images: %f ' % acc)
 fo.write('Accuracy of original model on clean images: %f \n' % acc)
+results_data["clean_model_baseline"] = acc
 
 
 
@@ -105,31 +112,37 @@ for eps_t in sigmas: #[8,32,64]:
 
     print(f'eps_t={eps_t}')
     fo.write(f'eps_t={eps_t} \n')
-
+    eps_key = f"sigma_eps_t"
+    results_data["experiments"][eps_key] = {
+        "clean_model" : {},
+        "robust_model" : {},
+        "robust_redetect_model": {}
+    }
     epsilons = [eps_t/255]
 
     # --- REPEATED ATTACKS WITH DIFFERENT SEEDS ---
     for a_seed in opt.attack_seeds:
-        set_seed(a_seed) # Reset seed for attack variability
+        set_seed(a_seed)
         fo.write(f'Attack Seed: {a_seed}\n')
 
     # Test the clean model on clean and attacks
-    net, dataloader_dict, criterior, optimizer = model_dispatcher(which_model, net_type, data_dir, inp_size, n_classes)
-    load_model(net, save_path)
-    net.to(device)
+        net, dataloader_dict, criterior, optimizer = model_dispatcher(which_model, net_type, data_dir, inp_size, n_classes)
+        load_model(net, save_path)
+        net.to(device)
 
-    acc_attack, images = test_model_attack(net, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
-    print('Accuracy of clean model on adversarial images: %f %%' % acc_attack[0])
-    fo.write('Accuracy of clean model on adversarial images: %f \n' % acc_attack[0])
+        acc_attack, images = test_model_attack(net, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
+        print('Accuracy of clean model on adversarial images: %f %%' % acc_attack[0])
+        fo.write('Accuracy of clean model on adversarial images: %f \n' % acc_attack[0])
 
+        seed_res = {"redetect_edge_false": acc_attack[0]}
 
-    if (net_type.lower() in ['grayedge', 'rgbedge']):
-        acc_attack, images = test_model_attack(net, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=True)
-        print('Accuracy of clean model on adversarial images with redetect_edge: %f %%' % acc_attack[0])
-        fo.write('Accuracy of clean model on adversarial images with redetect_edge: %f \n' % acc_attack[0])
+        if (net_type.lower() in ['grayedge', 'rgbedge']):
+            acc_attack, images = test_model_attack(net, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=True)
+            print('Accuracy of clean model on adversarial images with redetect_edge: %f %%' % acc_attack[0])
+            fo.write('Accuracy of clean model on adversarial images with redetect_edge: %f \n' % acc_attack[0])
+            seed_res["redetect_edge_true"] = acc_attack[0]
 
-
-
+        results_data["experiments"][eps_key]["clean_model"][f"seed_{a_seed}"] = seed_res
 
     # --------------------------------------------------------------------------------------------------------------------------------------------
     # Now perform adversarial training
@@ -158,15 +171,20 @@ for eps_t in sigmas: #[8,32,64]:
     # Test robust model with attack seeds
     for a_seed in opt.attack_seeds:
         set_seed(a_seed)
+
         acc_attack, images = test_model_attack(net_robust, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
         print('Accuracy of robust model on adversarial images: %f %%' % acc_attack[0])
         fo.write('Accuracy of robust model on adversarial images: %f \n' % acc_attack[0])
 
+        seed_res = {"redetect_edge_false": acc_attack[0]}
 
-    if (net_type.lower() in ['grayedge', 'rgbedge']):    
-        acc_attack, images = test_model_attack(net_robust, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=True)
-        print('Accuracy of robust  model on adversarial images with redetect_edge: %f %%' % acc_attack[0])
-        fo.write('Accuracy of robust  model on adversarial images with redetect_edge: %f \n' % acc_attack[0])
+        if (net_type.lower() in ['grayedge', 'rgbedge']):
+            acc_attack, images = test_model_attack(net_robust, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=True)
+            print('Accuracy of robust model on adversarial images with redetect_edge: %f %%' % acc_attack[0])
+            fo.write('Accuracy of robust model on adversarial images with redetect_edge: %f \n' % acc_attack[0])
+            seed_res["redetect_edge_true"] = acc_attack[0]
+
+        results_data["experiments"][eps_key]["robust_model"][f"seed_{a_seed}"] = seed_res
 
 
     # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -187,17 +205,27 @@ for eps_t in sigmas: #[8,32,64]:
 
     for a_seed in opt.attack_seeds:
         set_seed(a_seed)
-        acc_attack, images = test_model_attack(net_redetect, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
-        print('Accuracy of robust redetect  model on adversarial images: %f %%' % acc_attack[0])
-        fo.write('Accuracy of robust redetect  model on adversarial images: %f \n' % acc_attack[0])
 
+        acc_attack, images = test_model_attack(net_redetect, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
+        print('Accuracy of robust redetect model on adversarial images: %f %%' % acc_attack[0])
+        fo.write('Accuracy of robust redetect model on adversarial images: %f \n' % acc_attack[0])
+
+        seed_res = {"redetect_edge_false": acc_attack[0]}
 
         acc_attack, images = test_model_attack(net_redetect, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=True)
-        print('Accuracy of robust redtect model on adversarial images with redetect_edge: %f %%' % acc_attack[0])
+        print('Accuracy of robust redetect model on adversarial images with redetect_edge: %f %%' % acc_attack[0])
         fo.write('Accuracy of robust redetect model on adversarial images with redetect_edge: %f \n' % acc_attack[0])
 
+        seed_res["redetect_edge_true"] = acc_attack[0]
+
+        results_data["experiments"][eps_key]["robust_redetect_model"][f"seed_{a_seed}"] = seed_res
 
 
+json_path = os.path.join(attack_base_path, f"results_{net_type}.json")
+with open(json_path, "w") as jf:
+    json.dump(results_data, jf, indent=4)
+
+print(f"Saved results to {json_path}")
 
 fo.close()
 
