@@ -1,4 +1,4 @@
-name: binn3_eat
+name: eat
 channels:
   - pytorch
   - conda-forge
