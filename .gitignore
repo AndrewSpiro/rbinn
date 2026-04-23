@@ -367,6 +367,8 @@ dmypy.json
 .DS_Store
 *.DS_Store
 
+Rescifar10/
+
 
 #### binn4_cnnf ####
 __pycache__/
