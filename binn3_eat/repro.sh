@@ -5,7 +5,7 @@ source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate eat
 
-DEBUG=false
+DEBUG=true
 
 NET_TYPE=rgbedge
 DATA_DIR=cifar10
@@ -15,6 +15,7 @@ if [ "$DEBUG" = true ] ; then
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=1
+    echo "--- RUNNING IN DEBUG MODE ---"
 else
     ROOT="."
     TRAIN_SEEDS=(0 1 2)
@@ -39,10 +40,9 @@ do
         --attack_seeds ${ATTACK_SEEDS[@]}
 done
 
-
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
 python compute_stats.py \
     --root_dir $ROOT \
     --data_dir $DATA_DIR \
-    --seeds $TRAIN_SEEDS \
+    --seeds "${TRAIN_SEEDS[@]}" \
     --out "${ROOT}/Res${DATA_DIR}/seeds_$SEED_STRING.json"
