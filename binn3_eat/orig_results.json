@@ -1,0 +1,44 @@
+{
+    "clean_model" : {
+        "clean_accraucy" : {
+            "mean": 0.860,
+            "std": 0
+        },
+        "redetect_edge_false" : {
+            "mean": 0.366,
+            "std": 0
+        },
+        "redetect_edge_true": {
+            "mean": 0.399,
+            "std": 0
+        }
+    },
+    "robust_model": {
+        "clean_accuracy": {
+            "mean": 0.846,
+            "std": 0
+        },
+        "redetect_edge_false": {
+            "mean": 0.611,
+            "std": 0
+        },
+        "redetect_edge_true": {
+            "mean": 0.569,
+            "std": 0
+        }
+    },
+    "robust_redetect_model": {
+        "clean_accuracy": {
+            "mean": 0.846,
+            "std": 0
+        },
+        "redetect_edge_false": {
+            "mean": 0.530,
+            "std": 0
+        },
+        "redetect_edge_true": {
+            "mean": 0.702,
+            "std": 0
+        }
+    }
+}
