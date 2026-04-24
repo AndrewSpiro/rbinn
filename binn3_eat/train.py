@@ -167,12 +167,13 @@ for eps_t in sigmas: #[8,32,64]:
 
     acc, images = test_model_clean(net_robust, dataloader_dict)
     print('Accuracy of robust model on clean images: %f %%' % acc)
-    fo.write('Accuracy of robust model on clean images: %f \n' % acc)
+    fo.write('\nAccuracy of robust model on clean images: %f \n' % acc)
     results_data["experiments"][eps_key]["robust_model"]["clean_accuracy"] = acc
 
     # Test robust model with attack seeds
     for a_seed in opt.attack_seeds:
         set_seed(a_seed)
+        fo.write(f'Attack Seed: {a_seed}\n')
 
         acc_attack, images = test_model_attack(net_robust, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
         print('Accuracy of robust model on adversarial images: %f %%' % acc_attack[0])
@@ -203,11 +204,12 @@ for eps_t in sigmas: #[8,32,64]:
 
     acc, images = test_model_clean(net_redetect, dataloader_dict)
     print('Accuracy of robust redetect model on clean images: %f %%' % acc)
-    fo.write('Accuracy of robust redetect model on clean images: %f \n' % acc)
+    fo.write('\nAccuracy of robust redetect model on clean images: %f \n' % acc)
     results_data["experiments"][eps_key]["robust_redetect_model"]["clean_accuracy"] = acc
 
     for a_seed in opt.attack_seeds:
         set_seed(a_seed)
+        fo.write(f'Attack Seed: {a_seed}\n')
 
         acc_attack, images = test_model_attack(net_redetect, dataloader_dict, epsilons, attack_type, net_type, redetect_edge=False)
         print('Accuracy of robust redetect model on adversarial images: %f %%' % acc_attack[0])
