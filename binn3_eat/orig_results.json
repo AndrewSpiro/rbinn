@@ -1,6 +1,6 @@
 {
     "clean_model" : {
-        "clean_accraucy" : {
+        "clean_accuracy" : {
             "mean": 0.860,
             "std": 0
         },
