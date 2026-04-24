@@ -1,6 +1,11 @@
 #!/bin/bash
+set -e
 
-DEBUG=true
+source $(conda info --base)/etc/profile.d/conda.sh
+ 
+conda activate eat
+
+DEBUG=false
 
 NET_TYPE=rgbedge
 DATA_DIR=cifar10
@@ -28,7 +33,7 @@ do
         --data_dir $DATA_DIR  \
         --classes 10 \
         --epochs $EPOCHS \
-        --inp_size 28 \
+        --inp_size 64 \
         --root_dir $ROOT \
         --seed $T_SEED \
         --attack_seeds ${ATTACK_SEEDS[@]}
