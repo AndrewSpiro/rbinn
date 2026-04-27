@@ -1,4 +1,18 @@
 #!/bin/bash
+set -e
+
+source $(conda info --base)/etc/profile.d/conda.sh
+ 
+conda activate pixelreg
+DEBUG=true
+
+if [ "$DEBUG" = true ]; then
+SAVE_MODEL='CNNF_debug'
+EPOCHS=1
+else
+EPOCHS=500
+SAVE_MODEL='CNNF'
+fi
 
 python train.py --data 'cifar10' \
                 --max-cycles 2 \
@@ -12,10 +26,10 @@ python train.py --data 'cifar10' \
                 --eps 0.063 \
                 --eps-iter 0.02 \
                 --schedule 'poly' \
-                --epochs 500 \
+                --epochs $EPOCHS \
                 --seed 0 \
                 --grad-clip \
-                --save-model 'CNNF_2_cifar_acs' \
+                --save-model $SAVE_MODEL \
                 --model-dir 'models'
 
 
