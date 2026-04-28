@@ -8,10 +8,12 @@ DEBUG=true
 
 if [ "$DEBUG" = true ]; then
 SAVE_MODEL='CNNF_debug'
+RESULTS_DIR='results_debug'
 EPOCHS=1
 else
 EPOCHS=500
 SAVE_MODEL='CNNF'
+RESULTS_DIR='results'
 fi
 
 python train.py --data 'cifar10' \
@@ -31,5 +33,3 @@ python train.py --data 'cifar10' \
                 --grad-clip \
                 --save-model $SAVE_MODEL \
                 --model-dir 'models'
-
-
