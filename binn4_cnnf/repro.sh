@@ -87,4 +87,4 @@ python aggregate_results.py --results_dir $RESULTS_DIR_BASE \
                             --train_seeds "${TRAIN_SEEDS[@]}" \
                             --attack_seeds "${ATTACK_SEEDS[@]}" \
                             --out $AGG_RESULTS_DIR \
-                            --baselines_path BASELINES_PATH
+                            --baselines_path $BASELINES_PATH

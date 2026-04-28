@@ -87,7 +87,7 @@ def main():
 
     results = {}
     if args.bool_debug:
-        results['test']=3.14
+        results['clean_acc']=3.14
         with open(args.results_path, "w") as f:
             json.dump(results, f)
         return

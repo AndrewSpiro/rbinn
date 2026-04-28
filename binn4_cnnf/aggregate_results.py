@@ -2,6 +2,7 @@ import json
 import os
 import numpy as np
 import argparse
+from matplotlib import pyplot as plt
 
 def load_jsons(paths):
     return [json.load(open(p, "r")) for p in paths]
@@ -29,12 +30,44 @@ def aggregate(json_list):
         json.dump(stats, f)
     print(f"Aggregated results saved to {json_save_path}")
 
-# def plot_results(aggregated_data, baselines_path, out_put_path='results_bar_plot.png'):
+    return stats
 
-#     orig_results = json.load(open(baselines_path, "r"))
+def plot_results(aggregated_data, baselines_path, output_path='results_bar_plot.png'):
 
-#     fig, ax = plt.subplots(figsize=(14, 8))
+    orig_results = json.load(open(baselines_path, "r"))
+    shared_keys = [k for k in aggregated_data.keys() if k in orig_results]
+    if not shared_keys:
+        raise Warning("shared keys is empty")
 
+    x = np.arange(len(shared_keys))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    agg_means = [aggregated_data[k]['mean'] for k in shared_keys]
+    agg_stds = [aggregated_data[k]['std'] for k in shared_keys]
+
+    orig_means = [orig_results[k]['mean'] for k in shared_keys]
+    orig_stds = [orig_results[k]['std'] for k in shared_keys]
+
+    rects1 = ax.bar(x-width/2, agg_means, width, yerr=agg_stds,
+                    label = 'Aggregated Data')
+
+    rects2 = ax.bar(x+width/2, orig_means, width, yerr=orig_stds,
+                    label='Baseline Results')
+
+    ax.set_ylabel('Scores')
+    
+    clean_labels = [k.replace('_',' ').title() for k in shared_keys]
+    ax.set_xticks(x)
+    ax.set_xticklabels(clean_labels)
+
+    ax.legend()
+
+    fig.tight_layout()
+    plot_path = f"{output_path}/bar_plot.png"
+    plt.savefig(plot_path)
+    print(f"Saved figure to {plot_path}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -67,4 +100,7 @@ if __name__ == "__main__":
     else:
         print(f"Aggregating {len(found_paths)} files...")
         json_list = load_jsons(found_paths)
-        aggregate(json_list)
+        aggregated_data = aggregate(json_list)
+        plot_results(aggregated_data=aggregated_data, baselines_path=args.baselines_path, output_path=args.out)
+
+    
