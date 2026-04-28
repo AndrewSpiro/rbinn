@@ -10,26 +10,28 @@ RUN_TRAIN=false
 MODEL_DIR='models'
 
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL='CNNF_debug'
-    RESULTS_DIR='results_debug'
-    TRAIN_SEEDS=(0 1 2)
+    SAVE_MODEL_BASE='CNNF_debug'
+    RESULTS_DIR_BASE='results_debug'
+    TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=1
-    ATTACK_MODEL='CNN_cifar.pt'
-    TARGET_MODEL='CNNF_2_cifar.pt'
 else
-    SAVE_MODEL='CNNF'
-    RESULTS_DIR='results'
+    SAVE_MODEL_BASE='CNNF'
+    RESULTS_DIR_BASE='results'
     EPOCHS=500
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
 fi
 
-if [ "$RUN_TRAIN" = true ]; then
-    for T_SEED in "${TRAIN_SEEDS[@]}"
-    do
-        echo "Running training with seed $T_SEED"
 
+for T_SEED in "${TRAIN_SEEDS[@]}"
+do
+    SAVE_MODEL="${SAVE_MODEL_BASE}_seed_${T_SEED}"
+
+    if [ "$RUN_TRAIN" = true ]; then
+
+        echo "Running training with seed $T_SEED"
+        
         python train.py --data 'cifar10' \
                         --max-cycles 2 \
                         --ind 5 \
@@ -48,19 +50,28 @@ if [ "$RUN_TRAIN" = true ]; then
                         --save-model $SAVE_MODEL \
                         --model-dir $MODEL_DIR \
                         --bool-debug $DEBUG
+    fi        
+
+    for A_SEED in "${ATTACK_SEEDS[@]}"
+    do
+        if [ "$DEBUG" = true ]; then
+            # ATTACK_MODEL='CNN_cifar'
+            TARGET_MODEL=$SAVE_MODEL
+        else
+            TARGET_MODEL=$SAVE_MODEL
+        fi
+
+        echo "Running attack with seed $A_SEED"
+
+        RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
+        mkdir -p "$RESULTS_DIR"
+
+        python test.py --dataset 'cifar10' \
+                        --test 'average' \
+                        --results-path "${RESULTS_DIR}/results.json" \
+                        --model-dir $MODEL_DIR \
+                        --bool-debug $DEBUG \
+                        --seed $A_SEED \
+                        --target-model $TARGET_MODEL
     done
-fi
-
-for A_SEED in "${ATTACK_SEEDS[@]}"
-do
-    echo "Running attack with seed $A_SEED"
-
-    python test.py --dataset 'cifar10' \
-                    --test 'average' \
-                    --csv-dir $RESULTS_DIR \
-                    --model-dir $MODEL_DIR \
-                    --bool-debug $DEBUG \
-                    --seed $A_SEED \
-                    --attack-model $ATTACK_MODEL \
-                    --target-model $TARGET_MODEL
 done
