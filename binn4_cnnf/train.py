@@ -184,6 +184,7 @@ def test_pgd(args, model, device, test_loader, epsilon=0.063):
     return acc
 
 def main():
+    print("Main started...")
     parser = argparse.ArgumentParser(description='CNNF training')
     # optimization parameters
     parser.add_argument('--batch-size', type=int, default=128, metavar='N',
@@ -208,7 +209,7 @@ def main():
     parser.add_argument('--no-cuda', action='store_true', default=False,
                         help='disables CUDA training')
     parser.add_argument('--seed', type=int, default=1, metavar='S',
-                        help='random seed (default: 1)')
+                        help='random seed for training (default: 1)')
     parser.add_argument('--log-interval', type=int, default=400, metavar='N',
                         help='how many batches to wait before logging training status')
     
@@ -243,8 +244,16 @@ def main():
     parser.add_argument('--model-dir', default=None,
                         help='Directory for Saving the current Model')
 
-    
+    # debug parameters
+    parser.add_argument('--bool-debug', type=bool, default=False,
+                        help='whether to run the script in debug mode (default: False)')
+
     args = parser.parse_args()
+
+    if args.bool_debug:
+        print("Debugging")
+        print(f"Train seed: {args.seed}")
+        return
  
     if not os.path.exists(args.model_dir):
         os.makedirs(args.model_dir)
