@@ -8,6 +8,7 @@ from datetime import datetime
 from cnnf.model_cifar import WideResNet
 from cnnf.model_mnist import CNNF
 from utils import seed_torch
+import json
 
 # version issue- resolving manuall -aspiro
 import sys
@@ -34,13 +35,13 @@ def main():
                         default='cifar10', help='the dataset for training the model')
     parser.add_argument('--test', choices=['average', 'last','other'],
                         default='average', help='output averaged logits or logits from the last iteration')
-    parser.add_argument('--csv-dir', default='results_temp.csv',
+    parser.add_argument('--results-path', default='results_temp.json',
                         help='Directory for Saving the Evaluation results')
     parser.add_argument('--model-dir', default='models',
                         help='Directory for Saved Models')
     parser.add_argument('--seed', type=int, default=0) # for variance in tests -acs
-    parser.add_argument('--bool-debug', type=bool, default=False, help='whether to debug')
-    parser.add_argument('--attack-model', type=str, required=True, help='flag for debugging')
+    parser.add_argument('--bool-debug', type=bool, default=False, help='flag for debugging')
+    parser.add_argument('--attack-model', type=str, required=False, default=None, help='model for transfer attacks')
     parser.add_argument('--target-model', type=str, required=True, help='model being evaluated')
 
     args = parser.parse_args()
@@ -49,7 +50,6 @@ def main():
 
     if args.bool_debug:
         print(args)
-        return
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
@@ -80,20 +80,24 @@ def main():
         nb_iter = 7
     print("dataset loaded")
 
-    log_acc_path = args.csv_dir
     evalmethod = args.test
     model_dir = args.model_dir
 
-    with open(log_acc_path, 'a') as f:
-        f.write(',clean,pgd_first,pgd_last,spsa_first,spsa_last,transfer,')
-        f.write('\n')
+    results = {}
+    if args.bool_debug:
+        results['test']=3.14
+        with open(args.results_path, "w") as f:
+            json.dump(results, f)
+        return
 
     # Attacker model
+    model1 = None
     if args.dataset=='cifar10':
-        model1_name = 'CNN_cifar.pt'
-        model1_path = os.path.join(model_dir, model1_name)
-        model1 = WideResNet(40, 10, 2, 0.0, ind=0, cycles=0, res_param=0.0).to(device)
-        model1.load_state_dict(torch.load(model1_path))
+        if args.attack_model:
+            model1_name = args.attack_model
+            model1_path = os.path.join(model_dir, model1_name)
+            model1 = WideResNet(40, 10, 2, 0.0, ind=0, cycles=0, res_param=0.0).to(device)
+            model1.load_state_dict(torch.load(model1_path))
 
     elif args.dataset == 'fashion':
         model1_name = 'CNN_fmnist.pt'
@@ -103,7 +107,7 @@ def main():
 
     # Model to evaluate
     if args.dataset=='cifar10':
-        model_name = 'CNNF_2_cifar.pt'
+        model_name = args.target_model
         model = WideResNet(40, 10, 2, 0.0, ind=5, cycles=2, res_param=0.1).to(device)
     elif args.dataset == 'fashion':
         model_name = 'CNNF_1_fmnist.pt'
@@ -115,18 +119,18 @@ def main():
     eval = Evaluator(device, model)
     print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
-    return
-    # print(f"clean accuracy: {clean_acc}")
-    # breakpoint()
+    results['clean_acc'] = clean_acc
     
     # adv attack
     pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
+    results['pgd_acc_first'] = pgd_acc_first
     pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
-
+    results['pgd_acc_ete'] = pgd_acc_ete
+    
     spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
+    results['spsa_acc_first'] = spsa_acc_first
     spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
-
-    transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
+    results['spsa_acc_ete'] = spsa_acc_ete
 
     with open(log_acc_path, 'a') as f:
         f.write('%s,' % model_name)
@@ -137,6 +141,14 @@ def main():
         f.write('%0.2f,' % (100. * spsa_acc_ete))
         f.write('%0.2f,' % (100. * transfer_acc))
         f.write('\n')
+
+    if model1:
+        transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
+        results['transfer_acc'] = transfer_acc
+
+    with open(args.results_path, "w") as f:
+        json.dump(results, f)
+    print(f"Results saved to {args.results_path}")
 
 if __name__ == '__main__':
     main()
