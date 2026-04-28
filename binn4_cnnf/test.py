@@ -39,10 +39,17 @@ def main():
     parser.add_argument('--model-dir', default='models',
                         help='Directory for Saved Models')
     parser.add_argument('--seed', type=int, default=0) # for variance in tests -acs
+    parser.add_argument('--bool-debug', type=bool, default=False, help='whether to debug')
+    parser.add_argument('--attack-model', type=str, required=True, help='flag for debugging')
+    parser.add_argument('--target-model', type=str, required=True, help='model being evaluated')
 
     args = parser.parse_args()
     
     seed_torch(seed=args.seed)
+
+    if args.bool_debug:
+        print(args)
+        return
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
