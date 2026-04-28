@@ -376,6 +376,7 @@ __pycache__/
 data/
 *.pt
 **/models/
+**/results_debug/
 *.csv
 
 #### binn5_vonenet ####
