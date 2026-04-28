@@ -1,12 +1,40 @@
 import json
 import os
+import numpy as np
 import argparse
 
 def load_jsons(paths):
     return [json.load(open(p, "r")) for p in paths]
 
 def aggregate(json_list):
-    print(json_list)
+    all_metrics = [list(result.keys()) for result in json_list]
+    shared_metrics = set.intersection(*map(set, all_metrics))
+
+    stats = {}
+    for metric in shared_metrics:
+        stats[metric] = {
+            "mean": None,
+            "std": None
+        }
+        metric_vals = []
+        for result in json_list:
+            metric_vals.append(result[metric])
+        stats[metric]["mean"] = np.mean(metric_vals)
+        stats[metric]["std"] = np.std(metric_vals)
+
+    print(stats)
+    json_save_path = f"{args.out}/num_summary.json"
+    os.makedirs(os.path.dirname(json_save_path), exist_ok=True)
+    with open(json_save_path, "w") as f:
+        json.dump(stats, f)
+    print(f"Aggregated results saved to {json_save_path}")
+
+# def plot_results(aggregated_data, baselines_path, out_put_path='results_bar_plot.png'):
+
+#     orig_results = json.load(open(baselines_path, "r"))
+
+#     fig, ax = plt.subplots(figsize=(14, 8))
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -20,16 +48,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     found_paths = []
-    if args.bool_debug:
-        debug_string = "_debug"
-    else:
-        debug_string = ""
     for t_seed in args.train_seeds:
         for a_seed in args.attack_seeds:
             path = os.path.join(
                 args.results_dir,
-                f"{args.model_name_base}{debug_string}_seed_{t_seed}",
-                f"attack_seed_{a_seed}.json"
+                f"{args.model_name_base}_seed_{t_seed}",
+                f"attack_seed_{a_seed}",
+                "results.json"
             )
 
             if os.path.exists(path):

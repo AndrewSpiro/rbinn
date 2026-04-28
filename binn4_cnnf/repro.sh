@@ -8,6 +8,7 @@ conda activate cnnf
 DEBUG=true
 RUN_TRAIN=false
 MODEL_DIR='models'
+BASELINES_PATH=orig_results.json
 
 if [ "$DEBUG" = true ]; then
     SAVE_MODEL_BASE='CNNF_debug'
@@ -75,3 +76,15 @@ do
                         --target-model $TARGET_MODEL
     done
 done
+
+TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
+ATTACK_SEED_STRING=$(echo "${ATTACK_SEEDS[*]}" | tr ' ' '_')
+AGG_RESULTS_DIR="${RESULTS_DIR_BASE}/train_seeds_${TRAIN_SEED_STRING}/attack_seeds_${ATTACK_SEED_STRING}"
+mkdir -p "$AGG_RESULTS_DIR"
+python aggregate_results.py --results_dir $RESULTS_DIR_BASE \
+                            --model_name_base $SAVE_MODEL_BASE \
+                            --bool_debug $DEBUG \
+                            --train_seeds "${TRAIN_SEEDS[@]}" \
+                            --attack_seeds "${ATTACK_SEEDS[@]}" \
+                            --out $AGG_RESULTS_DIR \
+                            --baselines_path BASELINES_PATH

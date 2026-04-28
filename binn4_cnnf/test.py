@@ -30,6 +30,8 @@ import os
 
 def main():
 
+    print("Running main")
+
     parser = argparse.ArgumentParser(description='CNNF testing')
     parser.add_argument('--dataset', choices=['cifar10', 'fashion'],
                         default='cifar10', help='the dataset for training the model')
@@ -45,7 +47,7 @@ def main():
     parser.add_argument('--target-model', type=str, required=True, help='model being evaluated')
 
     args = parser.parse_args()
-    
+    print("Args parsed")
     seed_torch(seed=args.seed)
 
     if args.bool_debug:
@@ -131,16 +133,6 @@ def main():
     results['spsa_acc_first'] = spsa_acc_first
     spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
     results['spsa_acc_ete'] = spsa_acc_ete
-
-    with open(log_acc_path, 'a') as f:
-        f.write('%s,' % model_name)
-        f.write('%0.2f,' % (100. * clean_acc))
-        f.write('%0.2f,' % (100. * pgd_acc_first))
-        f.write('%0.2f,' % (100. * pgd_acc_ete))
-        f.write('%0.2f,' % (100. * spsa_acc_first))
-        f.write('%0.2f,' % (100. * spsa_acc_ete))
-        f.write('%0.2f,' % (100. * transfer_acc))
-        f.write('\n')
 
     if model1:
         transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
