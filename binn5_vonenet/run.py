@@ -2,6 +2,7 @@
 import os, argparse, time, subprocess, io, shlex
 import pandas as pd
 import tqdm
+import json
 
 parser = argparse.ArgumentParser(description='ImageNet Validation')
 
@@ -17,6 +18,8 @@ parser.add_argument('--model_arch', choices=['alexnet', 'resnet50', 'resnet50_at
                     help='back-end model architecture to load')
 parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='cifar10',
                     help='dataset to train or validate on')
+parser.add_argument('--results_path', type=str, default='results.json',
+                    help='path to save accuracies')
 
 FLAGS, FIRE_FLAGS = parser.parse_known_args()
 
@@ -76,6 +79,15 @@ def val():
 
     print(record['top1'])
     print(record['top5'])
+    
+    results = {
+        'top1': record['top1'],
+        'top5': record['top5']
+    }
+    with open(FLAGS.results_path, "w") as f:
+        json.dump(results, f)
+    print(f"Results saved to {FLAGS.results_path}")
+        
     return
 
 
