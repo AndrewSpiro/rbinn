@@ -56,7 +56,7 @@ def plot_results(aggregated_data, baselines_path, output_path='results_bar_plot.
     rects2 = ax.bar(x+width/2, orig_means, width, yerr=orig_stds,
                     label='Baseline Results')
 
-    ax.set_ylabel('Scores')
+    ax.set_ylabel('Accurary (%)')
     
     clean_labels = [k.replace('_',' ').title() for k in shared_keys]
     ax.set_xticks(x)

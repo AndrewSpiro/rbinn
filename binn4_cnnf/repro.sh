@@ -6,7 +6,7 @@ source $(conda info --base)/etc/profile.d/conda.sh
 conda activate cnnf
 
 DEBUG=true
-RUN_TRAIN=false
+RUN_TRAIN=true
 MODEL_DIR='models'
 BASELINES_PATH=orig_results.json
 
@@ -16,6 +16,7 @@ if [ "$DEBUG" = true ]; then
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=1
+    echo "Running in debug mode..."
 else
     SAVE_MODEL_BASE='CNNF'
     RESULTS_DIR_BASE='results'
