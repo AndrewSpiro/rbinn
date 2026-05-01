@@ -6,6 +6,7 @@ import random
 import math
 import argparse
 import torch
+import time
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -263,7 +264,6 @@ def main():
     if args.bool_debug:
         print("Debugging")
         print(f"Train seed: {args.seed}")
-        return
  
     if not os.path.exists(args.model_dir):
         os.makedirs(args.model_dir)
@@ -330,6 +330,9 @@ def main():
           optimizer, lr_lambda=lambda step: lr_poly(1.0, step, args.epochs * len(train_loader), args.power))
 
     # Begin training
+    print(f"Starting training...")
+    torch.cuda.synchronize()
+    start = time.time()
     best_acc = 0
 
     for epoch in range(args.epochs):    
@@ -359,6 +362,9 @@ def main():
 
             Tensor_writer.add_scalars('pgd_acc', {'test': pgd_acc}, epoch)
 
+    torch.cuda.synchronize()
+    end = time.time()
+    print(f"Took {end-start} seconds.")
     # Save final model
     if args.save_model is not None:
         experiment_fn = args.save_model
