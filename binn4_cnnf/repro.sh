@@ -6,9 +6,10 @@ source $(conda info --base)/etc/profile.d/conda.sh
 conda activate cnnf
 
 DEBUG=true
-RUN_TRAIN=true
+RUN_TRAIN=false
 MODEL_DIR='models'
 BASELINES_PATH=orig_results.json
+BATCH_SIZE=64
 
 if [ "$DEBUG" = true ]; then
     SAVE_MODEL_BASE='CNNF_debug'
@@ -42,7 +43,7 @@ do
                         --clean 'supclean' \
                         --clean-parameter 0.05 \
                         --lr 0.05 \
-                        --batch-size 64 \
+                        --batch-size $BATCH_SIZE \
                         --eps 0.063 \
                         --eps-iter 0.02 \
                         --schedule 'poly' \
@@ -74,7 +75,7 @@ do
                         --model-dir $MODEL_DIR \
                         --bool-debug $DEBUG \
                         --seed $A_SEED \
-                        --target-model $TARGET_MODEL
+                        --target-model "${TARGET_MODEL}.pt"
     done
 done
 
