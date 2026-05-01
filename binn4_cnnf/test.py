@@ -124,11 +124,6 @@ def main():
     pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
     results['pgd_acc_ete'] = pgd_acc_ete
 
-    if args.bool_debug:
-        with open(args.results_path, "w") as f:
-            json.dump(results, f)
-        print(f"Results saved to {args.results_path}")
-
     spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
     results['spsa_acc_first'] = spsa_acc_first
     spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
