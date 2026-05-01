@@ -7,6 +7,16 @@ import math
 import argparse
 import torch
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 # version issue- resolving manually -aspiro
 import sys
 def zero_gradients(x):
@@ -245,8 +255,8 @@ def main():
                         help='Directory for Saving the current Model')
 
     # debug parameters
-    parser.add_argument('--bool-debug', type=bool, default=False,
-                        help='whether to run the script in debug mode (default: False)')
+    parser.add_argument('--bool-debug', type=str2bool, default=False,
+                        help='whether to run the script in debug mode')
 
     args = parser.parse_args()
 
