@@ -1,0 +1,26 @@
+{
+    "clean_acc": {
+        "mean":81.12,
+        "std": 0
+    },
+    "pgd_acc_first": {
+        "mean": 48.8,
+        "std": 0.06
+    },
+    "pgd_acc_ete": {
+        "mean": 56.17,
+        "std": 0.18
+    },
+    "spsa_acc_first": {
+        "mean": 70.21,
+        "std": 0.95
+    },
+    "spsa_acc_ete": {
+        "mean": 59.37,
+        "std": 1.08
+    },
+    "transfer_acc": {
+        "mean": 68.08,
+        "std": 0.01
+    }
+}
