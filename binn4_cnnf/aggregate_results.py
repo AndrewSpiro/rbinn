@@ -9,7 +9,8 @@ def load_jsons(paths):
 
 def aggregate(json_list):
     all_metrics = [list(result.keys()) for result in json_list]
-    shared_metrics = set.intersection(*map(set, all_metrics))
+    unordered_shared_metrics = set.intersection(*map(set, all_metrics))
+    shared_metrics = [m for m in json_list[0].keys() if m in unordered_shared_metrics]
 
     stats = {}
     for metric in shared_metrics:
@@ -44,7 +45,7 @@ def plot_results(aggregated_data, baselines_path, output_path='results_bar_plot.
 
     fig, ax = plt.subplots(figsize=(14, 8))
 
-    agg_means = [aggregated_data[k]['mean'] for k in shared_keys]
+    agg_means = [aggregated_data[k]['mean']*100 for k in shared_keys]
     agg_stds = [aggregated_data[k]['std'] for k in shared_keys]
 
     orig_means = [orig_results[k]['mean'] for k in shared_keys]
