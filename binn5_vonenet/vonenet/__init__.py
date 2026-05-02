@@ -17,7 +17,7 @@ class Wrapper(Module):
         self.module = model
 
 
-def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwargs):
+def get_model(vonenet_dir, model_arch='resnet50', pretrained=True, map_location='cpu', **kwargs):
     """
     Returns a VOneNet model.
     Select pretrained=True for returning one of the 3 pretrained models.
@@ -25,7 +25,6 @@ def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwar
     """
     if pretrained and model_arch:
         url = f'https://vonenet-models.s3.us-east-2.amazonaws.com/{FILE_WEIGHTS[model_arch.lower()]}'
-        vonenet_dir = '.vonenet'
         weightsdir_path = os.path.join(vonenet_dir, FILE_WEIGHTS[model_arch.lower()])
         if not os.path.exists(vonenet_dir):
             raise Warning("vonenet_dir does not exist") #acs
