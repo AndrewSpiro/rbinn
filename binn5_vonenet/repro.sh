@@ -6,16 +6,16 @@ source $(conda info --base)/etc/profile.d/conda.sh
 conda activate vonenet
 
 DEBUG=true
-RUN_TRAIN=false
-RUN_EVAL=false
+RUN_TRAIN=true
+RUN_EVAL=true
 MODEL_ARCH=resnet50
 
 if [ "$DEBUG" = true ]; then
-    EPOCHS=1
+    EPOCHS=2
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     OUTPUT_BASE=output_debug
-    RESORE_EPOCH=1
+    RESTORE_EPOCH=1
     RESTORE_BASE=restore_debug
     echo "Running in debug mode..."
 else
@@ -23,13 +23,13 @@ else
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
     OUTPUT_BASE=output
-    RESORE_EPOCH=5
+    RESTORE_EPOCH=5
     RESTORE_BASE=restore
 fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
-    if [ "$BOOL_TRAIN" = true ]; then
+    if [ "$RUN_TRAIN" = true ]; then
 
         echo "Running training with seed $T_SEED"
 
@@ -52,15 +52,14 @@ do
 
     if [ "$DEBUG" = true ]; then
         RESULTS_DIR=debug_results
-        VONENET_DIR=.vonenet
+        VONENET_DIR="${OUTPUT_BASE}/${MODEL_ARCH}_vonenet_seed_${T_SEED}"
     else
         RESULTS_DIR=results
-        VONENT_DIR=".${MODEL_ARCH}_vonenet_seed_${T_SEED}"
+        VONENT_DIR="${OUTPUT_BASE}/${MODEL_ARCH}_vonenet_seed_${T_SEED}"
     fi
 
+    mkdir -p "${RESULTS_DIR}/${MODEL_ARCH}_seed_${T_SEED}"
     RESULTS_PATH="${RESULTS_DIR}/${MODEL_ARCH}_seed_${T_SEED}/results.json"
-
-    mkdir -p "$RESULTS_DIR"
 
     if [ "$RUN_EVAL" = true ]; then
         python run.py \
