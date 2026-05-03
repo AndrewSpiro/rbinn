@@ -390,6 +390,7 @@ __pycache__/
 **/vonenet.egg-info
 *.tar
 **/debug_results/
+**/output_debug/
 
 #### binn6_unsupvvs ####
 # Byte-compiled / optimized / DLL files
