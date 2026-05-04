@@ -391,6 +391,7 @@ __pycache__/
 *.tar
 **/debug_results/
 **/output_debug/
+**/debug/
 
 #### binn6_unsupvvs ####
 # Byte-compiled / optimized / DLL files
