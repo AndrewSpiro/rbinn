@@ -34,17 +34,17 @@ def aggregate(json_list):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--results_dir", type=str, required=True, help="Base results directory")    
+    parser.add_argument("--root", type=str, required=True, help="root where models are saved")    
     parser.add_argument("--train_seeds", nargs="+", type=int, help="List of train seeds to aggregate over")
-    parser.add_argument("--model_name_base", type=str, help="base name of model (i.e., excluding seed)")
+    parser.add_argument("--model_arch", type=str, help="model architecture (e.g., resnet50)")
     parser.add_argument("--out", type=str, help="save path for aggregated results")
     args = parser.parse_args()
 
     found_paths = []
     for t_seed in args.train_seeds:
         path = os.path.join(
-            args.results_dir,
-            f"{args.model_name_base}_seed_{t_seed}",
+            args.root,
+            f"{args.model_arch}_vonenet_seed_{t_seed}",
             "results.json"
         )
 
