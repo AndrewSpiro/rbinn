@@ -48,8 +48,7 @@ do
         --batch_size 64 \
         -o $OUTPUT_PATH \
         -restore_path $RESTORE_PATH \
-        --model_arch $MODEL_ARCH \
-        --vonenet_dir $OUTPUT_PATH
+        --model_arch $MODEL_ARCH
 
         echo 'Finished training.'
     fi
@@ -59,6 +58,7 @@ do
         --in_path ../data \
         --ngpus 1 \
         --vonenet_dir $OUTPUT_PATH \
+        --epoch $EPOCHS \
         --results_path $RESULTS_PATH
     fi
 done

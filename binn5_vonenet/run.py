@@ -21,6 +21,7 @@ parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='cifar
 parser.add_argument('--results_path', type=str, default='results.json',
                     help='path to save accuracies')
 parser.add_argument('--vonenet_dir', type=str, help='dir to specify model')
+parser.add_argument('--epoch', type=int, help='epoch from which to load model')
 
 FLAGS, FIRE_FLAGS = parser.parse_known_args()
 
@@ -60,7 +61,7 @@ device = torch.device("cuda" if FLAGS.ngpus > 0 else "cpu")
 
 
 def val():
-    model = get_model(model_arch=FLAGS.model_arch, pretrained=True, vonenet_dir=FLAGS.vonenet_dir)
+    model = get_model(model_arch=FLAGS.model_arch, pretrained=True, vonenet_dir=FLAGS.vonenet_dir, epoch=FLAGS.epoch)
 
     print(f"ngpus = {FLAGS.ngpus}")
     if FLAGS.ngpus == 0:

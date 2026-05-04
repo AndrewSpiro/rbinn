@@ -17,15 +17,19 @@ class Wrapper(Module):
         self.module = model
 
 
-def get_model(vonenet_dir, model_arch='resnet50', pretrained=True, map_location='cpu', **kwargs):
+def get_model(model_arch='resnet50', pretrained=True, map_location='cpu', **kwargs):
     """
     Returns a VOneNet model.
     Select pretrained=True for returning one of the 3 pretrained models.
     model_arch: string with identifier to choose the architecture of the back-end (resnet50, cornets, alexnet)
     """
     if pretrained and model_arch:
+        vonenet_dir=kwargs.get('vonenet_dir', None)
+        epoch=kwargs.get('epoch', None)
         url = f'https://vonenet-models.s3.us-east-2.amazonaws.com/{FILE_WEIGHTS[model_arch.lower()]}'
-        weightsdir_path = os.path.join(vonenet_dir, FILE_WEIGHTS[model_arch.lower()])
+        weightsdir_path = os.path.join(vonenet_dir, f"epoch_{epoch:02d}.pth.tar")
+        print(f"file weights model arch lower: {FILE_WEIGHTS[model_arch.lower()]}")
+        print(f"weightsdir_path: {weightsdir_path}")
         if not os.path.exists(vonenet_dir):
             raise Warning("vonenet_dir does not exist") #acs
             os.makedirs(vonenet_dir)

@@ -16,7 +16,6 @@ parser.add_argument('-restore_epoch', '--restore_epoch', default=0, type=int,
 parser.add_argument('-restore_path', '--restore_path', default=None, type=str,
                     help='path of folder containing specific epoch file for restoring model training')
 parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='imagenet', help='dataset to train on')
-parser.add_argument('--vonenet_dir', type=str, help='dir to specify model')
 
 ## Training parameters
 parser.add_argument('--ngpus', default=0, type=int,
@@ -156,8 +155,8 @@ def load_model():
                       gabor_seed=FLAGS.gabor_seed, simple_channels=FLAGS.simple_channels,
                       complex_channels=FLAGS.simple_channels, noise_mode=FLAGS.noise_mode,
                       noise_scale=FLAGS.noise_scale, noise_level=FLAGS.noise_level, k_exc=FLAGS.k_exc,
-                      image_size=image_size, num_classes=num_classes,
-                      vonenet_dir=FLAGS.vonenet_dir)
+                      image_size=image_size, num_classes=num_classes
+                      )
 
     print(f"gpu info: {FLAGS.ngpus} {torch.cuda.device_count()}")
     if FLAGS.ngpus > 0 and torch.cuda.device_count() > 1:
