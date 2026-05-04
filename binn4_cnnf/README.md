@@ -1,3 +1,18 @@
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+NOTE: 
+```bash
+<model_name>_seed_<train_seed>-best_model.pt
+```
+is the model with highest accuracy during training with seed 
+```bash
+<train_seed>
+```
+while 
+```bash
+<model_name>_seed_<train_seed>.pt
+```
+is the model obtained after all epochs are completed. If training loss monotonically decreases, these models are the same.
+---
 # CNNF
 <img align="center" src="CNNF.png" width="750">
 
