@@ -14,34 +14,31 @@ if [ "$DEBUG" = true ]; then
     EPOCHS=1
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
-    OUTPUT_BASE=output_debug
     RESTORE_EPOCH=1
-    RESTORE_BASE=restore_debug
-    RESULTS_DIR=debug_results
+    ROOT=./debug
     echo "Running in debug mode..."
 else
     EPOCHS=70
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
-    OUTPUT_BASE=output
     RESTORE_EPOCH=5
-    RESTORE_BASE=restore
-    RESULTS_DIR=results
+    ROOT=.
 fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
+
+    OUTPUT_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/output"
+    mkdir -p $OUTPUT_PATH
+    
+    RESTORE_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/restore"
+    mkdir -p $RESTORE_PATH
+    
+    RESULTS_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/results.json"
+
     if [ "$RUN_TRAIN" = true ]; then
 
         echo "Running training with seed $T_SEED"
-
-        mkdir -p $OUTPUT_BASE
-        VONENET_DIR="${OUTPUT_BASE}/${MODEL_ARCH}_vonenet_seed_${T_SEED}"
-        
-        mkdir -p $RESTORE_BASE
-        
-        mkdir -p "${RESULTS_DIR}/${MODEL_ARCH}_seed_${T_SEED}"
-        RESULTS_PATH="${RESULTS_DIR}/${MODEL_ARCH}_seed_${T_SEED}/results.json"
 
         python train.py train \
         --dataset cifar10 \
@@ -49,10 +46,10 @@ do
         --ngpus 1 \
         --epochs $EPOCHS \
         --batch_size 64 \
-        -o "${OUTPUT_BASE}/${MODEL_ARCH}_vonenet_seed_${T_SEED}" \
-        -restore_path "$RESTORE_BASE/${MODEL_ARCH}_vonenet_seed_${T_SEED}" \
+        -o $OUTPUT_PATH \
+        -restore_path $RESTORE_PATH \
         --model_arch $MODEL_ARCH \
-        --vonenet_dir $VONENET_DIR
+        --vonenet_dir $OUTPUT_PATH
 
         echo 'Finished training.'
     fi
@@ -61,14 +58,14 @@ do
         python run.py \
         --in_path ../data \
         --ngpus 1 \
-        --vonenet_dir $VONENET_DIR \
+        --vonenet_dir $OUTPUT_PATH \
         --results_path $RESULTS_PATH
     fi
 done
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-AGG_RESULTS_DIR="${RESULTS_DIR}/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}"
-python aggregate_results.py --results_dir $RESULTS_DIR \
+AGG_RESULTS_DIR="${ROOT}/aggregated_results/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}"
+python aggregate_results.py --root $ROOT \
                             --train_seeds "${TRAIN_SEEDS[@]}" \
-                            --model_name_base $MODEL_ARCH \
+                            --model_arch $MODEL_ARCH \
                             --out $AGG_RESULTS_DIR
