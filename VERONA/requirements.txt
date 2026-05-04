@@ -1,0 +1,15 @@
+# VERONA Requirements - CPU-only installation
+# Note: NVIDIA packages are excluded for compatibility with different CUDA versions.
+# For direct GPU support, use: uv pip install ada-verona
+matplotlib>=3.10.0
+numpy>=1.24.3
+onnx>=1.14.0
+onnxruntime>=1.14.1
+onnx2torch>=1.5.14
+pandas>=2.0.1
+PyYAML>=6.0.1
+result>=0.9.0
+seaborn>=0.13.2
+torch>=2.6.0
+torchvision>=0.18.1
+typing_extensions

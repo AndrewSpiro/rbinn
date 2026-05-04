@@ -1,0 +1,124 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ada-verona"
+version = "1.0.3"
+description = "Neural Network Robustness Analysis Framework"
+authors = [
+    {name = "Annelot Bosman", email = "a.w.bosman@liacs.leidenuniv.nl"},
+    {name = "Aaron Berger", email = "A.Berger@tudelft.nl"},
+    {name = "Hendrik Baacke", email = "hendrik.baacke@rwth-aachen.de"},
+    {name = "Jan van Rijn", email = "jan.vanrijn@liacs.leidenuniv.nl"},
+    {name = "Holger H. Hoos", email = "hh@aim.rwth-aachen.de"}
+]
+author = "Annelot Bosmann, Aaron Berger, Hendrik Baacke, Jan van Rijn, Holger H. Hoos"
+author_email = "a.w.bosman@liacs.leidenuniv.nl, aaron.berger@rwth-aachen.de, hendrik.baacke@rwth-aachen.de, jan.vanrijn@liacs.leidenuniv.nl, hh@aim.rwth-aachen.de"
+readme = "README.md"
+requires-python = ">=3.10,<3.12" 
+license = {file = "LICENSE"}
+keywords = ["neural networks", "robustness", "verification", "adversarial", "adversarial robustness", "adversarial attacks", "AI safety"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: POSIX :: Linux", 
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "matplotlib>=3.10.0",
+    "numpy>=1.24.3",
+    "onnx>=1.17.0",
+    "onnxruntime>=1.18.0",
+    "onnx2torch>=1.5.15",
+    "pandas>=2.0.1",
+    "PyYAML>=6.0.1",
+    "result>=0.9.0",
+    "seaborn>=0.13.2",
+    "torch>=2.6.0",
+    "torchvision>=0.18.1",
+    "typing_extensions"
+]
+
+[project.optional-dependencies]
+
+gpu = [
+    "nvidia-cublas-cu12>=12.1.0,<13.0.0",
+    "nvidia-cuda-cupti-cu12>=12.1.0,<13.0.0",
+    "nvidia-cuda-nvrtc-cu12>=12.1.0,<13.0.0",
+    "nvidia-cuda-runtime-cu12>=12.1.0,<13.0.0",
+    "nvidia-cudnn-cu12>=9.1.0,<10.0.0",
+    "nvidia-cufft-cu12>=11.0.0,<12.0.0",
+    "nvidia-curand-cu12>=10.3.0,<11.0.0",
+    "nvidia-cusolver-cu12>=11.4.0,<12.0.0",
+    "nvidia-cusparse-cu12>=12.1.0,<13.0.0",
+    "nvidia-nccl-cu12>=2.20.0,<3.0.0",
+    "nvidia-nvjitlink-cu12>=12.4.0,<13.0.0",
+    "nvidia-nvtx-cu12>=12.1.0,<13.0.0",
+    "triton>=3.2.0,<4.0.0"
+]
+
+dev = [
+    "pytest>=8.2.2",
+    "pytest-mock>=3.14.0",
+    "pytest-cov>=4.1.0",
+    "coverage>=7.0.0",
+    "auto-verify==1.0.0",
+    "autoattack @ git+https://github.com/fra31/auto-attack",
+    "ruff>=0.3.4",
+    "black>=22.0.0",
+    "mypy>=0.991",
+    "build>=0.10.0",
+    "twine>=4.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/ADA-research/VERONA"
+Repository = "https://github.com/ADA-research/VERONA" 
+Documentation = "https://ada-research.github.io/VERONA/"
+Issues = "https://github.com/ADA-research/VERONA/issues"
+
+
+[tool.hatch.build.targets.wheel]
+packages = ["ada_verona"]
+exclude = [
+    "*.pyc",
+    "__pycache__/**/*",
+    "*.log",
+    "*.tmp",
+    "*.bak",
+    ".DS_Store",
+    "Thumbs.db"
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
+
+[tool.ruff]
+line-length = 120
+exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F", 
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
