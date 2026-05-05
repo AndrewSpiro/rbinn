@@ -5,11 +5,21 @@ import requests
 
 from .vonenet import VOneNet
 from torch.nn import Module
+import torch.nn.functional as F
 
 FILE_WEIGHTS = {'alexnet': 'vonealexnet_e70.pth.tar', 'resnet50': 'voneresnet50_e70.pth.tar',
                 'resnet50_at': 'voneresnet50_at_e96.pth.tar', 'cornets': 'vonecornets_e70.pth.tar',
                 'resnet50_ns': 'voneresnet50_ns_e70.pth.tar'}
 
+
+class CIFARVOneNetWrapper(nn.Module):
+    def __init__(self, vone_model):
+        super(CIFARVOneNetWrapper, self).__init__()
+        self.vone_model = vone_model
+
+    def forward(self, x):
+        x = F.interpolate(x, size=(224, 224), mode='bilinear', align_corners=False)
+        return self.vone_model(x)
 
 class Wrapper(Module):
     def __init__(self, model):
