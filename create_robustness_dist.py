@@ -7,9 +7,18 @@ import torchvision.transforms as transforms
 
 # MODEL IMPORTS
 # pixelreg
+from binn1_pixelreg.models import ResNet18
+# khmodel
+from binn2_khmodel.tests.context import *
+from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
+from binn2_khmodel.src.LocalLearning import Data
 # eat
 from binn3_eat.model import model_dispatcher
 from binn3_eat.helper_class import AddEdgeMap
+#cnnf
+from binn4_cnnf.cnnf.model_cifar import WideResNet
+from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
+#vonenet
 
 # VERONA imports
 from VERONA.ada_verona.verification_module.attack_estimation_module import (
