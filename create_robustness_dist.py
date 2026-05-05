@@ -19,6 +19,9 @@ from binn3_eat.helper_class import AddEdgeMap
 from binn4_cnnf.cnnf.model_cifar import WideResNet
 from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
 #vonenet
+from binn5_vonenet import vonenet
+from binn5_vonenet.vonenet import CIFARVOneNetWrapper
+from binn5_vonenet.train import load_model as load_vonenet
 
 # VERONA imports
 from VERONA.ada_verona.verification_module.attack_estimation_module import (
@@ -108,7 +111,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "model",
-        choices=["pixelreg", "eat"],
+        choices=["pixelreg", "eat", "cnnf", "vonenet"],
         help="Model on which to obtain robustness distributions.",
     )
 
