@@ -14,5 +14,18 @@
             "seed_2": "binn3_eat/Rescifar10/seed_2/FGSM/cifar10_rgbedge_8_robust.pth"
         },
         "type": "pytorch"
+    },
+    "cnnf": {
+        "paths": {
+            "seed_0": "binn4_cnnf/models/CNNF_seed_0-best.pt",
+            "baseline": "binn4_cnnf/models/huang_CNNF_2_cifar.pt"
+        },
+        "type": "pytorch"
+    },
+    "vonenet": {
+        "paths": {
+            "seed_0": "binn5_vonenet/resnet50_vonenet_seed_0/output/epoch_70.pth.tar"
+        },
+        "type": "pytorch"
     }
 }
