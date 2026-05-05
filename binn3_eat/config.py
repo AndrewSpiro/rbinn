@@ -1,5 +1,5 @@
-from lib import *
-import edge_detector
+from binn3_eat.lib import *
+import binn3_eat.edge_detector
 
 
 torch.manual_seed(42)
