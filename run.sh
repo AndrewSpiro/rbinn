@@ -7,7 +7,7 @@ source $(conda info --base)/etc/profile.d/conda.sh
 DEBUG=true
 RUN_VALIDS=false
 
-MODELS=("pixelreg" "eat")
+MODELS=("pixelreg" "eat" "cnnf" "vonenet")
 EPSILON_SPACE=berger
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
