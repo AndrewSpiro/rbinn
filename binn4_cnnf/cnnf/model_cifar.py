@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import cnnf.layers as layers
+from ..cnnf import layers as layers
 import logging
 import os
 import torch.optim as optim
