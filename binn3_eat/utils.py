@@ -1,6 +1,6 @@
-from lib import *
-from config import *
-from edge_detector import *
+from binn3_eat.lib import *
+from binn3_eat.config import *
+from binn3_eat.edge_detector import *
 import torchattacks
 # import copy
 from torchattacks import PGD, FGSM, CW
