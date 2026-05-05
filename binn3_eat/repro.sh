@@ -5,6 +5,8 @@ source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate eat
 
+cd "$(dirname "$0")"
+
 DEBUG=true
 
 NET_TYPE=rgbedge
