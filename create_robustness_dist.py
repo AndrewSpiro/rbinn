@@ -5,6 +5,12 @@ import numpy as np
 # torch imports
 import torchvision.transforms as transforms
 
+# MODEL IMPORTS
+# pixelreg
+# eat
+from binn3_eat.model import model_dispatcher
+from binn3_eat.helper_class import AddEdgeMap
+
 # VERONA imports
 from VERONA.ada_verona.verification_module.attack_estimation_module import (
     AttackEstimationModule,
@@ -27,25 +33,26 @@ def str2bool(v):
 
 
 def create_transforms(network_name):
-    if network_name == "attias_B7A869":
+    if network_name == "pixelreg":
+        print("Transforming for pixelreg")
         return transforms.Compose(
             [transforms.ToTensor(), transforms.Lambda(lambda x: (x * 5) - 2.5)]
         )
-    elif network_name == "dapello":
-        print("Transforming for dapello")
+    elif network_name == "vonenet":
+        print("Transforming for vonenet")
         return transforms.Compose(
             [
                 transforms.ToTensor(),
                 transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
             ]
         )
-    elif network_name == "huang":
-        print("Transforming for Huang")
+    elif network_name == "cnnf":
+        print("Transforming for cnnf")
         return transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]
         )
-    elif network_name == "borji":
-        print("Transforming for Borji")
+    elif network_name == "eat":
+        print("Transforming for eat")
         return transforms.Compose(
             [
                 transforms.Resize((64, 64)),
@@ -84,6 +91,7 @@ def get_epsilon_list(search_space: str):
 
 def main():
     print("Creating robustness distribution...")
+    transform = create_transforms(NETWORK_NAME)
 
 
 if __name__ == "__main__":
