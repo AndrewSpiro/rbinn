@@ -7,7 +7,7 @@ import fire
 
 parser = argparse.ArgumentParser(description='ImageNet / CIFAR-10 Training')
 ## General parameters
-parser.add_argument('--in_path', required=True,
+parser.add_argument('--in_path', default='../data',
                     help='for ImageNet: path to folder that contains train and val folders; for CIFAR-10: root path where the dataset will be downloaded/stored')
 parser.add_argument('-o', '--output_path', default=None,
                     help='path for storing ')
@@ -116,7 +116,7 @@ import torch
 import torch.nn as nn
 import torch.utils.model_zoo
 import torchvision
-from vonenet import get_model
+from .vonenet import get_model
 
 torch.manual_seed(FLAGS.torch_seed)
 
