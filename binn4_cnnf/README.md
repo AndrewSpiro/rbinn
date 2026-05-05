@@ -12,6 +12,36 @@ while
 <model_name>_seed_<train_seed>.pt
 ```
 is the model obtained after all epochs are completed. If training loss monotonically decreases, these models are the same.
+
+### Contributions
+
+Added a helper class 
+```bash
+iterative_wrapper.py
+```
+ so that 
+```bash
+model[x]
+```
+is now 
+```bash
+model.run_average[x]
+```
+. VERONA calls models like
+```bash
+model[x]
+```
+so use this helper class to specify 
+```bash
+run_average
+```
+```bash
+run_cycles
+```
+or
+```bash
+run_cycles_adv
+```.
 ---
 # CNNF
 <img align="center" src="CNNF.png" width="750">
