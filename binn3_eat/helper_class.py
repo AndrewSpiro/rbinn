@@ -1,4 +1,4 @@
-from binn3_eat.edge_detector import *
+from edge_detector import *
 import torch
 
 class AddEdgeMap:

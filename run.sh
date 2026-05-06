@@ -5,9 +5,11 @@ set -e
 source $(conda info --base)/etc/profile.d/conda.sh
 
 DEBUG=true
-RUN_VALIDS=false
+RUN_VALIDS=true
+GET_RDS=false
 
-MODELS=("pixelreg" "eat" "cnnf" "vonenet")
+declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
+MODELS=("pixelreg")
 EPSILON_SPACE=berger
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -16,20 +18,31 @@ echo "Starting full pipeline..."
 
 if [ "$RUN_VALIDS" = true ]; then
     echo "Starting validations..."
-    echo "Starting BINN1 pipeline..."
-    bash binn1_pixelreg/repro.sh
+
+    for m in "${MODELS[@]}"
+    do
+        echo "Starting $m pipeline..."
+    
+        conda deactivate
+        conda activate $m
+
+        bash "binn"${MODEL_IDS[$m]}"_"$m"/repro.sh"
+
+        echo "Completed $m validation."
+    done
 else
     echo "Skipping validations"
 fi
 
-conda activate verona_env
-for m in "${MODELS[@]}"; do
-    echo "Obtaining robustness distribution for $m"
-    python create_robustness_dist.py $m \
-        --epsilon_space $EPSILON_SPACE \
-        --bool_debug $DEBUG \
-        --pgd_num_iter $PGD_NUM_ITER \
-        --pgd_step_size $PGD_STEP_SIZE
-done
-
+if [ "${GET_RDS}" = true ]; then
+    conda activate verona_env
+    for m in "${MODELS[@]}"; do
+        echo "Obtaining robustness distribution for $m"
+        python create_robustness_dist.py $m \
+            --epsilon_space $EPSILON_SPACE \
+            --bool_debug $DEBUG \
+            --pgd_num_iter $PGD_NUM_ITER \
+            --pgd_step_size $PGD_STEP_SIZE
+    done
+fi
 echo "Completed all experiments successfully"

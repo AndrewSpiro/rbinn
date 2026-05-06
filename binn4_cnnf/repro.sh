@@ -4,9 +4,10 @@ set -e
 source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate cnnf
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DEBUG=true
-RUN_TRAIN=false
+RUN_TRAIN=true
 MODEL_DIR='models'
 BASELINES_PATH=orig_results.json
 BATCH_SIZE=64
@@ -35,7 +36,7 @@ do
 
         echo "Running training with seed $T_SEED"
         
-        python train.py --data 'cifar10' \
+        python "$SCRIPT_DIR/train.py" --data 'cifar10' \
                         --max-cycles 2 \
                         --ind 5 \
                         --mse-parameter 0.1 \

@@ -3,22 +3,27 @@ import json
 import numpy as np
 
 # torch imports
+import torchvision
 import torchvision.transforms as transforms
 
 # MODEL IMPORTS
 # pixelreg
 from binn1_pixelreg.models import ResNet18
+
 # khmodel
 from binn2_khmodel.tests.context import *
 from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
 from binn2_khmodel.src.LocalLearning import Data
+
 # eat
 from binn3_eat.model import model_dispatcher
 from binn3_eat.helper_class import AddEdgeMap
-#cnnf
+
+# cnnf
 from binn4_cnnf.cnnf.model_cifar import WideResNet
 from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
-#vonenet
+
+# vonenet
 from binn5_vonenet import vonenet
 from binn5_vonenet.vonenet import CIFARVOneNetWrapper
 from binn5_vonenet.train import load_model as load_vonenet
@@ -100,10 +105,35 @@ def get_epsilon_list(search_space: str):
             f"Only implemented search spaces are berger and bosman. got {search_space} instead."
         )
 
+def normalize_epsilon_list(dataset, epsilon_list: list, eps_max, eps_min):
+    '''
+    Rescale the epsilons so they have the have the appropriate relative perturbation on images.
+    Range is defined as the difference between the max anx min pixel value in the dataset.
+    The scaling factor is the qoutient of the data range and the eps range.
+    Each eps in the original list is multiplied by the scaling facotr.
+    '''
+
+    data_max = max([torch.max(dataset[i][0]) for i in range(len(dataset))])
+    data_min = min([torch.min(dataset[i][0]) for i in range(len(dataset))])
+    print(f"Normalizing. Dataset max is {data_max}, dataset min is {data_min}")
+    
+    normalized_list = []
+    for eps in epsilon_list:
+        eps_normalized = eps * ((data_max - data_min))/(eps_max - eps_min)
+        normalized_list.append(np.float64(eps_normalized.numpy()))
+    print(f"Max and min epsilons were {max(epsilon_list), min(epsilon_list)}, now they are {max(normalized_list), min(normalized_list)}")
+    return normalized_list
+
 
 def main():
     print("Creating robustness distribution...")
     transform = create_transforms(NETWORK_NAME)
+
+    torch_dataset = getattr(torchvision.datasets, DATASET_NAME)(
+    root="./data", train=False, download=True, transform=transform
+    )
+
+    epsilon_list = normalize_epsilon_list(torch_dataset, EPSILON_LIST, ORIG_MAX, ORIG_MIN)
 
 
 if __name__ == "__main__":
@@ -146,6 +176,7 @@ if __name__ == "__main__":
 
     models = json.load(open("models.json", "r"))
 
+    DATASET_NAME = "CIFAR10"
     NETWORK_NAME = args.model
     PGD_NUM_ITER = args.pgd_num_iter
     PGD_STEP_SIZE = args.pgd_step_size

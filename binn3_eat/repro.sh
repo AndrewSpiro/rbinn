@@ -4,8 +4,7 @@ set -e
 source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate eat
-
-cd "$(dirname "$0")"
+SCRIPT_DIR=binn3_eat
 
 DEBUG=true
 
@@ -13,13 +12,13 @@ NET_TYPE=rgbedge
 DATA_DIR=cifar10
 
 if [ "$DEBUG" = true ] ; then
-    ROOT="./debug"
+    ROOT="${SCRIPT_DIR}/debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=1
     echo "--- RUNNING IN DEBUG MODE ---"
 else
-    ROOT="."
+    ROOT="${SCRIPT_DIR}"
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
     EPOCHS=10
@@ -29,7 +28,7 @@ for T_SEED in "${TRAIN_SEEDS[@]}"
 do
     echo "Running training with seed $T_SEED"
 
-    python train.py \
+    python "${SCRIPT_DIR}/train.py" \
         --net_type $NET_TYPE \
         --model cifar10 \
         --sigmas 8 \
@@ -43,7 +42,7 @@ do
 done
 
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-python compute_stats.py \
+python "${SCRIPT_DIR}/compute_stats.py" \
     --root_dir $ROOT \
     --data_dir $DATA_DIR \
     --seeds "${TRAIN_SEEDS[@]}" \

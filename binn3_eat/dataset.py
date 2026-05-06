@@ -1,4 +1,4 @@
-from binn3_eat.lib import *
+from lib import *
 from torchvision import datasets
 from torchvision import transforms, datasets, models
 import torch

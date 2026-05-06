@@ -4,6 +4,7 @@ set -e
 source $(conda info --base)/etc/profile.d/conda.sh
 
 conda activate vonenet
+cd "$(dirname "$0")"
 
 DEBUG=true
 RUN_TRAIN=true
