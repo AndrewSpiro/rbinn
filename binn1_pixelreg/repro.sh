@@ -40,11 +40,16 @@ do
     MODEL_DIR="${SAVE_DIR}/model_seed_$T_SEED"
     mkdir -p "$MODEL_DIR"
 
+    DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
+    echo "Data dir is here: ${DATA_DIR}"
+    mkdir -p "$DATA_DIR"
+
     if [ "$RUN_TRAINING" = true ]; then
         #Train
         echo "Starting training for train seed $T_SEED"
 
         python "${SCRIPT_DIR}/train.py" \
+        --data_dir $DATA_DIR \
         --task $TASK \
         --archi $ARCHI \
         --reg_data $REG_DATA \
@@ -93,6 +98,7 @@ do
                 esac
 
                 python "${SCRIPT_DIR}/eval.py" \
+                --data_dir $DATA_DIR \
                 --task $TASK \
                 --archi $ARCHI \
                 --reg_data $REG_DATA \
@@ -113,4 +119,4 @@ do
 done
 
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-python aggregate_results.py $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
+python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
