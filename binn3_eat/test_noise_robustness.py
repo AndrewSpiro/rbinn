@@ -12,9 +12,9 @@ import torchvision.transforms as trn
 import torchvision.models as models
 import torch.utils.model_zoo as model_zoo
 import numpy as np
-from model import *
-from utils import detect_edge_batch, save_img
-from dataset import folderDB
+from binn3_eat.model import *
+from binn3_eat.utils import detect_edge_batch, save_img
+from binn3_eat.dataset import folderDB
 from make_imagenet_64_c import *
 
 

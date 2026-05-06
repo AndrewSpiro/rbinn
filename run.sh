@@ -32,7 +32,7 @@ if [ "$RUN_VALIDS" = true ]; then
         conda deactivate
         conda activate $m
 
-        bash "binn"${MODEL_IDS[$m]}"_"$m"/repro.sh"
+        bash "${SCRIPT_DIR}/binn${MODEL_IDS[$m]}_"${m}"/repro.sh"
 
         echo "Completed $m validation."
     done

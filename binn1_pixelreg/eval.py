@@ -6,8 +6,8 @@ import torch
 
 from dotenv import load_dotenv
 
-from args_control import runtime_parser, get_configs
-from records_management import TrainingEnvironment
+from binn1_pixelreg.args_control import runtime_parser, get_configs
+from binn1_pixelreg.records_management import TrainingEnvironment
 
 from utils import (
     timer_func,
@@ -16,7 +16,7 @@ from utils import (
 )
 import wandb
 
-from attack import attack_resnet
+from binn1_pixelreg.attack import attack_resnet
 
 
 @timer_func

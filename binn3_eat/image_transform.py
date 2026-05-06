@@ -1,5 +1,5 @@
-from .lib import *
-from .config import *
+from binn3_eat.lib import *
+from binn3_eat.config import *
 
 class ImageTransform():
     def __init__(self, resize, mean, std):

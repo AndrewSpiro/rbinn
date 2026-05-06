@@ -5,6 +5,8 @@ source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate cnnf
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 DEBUG=true
 RUN_TRAIN=true

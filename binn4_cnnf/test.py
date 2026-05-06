@@ -5,9 +5,9 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from shutil import copyfile
 from datetime import datetime
-from cnnf.model_cifar import WideResNet
-from cnnf.model_mnist import CNNF
-from utils import seed_torch
+from binn4_cnnf.cnnf.model_cifar import WideResNet
+from binn4_cnnf.cnnf.model_mnist import CNNF
+from binn4_cnnf.utils import seed_torch
 import json
 
 # version issue- resolving manuall -aspiro

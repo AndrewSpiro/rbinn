@@ -3,7 +3,7 @@ from adversarialAttacks.attackFactory import AttackFactory
 import wandb, utils
 
 # from dotenv import load_dotenv
-from args_control import runtime_parser, get_configs
+from binn1_pixelreg.args_control import runtime_parser, get_configs
 from utils import get_images_from_loader, timer_func, name_wandb_run
 import numpy as np
 

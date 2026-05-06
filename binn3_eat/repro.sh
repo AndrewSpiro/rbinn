@@ -5,9 +5,11 @@ source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate eat
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 DEBUG=true
-RUN_TRAIN=false
+RUN_TRAIN=true
 
 NET_TYPE=rgbedge
 DATA_DIR=cifar10

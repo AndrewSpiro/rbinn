@@ -6,10 +6,10 @@ import random
 import numpy as np
 import json
 
-from lib import *
-from config import *
-from model import model_dispatcher
-from utils import * 
+from binn3_eat.lib import *
+from binn3_eat.config import *
+from binn3_eat.model import model_dispatcher
+from binn3_eat.utils import * 
 
 def set_seed(seed):
     random.seed(seed)

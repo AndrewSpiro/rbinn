@@ -8,11 +8,11 @@ from torch.optim import lr_scheduler
 from time import time
 import sys
 
-from .lib import *
-from .image_transform import ImageTransform
-from .config import *
-from .utils import make_datapath_list, train_model, load_model
-from .dataset import MyDataset, Dataset_MNIST, Dataset_FashionMNIST, DogsDataset, folderDB, Dataset_CIFAR10
+from binn3_eat.lib import *
+from binn3_eat.image_transform import ImageTransform
+from binn3_eat.config import *
+from binn3_eat.utils import make_datapath_list, train_model, load_model
+from binn3_eat.dataset import MyDataset, Dataset_MNIST, Dataset_FashionMNIST, DogsDataset, folderDB, Dataset_CIFAR10
 
 
 # hybrid hulz imports

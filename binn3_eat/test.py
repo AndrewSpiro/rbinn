@@ -1,10 +1,10 @@
 from __future__ import print_function
 import argparse
 
-from lib import *
-from config import *
-from model import model_dispatcher
-from utils import * 
+from binn3_eat.lib import *
+from binn3_eat.config import *
+from binn3_eat.model import model_dispatcher
+from binn3_eat.utils import * 
 import os
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'

@@ -5,9 +5,8 @@ source $(conda info --base)/etc/profile.d/conda.sh
 
 conda activate vonenet
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PARENT="$(dirname "$SCRIPT_DIR")"
-PACKAGE="$(basename "$SCRIPT_DIR")"
-cd "$PARENT"
+PARENT_DIR="$(dirname "$SCRIPT_DIR")"
+export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 DEBUG=true
 RUN_TRAIN=true
@@ -48,7 +47,7 @@ do
 
         echo "Running training with seed $T_SEED"
 
-        python -m "$PACKAGE.train" train \
+        python "${SCRIPT_DIR}/train.py" train \
         --dataset cifar10 \
         --in_path $DATA_DIR \
         --ngpus 1 \
@@ -62,7 +61,7 @@ do
     fi
 
     if [ "$RUN_EVAL" = true ]; then
-        python -m "$PACKAGE.run" \
+        python "${SCRIPT_DIR}/run.py" \
         --in_path $DATA_DIR \
         --ngpus 1 \
         --vonenet_dir $OUTPUT_PATH \
@@ -73,7 +72,7 @@ done
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
 AGG_RESULTS_DIR="${ROOT}/aggregated_results/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}"
-python -m "$PACKAGE.aggregate_results" --root $ROOT \
+python "${SCRIPT_DIR}/aggregate_results.py" --root $ROOT \
                             --train_seeds "${TRAIN_SEEDS[@]}" \
                             --model_arch $MODEL_ARCH \
                             --out $AGG_RESULTS_DIR

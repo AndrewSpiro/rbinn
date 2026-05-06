@@ -6,8 +6,11 @@ source $(conda info --base)/etc/profile.d/conda.sh
 conda activate pixelreg
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
+
 DEBUG=true
-RUN_TRAINING=false
+RUN_TRAINING=true
 RUN_ATTACKS=true
 
 TASK=CIFAR10
@@ -35,8 +38,6 @@ fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
-
-
     MODEL_DIR="${SAVE_DIR}/model_seed_$T_SEED"
     mkdir -p "$MODEL_DIR"
 
