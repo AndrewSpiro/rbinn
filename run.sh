@@ -8,8 +8,14 @@ DEBUG=true
 RUN_VALIDS=true
 GET_RDS=false
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
+echo "Data dir is here: ${DATA_DIR}"
+mkdir -p "$DATA_DIR"
+EXP_REPO_PATH="$(dirname "$SCRIPT_DIR")/experiments"
+
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
-MODELS=("pixelreg")
+MODELS=("vonenet")
 EPSILON_SPACE=berger
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -42,7 +48,9 @@ if [ "${GET_RDS}" = true ]; then
             --epsilon_space $EPSILON_SPACE \
             --bool_debug $DEBUG \
             --pgd_num_iter $PGD_NUM_ITER \
-            --pgd_step_size $PGD_STEP_SIZE
+            --pgd_step_size $PGD_STEP_SIZE \
+            --data_dir $DATA_DIR \
+            --exp_repo_path $EXP_REPO_PATH
     done
 fi
 echo "Completed all experiments successfully"
