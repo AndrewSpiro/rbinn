@@ -1,8 +1,13 @@
+import logging
 import argparse
 import json
 import numpy as np
 from pathlib import Path
 import os
+import pandas as pd
+import time
+from tqdm import tqdm
+import sys
 
 # torch imports
 import torch
@@ -21,56 +26,61 @@ import torchvision.transforms as transforms
 # print("khmodel imports done")
 
 # # eat
-# from binn3_eat.model import model_dispatcher
-# from binn3_eat.helper_class import AddEdgeMap
+from binn3_eat.model import model_dispatcher
+from binn3_eat.helper_class import AddEdgeMap
 
-# print("eat imports done")
+print("eat imports done")
 
-# # cnnf
-# from binn4_cnnf.cnnf.model_cifar import WideResNet
-# from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
-# print("cnnf imports done")
+# cnnf
+from binn4_cnnf.cnnf.model_cifar import WideResNet
+from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
 
-# vonenet
-from binn5_vonenet import vonenet
-from binn5_vonenet.vonenet import CIFARVOneNetWrapper
-from binn5_vonenet.train import load_model as load_vonenet
-print("vonenet imports done")
+print("cnnf imports done")
+
+# # vonenet
+# from binn5_vonenet import vonenet
+# from binn5_vonenet.vonenet import CIFARVOneNetWrapper
+# from binn5_vonenet.train import load_model as load_vonenet
+# print("vonenet imports done")
 
 # VERONA imports
-from VERONA.ada_verona import PGDAttack
-from VERONA.ada_verona.epsilon_value_estimator.binary_search_epsilon_value_estimator import (
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "VERONA"))
+from ada_verona import PGDAttack
+from ada_verona.epsilon_value_estimator.binary_search_epsilon_value_estimator import (
     BinarySearchEpsilonValueEstimator,
 )
 
-from VERONA.ada_verona.database.dataset.pytorch_experiment_dataset import (
+from ada_verona.database.dataset.pytorch_experiment_dataset import (
     PytorchExperimentDataset,
 )
-from VERONA.ada_verona.database.experiment_repository import ExperimentRepository
-from VERONA.ada_verona.database.machine_learning_model.pytorch_network import (
+from ada_verona.database.experiment_repository import ExperimentRepository
+from ada_verona.database.machine_learning_model.pytorch_network import (
     PyTorchNetwork,
 )
 
-from VERONA.ada_verona.dataset_sampler.predictions_based_sampler import (
+from ada_verona.dataset_sampler.predictions_based_sampler import (
     PredictionsBasedSampler,
 )
-from VERONA.ada_verona.dataset_sampler.dataset_sampler import DatasetSampler
-from VERONA.ada_verona.database.dataset.experiment_dataset import ExperimentDataset
-from VERONA.ada_verona.epsilon_value_estimator.epsilon_value_estimator import (
+from ada_verona.dataset_sampler.dataset_sampler import DatasetSampler
+from ada_verona.database.dataset.experiment_dataset import ExperimentDataset
+from ada_verona.epsilon_value_estimator.epsilon_value_estimator import (
     EpsilonValueEstimator,
 )
 
-from VERONA.ada_verona.verification_module.attack_estimation_module import (
+from ada_verona.verification_module.attack_estimation_module import (
     AttackEstimationModule,
 )
-from VERONA.ada_verona.verification_module.property_generator.one2any_property_generator import (
+from ada_verona.verification_module.property_generator.one2any_property_generator import (
     One2AnyPropertyGenerator,
 )
-from VERONA.ada_verona.verification_module.property_generator.property_generator import (
+from ada_verona.verification_module.property_generator.property_generator import (
     PropertyGenerator,
 )
 
 print("verona imports done")
+
+logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
+torch.manual_seed(0)
 
 
 def str2bool(v):
@@ -178,6 +188,48 @@ def create_distribution(
         )
     print(f"network: {network}")
 
+    try:
+        if args.bool_debug:
+            num_samples = 2
+            sampled_data = dataset.get_subset(range(num_samples))
+            print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
+            start_time = time.time()
+            correct_data = dataset_sampler.sample(network, sampled_data)
+            end_time = time.time()
+            print(f"time to sample was {end_time - start_time}")
+            save_correct_instances(correct_data, experiment_repository)
+            print(f"Clean accuracy on subset is {len(correct_data)/num_samples}")
+        else:
+            sampled_data = dataset
+            print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
+            if hasattr(network.model, "run_average"):
+                print("model has 'run_average' attr")
+            else:
+                print("model does not have 'run_average' attr")
+                print("Sampling started")
+                correct_data = dataset_sampler.sample(network, sampled_data)
+                print("Sampling finished")
+                save_correct_instances(correct_data, experiment_repository)
+                print(
+                    f"Clean accuracy on subset is {len(correct_data)/len(sampled_data)}"
+                )
+        print("Data sampled")
+
+    except Exception as e:
+        logging.info(f"failed for network {network} with error {e}")
+    for data_point in tqdm(sampled_data):
+        verification_context = experiment_repository.create_verification_context(
+            network=network,
+            data_point=data_point,
+            property_generator=property_generator,
+        )
+        epsilon_value_result = epsilon_value_estimator.compute_epsilon_value(
+            verification_context
+        )
+        experiment_repository.save_result(epsilon_value_result)
+
+    experiment_repository.save_plots()
+
 
 def load_pt_network(network_name: str, network_path):
     print(f"Loading network {network_name}")
@@ -192,7 +244,7 @@ def load_pt_network(network_name: str, network_path):
     elif network_name == "khmodel":
         print("load khmodel")
     elif network_name == "eat":
-        model, _, _, _ = model_dispatcher('cifar10', 'rgbedge', 'cifar10', 64, 10)
+        model, _, _, _ = model_dispatcher("cifar10", "rgbedge", "cifar10", 64, 10)
         state_dict = torch.load(network_path)
         model.load_state_dict(state_dict)
         network = PyTorchNetwork(model, (1, 4, 64, 64), network_name)
@@ -202,20 +254,35 @@ def load_pt_network(network_name: str, network_path):
         state_dict = torch.load(network_path)
         model.load_state_dict(state_dict)
         cycles_model = IterativeWrapper(model)
-        network = PyTorchNetwork(cycles_model, (1,3,32,32), network_name)
+        network = PyTorchNetwork(cycles_model, (1, 3, 32, 32), network_name)
         return network
     elif network_name == "vonenet":
         ckpt_data = torch.load(network_path)
-        state_dict = ckpt_data['state_dict']
+        state_dict = ckpt_data["state_dict"]
         vonenet = load_vonenet()
         vonenet.load_state_dict(state_dict)
         model = CIFARVOneNetWrapper(vonenet)
-        network = PyTorchNetwork(model, (1,3,32,32), network_name)
+        network = PyTorchNetwork(model, (1, 3, 32, 32), network_name)
         return network
     else:
         raise Exception(
             f"Supported architectures are pixelreg, khmodel, eat, cnnf, and vonenet. Update this script with relevant imports to add a new architecture."
         )
+
+
+def save_correct_instances(
+    dataset: ExperimentDataset, experiment_repository: ExperimentRepository
+):
+    id_label_dict = dict.fromkeys(range(len(dataset)))
+    for i in range(len(dataset)):
+        data_point = dataset[i]
+        id_label_dict[i] = {"id": None, "label": None}
+        id_label_dict[i]["id"] = data_point.id
+        id_label_dict[i]["label"] = data_point.label
+    id_label_df = pd.DataFrame(id_label_dict)
+    id_label_df.to_csv(
+        experiment_repository.get_act_experiment_path() / "correct_instances.csv"
+    )
 
 
 def main():
@@ -235,10 +302,8 @@ def main():
     )
 
     experiment_name = f"{NETWORK_NAME}_{model_ver}_rd"
-    property_generator = PROPERTY_GENERATOR
-    verifier = VERIFIER
     epsilon_value_estimator = BinarySearchEpsilonValueEstimator(
-        epsilon_value_list=epsilon_list.copy(), verifier=verifier
+        epsilon_value_list=epsilon_list.copy(), verifier=VERIFIER
     )
     dataset_sampler = PredictionsBasedSampler(sample_correct_predictions=True)
     experiment_repository.initialize_new_experiment(experiment_name)
@@ -258,7 +323,7 @@ def main():
         dataset=dataset,
         dataset_sampler=dataset_sampler,
         epsilon_value_estimator=epsilon_value_estimator,
-        property_generator=property_generator,
+        property_generator=PROPERTY_GENERATOR,
     )
     print(f"Distribution created for {NETWORK_NAME}.")
 
