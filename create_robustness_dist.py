@@ -1,6 +1,8 @@
 import argparse
 import json
 import numpy as np
+from pathlib import Path
+import os
 
 # torch imports
 import torch
@@ -10,24 +12,29 @@ import torchvision.transforms as transforms
 # MODEL IMPORTS
 # pixelreg
 from binn1_pixelreg.models import ResNet18
+print("pixelreg imports done")
 
-# khmodel
-from binn2_khmodel.tests.context import *
-from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
-from binn2_khmodel.src.LocalLearning import Data
+# # khmodel
+# from binn2_khmodel.tests.context import *
+# from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
+# from binn2_khmodel.src.LocalLearning import Data
+# print("khmodel imports done")
 
-# eat
-from binn3_eat.model import model_dispatcher
-from binn3_eat.helper_class import AddEdgeMap
+# # eat
+# from binn3_eat.model import model_dispatcher
+# from binn3_eat.helper_class import AddEdgeMap
+# print("eat imports done")
 
-# cnnf
-from binn4_cnnf.cnnf.model_cifar import WideResNet
-from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
+# # cnnf
+# from binn4_cnnf.cnnf.model_cifar import WideResNet
+# from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
+# print("cnnf imports done")
 
-# vonenet
-from binn5_vonenet import vonenet
-from binn5_vonenet.vonenet import CIFARVOneNetWrapper
-from binn5_vonenet.train import load_model as load_vonenet
+# # vonenet
+# from binn5_vonenet import vonenet
+# from binn5_vonenet.vonenet import CIFARVOneNetWrapper
+# from binn5_vonenet.train import load_model as load_vonenet
+# print("vonenet imports done")
 
 # VERONA imports
 from VERONA.ada_verona import PGDAttack
@@ -42,6 +49,9 @@ from VERONA.ada_verona.database.experiment_repository import ExperimentRepositor
 from VERONA.ada_verona.dataset_sampler.predictions_based_sampler import (
     PredictionsBasedSampler,
 )
+from VERONA.ada_verona.dataset_sampler.dataset_sampler import DatasetSampler
+from VERONA.ada_verona.database.dataset.experiment_dataset import ExperimentDataset
+from VERONA.ada_verona.epsilon_value_estimator.epsilon_value_estimator import EpsilonValueEstimator
 
 from VERONA.ada_verona.verification_module.attack_estimation_module import (
     AttackEstimationModule,
@@ -49,7 +59,9 @@ from VERONA.ada_verona.verification_module.attack_estimation_module import (
 from VERONA.ada_verona.verification_module.property_generator.one2any_property_generator import (
     One2AnyPropertyGenerator,
 )
+from VERONA.ada_verona.verification_module.property_generator.property_generator import PropertyGenerator
 
+print("verona imports done")
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -250,7 +262,7 @@ if __name__ == "__main__":
         help="whether to run the script in debug mode",
     )
     parser.add_argument(
-        "--data-dir", type=str, default="data", help="path to dataset root"
+        "--data_dir", type=str, default="data", help="path to dataset root"
     )
     parser.add_argument(
         "--exp_repo_path",
@@ -259,7 +271,7 @@ if __name__ == "__main__":
         help="Path for robustness distribution experiments",
     )
     parser.add_argument(
-        "--model_seed", type=int, help="What seed was used to train this model?"
+        "--model_seed", type=int, help="the seed used to train this model"
     )
     args = parser.parse_args()
 
@@ -268,7 +280,7 @@ if __name__ == "__main__":
 
     models = json.load(open("models.json", "r"))
 
-    EXPERIMENT_REPOSITORY_PATH = args.exp_repo_path
+    EXPERIMENT_REPOSITORY_PATH = Path(args.exp_repo_path)
 
     DATASET_NAME = "CIFAR10"
     DATASET_DIR = args.data_dir
@@ -278,10 +290,11 @@ if __name__ == "__main__":
     if args.model_seed:
         model_ver = f"seed_{args.model_seed}"
     else:
-        model_ver = model_dict["paths"].keys()[0]
+        model_ver = list(model_dict["paths"].keys())[0]
     NETWORK_TYPE = model_dict["type"]
-    NETWORK_PATH = model_dict["paths"][model_ver]
-    NETWORK_FOLDER, NETWORK_FULL_NAME = os.path.split(NETWORK_PATH)
+    NETWORK_PATH = Path(model_dict["paths"][model_ver])
+    network_folder_str, network_full_name_str = os.path.split(NETWORK_PATH)
+    NETWORK_FOLDER, NETWORK_FULL_NAME = Path(network_folder_str), Path(network_full_name_str)
     print(f"Network folder: {NETWORK_FOLDER} \nNetwork name: NETWORK_FULL_NAME")
 
     PGD_NUM_ITER = args.pgd_num_iter
