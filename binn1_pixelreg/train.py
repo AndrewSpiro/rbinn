@@ -243,7 +243,7 @@ def main(
                 {attack_type: result},
             )
     else:
-        print("skipping attacks")
+        print("skipping attacks in train.py")
 
     return r_training_id, results
 
@@ -278,9 +278,13 @@ if __name__ == "__main__":
         wandb.define_metric("Perturbation_Strength")
         wandb.define_metric("Epoch")
 
-    r_training_id, accuracies = main(*config)
-    print(f"training id: {r_training_id}")
-    print(f"accuracies: {accuracies}")
+    train_result = main(*config)
+    if not train_result:
+        print("Training failed or model already exists. No train ouput.")
+    else:
+        r_training_id, accuracies = train_result
+        print(f"training id: {r_training_id}")
+        print(f"accuracies: {accuracies}")
     if wandb_log:
         wandb.finish()
 # #
