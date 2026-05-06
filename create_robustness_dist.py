@@ -3,6 +3,7 @@ import json
 import numpy as np
 
 # torch imports
+import torch
 import torchvision
 import torchvision.transforms as transforms
 
@@ -29,10 +30,22 @@ from binn5_vonenet.vonenet import CIFARVOneNetWrapper
 from binn5_vonenet.train import load_model as load_vonenet
 
 # VERONA imports
+from VERONA.ada_verona import PGDAttack
+from VERONA.ada_verona.epsilon_value_estimator.binary_search_epsilon_value_estimator import (
+    BinarySearchEpsilonValueEstimator,
+)
+
+from VERONA.ada_verona.database.dataset.pytorch_experiment_dataset import (
+    PytorchExperimentDataset,
+)
+from VERONA.ada_verona.database.experiment_repository import ExperimentRepository
+from VERONA.ada_verona.dataset_sampler.predictions_based_sampler import (
+    PredictionsBasedSampler,
+)
+
 from VERONA.ada_verona.verification_module.attack_estimation_module import (
     AttackEstimationModule,
 )
-from VERONA.ada_verona import PGDAttack
 from VERONA.ada_verona.verification_module.property_generator.one2any_property_generator import (
     One2AnyPropertyGenerator,
 )
@@ -105,35 +118,102 @@ def get_epsilon_list(search_space: str):
             f"Only implemented search spaces are berger and bosman. got {search_space} instead."
         )
 
+
 def normalize_epsilon_list(dataset, epsilon_list: list, eps_max, eps_min):
-    '''
+    """
     Rescale the epsilons so they have the have the appropriate relative perturbation on images.
     Range is defined as the difference between the max anx min pixel value in the dataset.
     The scaling factor is the qoutient of the data range and the eps range.
     Each eps in the original list is multiplied by the scaling facotr.
-    '''
+    """
 
     data_max = max([torch.max(dataset[i][0]) for i in range(len(dataset))])
     data_min = min([torch.min(dataset[i][0]) for i in range(len(dataset))])
     print(f"Normalizing. Dataset max is {data_max}, dataset min is {data_min}")
-    
+
     normalized_list = []
     for eps in epsilon_list:
-        eps_normalized = eps * ((data_max - data_min))/(eps_max - eps_min)
+        eps_normalized = eps * ((data_max - data_min)) / (eps_max - eps_min)
         normalized_list.append(np.float64(eps_normalized.numpy()))
-    print(f"Max and min epsilons were {max(epsilon_list), min(epsilon_list)}, now they are {max(normalized_list), min(normalized_list)}")
+    print(
+        f"Max and min epsilons were {max(epsilon_list), min(epsilon_list)}, now they are {max(normalized_list), min(normalized_list)}"
+    )
     return normalized_list
 
 
+def create_distribution(
+    experiment_repository: ExperimentRepository,
+    dataset: ExperimentDataset,
+    dataset_sampler: DatasetSampler,
+    epsilon_value_estimator: EpsilonValueEstimator,
+    property_generator: PropertyGenerator,
+):
+    if NETWORK_TYPE == "pytorch":
+        network = load_pt_network(NETWORK_NAME, NETWORK_PATH)
+    else:
+        raise Exception(f"Only supported NETWORK_TYPE currently is 'pytorch'. Got {NETWORK_TYPE}.")
+    print(f"network: {network}")
+
+def load_pt_network(network_name: str, network_path):
+    if network_name == "pixelreg":
+        print("load pixel reg")
+    elif network_name == "khmodel":
+        print("load khmodel")
+    elif network_name == "eat":
+        print("load eat")
+    elif network_name == "cnnf":
+        print("load cnnf")
+    elif network_name == "vonenet":
+        print("load vonenet")
+    else:
+        raise Exception(
+            f"Supported architectures are pixelreg, khmodel, eat, cnnf, and vonenet. Update this script with relevant imports to add a new architecture."
+        )
+
+
 def main():
-    print("Creating robustness distribution...")
     transform = create_transforms(NETWORK_NAME)
 
     torch_dataset = getattr(torchvision.datasets, DATASET_NAME)(
-    root="./data", train=False, download=True, transform=transform
+        root=DATASET_DIR, train=False, download=True, transform=transform
     )
 
-    epsilon_list = normalize_epsilon_list(torch_dataset, EPSILON_LIST, ORIG_MAX, ORIG_MIN)
+    epsilon_list = normalize_epsilon_list(
+        torch_dataset, EPSILON_LIST, ORIG_MAX, ORIG_MIN
+    )
+    dataset = PytorchExperimentDataset(dataset=torch_dataset)
+
+    experiment_repository = ExperimentRepository(
+        base_path=EXPERIMENT_REPOSITORY_PATH, network_folder=NETWORK_FOLDER
+    )
+
+    experiment_name = f"{NETWORK_NAME}_{model_ver}_rd"
+    property_generator = PROPERTY_GENERATOR
+    verifier = VERIFIER
+    epsilon_value_estimator = BinarySearchEpsilonValueEstimator(
+        epsilon_value_list=epsilon_list.copy(), verifier=verifier
+    )
+    dataset_sampler = PredictionsBasedSampler(sample_correct_predictions=True)
+    experiment_repository.initialize_new_experiment(experiment_name)
+    experiment_repository.save_configuration(
+        dict(
+            experiment_name=experiment_name,
+            experiment_repository_path=str(EXPERIMENT_REPOSITORY_PATH),
+            network_folder=str(NETWORK_FOLDER),
+            dataset=str(dataset),
+            timeout=600,
+            epsilon_list=[str(x) for x in epsilon_list],
+        )
+    )
+    print("Creating robustness distribution...")
+    create_distribution(
+        experiment_repository=experiment_repository,
+        dataset=dataset,
+        dataset_sampler=dataset_sampler,
+        epsilon_value_estimator=epsilon_value_estimator,
+        property_generator=property_generator,
+    )
+    print(f"Distribution created for {NETWORK_NAME}.")
 
 
 if __name__ == "__main__":
@@ -169,6 +249,18 @@ if __name__ == "__main__":
         default=False,
         help="whether to run the script in debug mode",
     )
+    parser.add_argument(
+        "--data-dir", type=str, default="data", help="path to dataset root"
+    )
+    parser.add_argument(
+        "--exp_repo_path",
+        type=str,
+        default="experiments",
+        help="Path for robustness distribution experiments",
+    )
+    parser.add_argument(
+        "--model_seed", type=int, help="What seed was used to train this model?"
+    )
     args = parser.parse_args()
 
     if args.bool_debug:
@@ -176,11 +268,24 @@ if __name__ == "__main__":
 
     models = json.load(open("models.json", "r"))
 
+    EXPERIMENT_REPOSITORY_PATH = args.exp_repo_path
+
     DATASET_NAME = "CIFAR10"
+    DATASET_DIR = args.data_dir
+
     NETWORK_NAME = args.model
+    model_dict = models[NETWORK_NAME]
+    if args.model_seed:
+        model_ver = f"seed_{args.model_seed}"
+    else:
+        model_ver = model_dict["paths"].keys()[0]
+    NETWORK_TYPE = model_dict["type"]
+    NETWORK_PATH = model_dict["paths"][model_ver]
+    NETWORK_FOLDER, NETWORK_FULL_NAME = os.path.split(NETWORK_PATH)
+    print(f"Network folder: {NETWORK_FOLDER} \nNetwork name: NETWORK_FULL_NAME")
+
     PGD_NUM_ITER = args.pgd_num_iter
     PGD_STEP_SIZE = args.pgd_step_size
-    NETWORK_TYPE = models[NETWORK_NAME]["type"]
     EPSILON_LIST, ORIG_MIN, ORIG_MAX = get_epsilon_list(search_space=args.epsilon_space)
     print(f"Length of epsilon list: {len(EPSILON_LIST)}")
 
