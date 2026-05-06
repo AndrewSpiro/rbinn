@@ -1,5 +1,5 @@
-from lib import *
-from config import *
+from .lib import *
+from .config import *
 
 class ImageTransform():
     def __init__(self, resize, mean, std):

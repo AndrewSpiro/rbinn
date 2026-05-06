@@ -1,4 +1,4 @@
-from lib import *
+from .lib import *
 from torchvision import datasets
 from torchvision import transforms, datasets, models
 import torch
@@ -7,8 +7,8 @@ import pandas as pd
 from torch.utils.data import Dataset
 import numpy as np
 from PIL import Image
-from binn3_eat.config import *
-from binn3_eat.edge_detector import *
+from .config import *
+from .edge_detector import *
 
 
 

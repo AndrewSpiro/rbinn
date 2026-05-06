@@ -1,5 +1,5 @@
-from lib import *
-import edge_detector as edge_detector
+from .lib import *
+from . import edge_detector as edge_detector
 
 
 torch.manual_seed(42)
