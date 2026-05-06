@@ -4,10 +4,11 @@ set -e
 source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate pixelreg
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DEBUG=true
 RUN_TRAINING=false
-RUN_ATTACKS=false
+RUN_ATTACKS=true
 
 TASK=CIFAR10
 ARCHI=ResNet18
@@ -20,16 +21,16 @@ ATTACK_TYPES=(Gaussian)
 GAUSSIAN_RANGE="0.0 0.3"
 
 if [ "$DEBUG" = true ]; then
-    EPOCHS=1
+    EPOCHS=0
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(101)
-    SAVE_DIR="save/debug"
+    SAVE_DIR="${SCRIPT_DIR}/save/debug"
     echo "--- RUNNING IN DEBUG MODE ---"
 else
     EPOCHS=40
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
-    SAVE_DIR="save"
+    SAVE_DIR="${SCRIPT_DIR}/save"
 fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
@@ -42,7 +43,8 @@ do
     if [ "$RUN_TRAINING" = true ]; then
         #Train
         echo "Starting training for train seed $T_SEED"
-        python train.py \
+
+        python "${SCRIPT_DIR}/train.py" \
         --task $TASK \
         --archi $ARCHI \
         --reg_data $REG_DATA \
@@ -59,6 +61,7 @@ do
     if [ "$RUN_ATTACKS" = true ]; then
         # ATTACK
         echo "Starting attacks for attack seeds $ATTACK_SEEDS"
+
         for A_SEED in "${ATTACK_SEEDS[@]}"
         do
             for TYPE in "${ATTACK_TYPES[@]}"
@@ -89,7 +92,7 @@ do
                         ;;
                 esac
 
-                python eval.py \
+                python "${SCRIPT_DIR}/eval.py" \
                 --task $TASK \
                 --archi $ARCHI \
                 --reg_data $REG_DATA \
@@ -110,4 +113,4 @@ do
 done
 
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-python aggregate_results.py $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "save/results_${SEED_STRING}.txt"
+python aggregate_results.py $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
