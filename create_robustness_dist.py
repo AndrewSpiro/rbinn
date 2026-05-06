@@ -190,7 +190,7 @@ def create_distribution(
 
     try:
         if args.bool_debug:
-            num_samples = 2
+            num_samples = 10
             sampled_data = dataset.get_subset(range(num_samples))
             print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
             start_time = time.time()
@@ -381,6 +381,7 @@ if __name__ == "__main__":
     models = json.load(open("models.json", "r"))
 
     EXPERIMENT_REPOSITORY_PATH = Path(args.exp_repo_path)
+    print(EXPERIMENT_REPOSITORY_PATH)
 
     DATASET_NAME = "CIFAR10"
     DATASET_DIR = args.data_dir
