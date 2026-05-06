@@ -223,6 +223,7 @@ def main():
                         help='random seed for training (default: 1)')
     parser.add_argument('--log-interval', type=int, default=400, metavar='N',
                         help='how many batches to wait before logging training status')
+    parser.add_argument('--data-dir', type=str, default = 'data', help='path to dataset root')
     
     # adversarial training parameters
     parser.add_argument('--eps', type=float, default=0.063,
@@ -304,9 +305,9 @@ def main():
         
     elif args.dataset == 'cifar10':
         train_data = datasets.CIFAR10(
-            'data', train=True, transform=train_transform_cifar, download=True)
+            args.data_dir, train=True, transform=train_transform_cifar, download=True)
         test_data = datasets.CIFAR10(
-            'data', train=False, transform=test_transform_cifar, download=True)
+            args.data_dir, train=False, transform=test_transform_cifar, download=True)
         train_loader = torch.utils.data.DataLoader(
           train_data, batch_size=args.batch_size,
           shuffle=True, num_workers=4, pin_memory=True)

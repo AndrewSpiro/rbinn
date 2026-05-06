@@ -8,24 +8,29 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DEBUG=true
 RUN_TRAIN=true
-MODEL_DIR='models'
-BASELINES_PATH=orig_results.json
+MODEL_DIR="${SCRIPT_DIR}/models"
+BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
 if [ "$DEBUG" = true ]; then
     SAVE_MODEL_BASE='CNNF_debug'
-    RESULTS_DIR_BASE='results_debug'
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/results_debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=1
     echo "Running in debug mode..."
 else
     SAVE_MODEL_BASE='CNNF'
-    RESULTS_DIR_BASE='results'
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/results"
     EPOCHS=500
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
 fi
+
+
+DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
+echo "Data dir is here: ${DATA_DIR}"
+mkdir -p "$DATA_DIR"
 
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
@@ -36,7 +41,9 @@ do
 
         echo "Running training with seed $T_SEED"
         
-        python "$SCRIPT_DIR/train.py" --data 'cifar10' \
+        python "${SCRIPT_DIR}/train.py" \
+                        --dataset 'cifar10' \
+                        --data-dir "${DATA_DIR}" \
                         --max-cycles 2 \
                         --ind 5 \
                         --mse-parameter 0.1 \
@@ -70,8 +77,9 @@ do
         RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
         mkdir -p "$RESULTS_DIR"
 
-        python test.py --dataset 'cifar10' \
+        python "${SCRIPT_DIR}/test.py" --dataset 'cifar10' \
                         --test 'average' \
+                        --data-dir "${DATA_DIR}" \
                         --results-path "${RESULTS_DIR}/results.json" \
                         --model-dir $MODEL_DIR \
                         --bool-debug $DEBUG \
@@ -84,7 +92,7 @@ TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
 ATTACK_SEED_STRING=$(echo "${ATTACK_SEEDS[*]}" | tr ' ' '_')
 AGG_RESULTS_DIR="${RESULTS_DIR_BASE}/train_seeds_${TRAIN_SEED_STRING}/attack_seeds_${ATTACK_SEED_STRING}"
 mkdir -p "$AGG_RESULTS_DIR"
-python aggregate_results.py --results_dir $RESULTS_DIR_BASE \
+python "${SCRIPT_DIR}/aggregate_results.py" --results_dir $RESULTS_DIR_BASE \
                             --model_name_base $SAVE_MODEL_BASE \
                             --bool_debug $DEBUG \
                             --train_seeds "${TRAIN_SEEDS[@]}" \

@@ -35,6 +35,7 @@ def main():
     parser = argparse.ArgumentParser(description='CNNF testing')
     parser.add_argument('--dataset', choices=['cifar10', 'fashion'],
                         default='cifar10', help='the dataset for training the model')
+    parser.add_argument('--data-dir', type=str, default = 'data', help='path to dataset root')
     parser.add_argument('--test', choices=['average', 'last','other'],
                         default='average', help='output averaged logits or logits from the last iteration')
     parser.add_argument('--results-path', default='results_temp.json',
@@ -55,7 +56,7 @@ def main():
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
-    clean_dir = 'data/'
+    clean_dir = f"{args.data_dir}/"
     
     # load in data
     if args.dataset=='cifar10':
@@ -117,7 +118,13 @@ def main():
     print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
     results['clean_acc'] = clean_acc
-    
+
+    if args.bool_debug:    
+        with open(args.results_path, "w") as f:
+            json.dump(results, f)
+        print(f"Results saved to {args.results_path}")
+        return
+
     # adv attack
     pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
     results['pgd_acc_first'] = pgd_acc_first
