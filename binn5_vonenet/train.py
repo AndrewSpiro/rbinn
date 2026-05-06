@@ -15,10 +15,10 @@ parser.add_argument('-restore_epoch', '--restore_epoch', default=0, type=int,
                     help='epoch number for restoring model training ')
 parser.add_argument('-restore_path', '--restore_path', default=None, type=str,
                     help='path of folder containing specific epoch file for restoring model training')
-parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='imagenet', help='dataset to train on')
+parser.add_argument('--dataset', choices=['imagenet', 'cifar10'], default='cifar10', help='dataset to train on')
 
 ## Training parameters
-parser.add_argument('--ngpus', default=0, type=int,
+parser.add_argument('--ngpus', default=1, type=int,
                     help='number of GPUs to use; 0 if you want to run on CPU')
 parser.add_argument('-j', '--workers', default=20, type=int,
                     help='number of data loading workers')

@@ -11,8 +11,8 @@ import torchvision.transforms as transforms
 
 # MODEL IMPORTS
 # pixelreg
-from binn1_pixelreg.models import ResNet18
-print("pixelreg imports done")
+# from binn1_pixelreg.models import ResNet18
+# print("pixelreg imports done")
 
 # # khmodel
 # from binn2_khmodel.tests.context import *
@@ -23,6 +23,7 @@ print("pixelreg imports done")
 # # eat
 # from binn3_eat.model import model_dispatcher
 # from binn3_eat.helper_class import AddEdgeMap
+
 # print("eat imports done")
 
 # # cnnf
@@ -30,11 +31,11 @@ print("pixelreg imports done")
 # from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
 # print("cnnf imports done")
 
-# # vonenet
-# from binn5_vonenet import vonenet
-# from binn5_vonenet.vonenet import CIFARVOneNetWrapper
-# from binn5_vonenet.train import load_model as load_vonenet
-# print("vonenet imports done")
+# vonenet
+from binn5_vonenet import vonenet
+from binn5_vonenet.vonenet import CIFARVOneNetWrapper
+from binn5_vonenet.train import load_model as load_vonenet
+print("vonenet imports done")
 
 # VERONA imports
 from VERONA.ada_verona import PGDAttack
@@ -46,12 +47,18 @@ from VERONA.ada_verona.database.dataset.pytorch_experiment_dataset import (
     PytorchExperimentDataset,
 )
 from VERONA.ada_verona.database.experiment_repository import ExperimentRepository
+from VERONA.ada_verona.database.machine_learning_model.pytorch_network import (
+    PyTorchNetwork,
+)
+
 from VERONA.ada_verona.dataset_sampler.predictions_based_sampler import (
     PredictionsBasedSampler,
 )
 from VERONA.ada_verona.dataset_sampler.dataset_sampler import DatasetSampler
 from VERONA.ada_verona.database.dataset.experiment_dataset import ExperimentDataset
-from VERONA.ada_verona.epsilon_value_estimator.epsilon_value_estimator import EpsilonValueEstimator
+from VERONA.ada_verona.epsilon_value_estimator.epsilon_value_estimator import (
+    EpsilonValueEstimator,
+)
 
 from VERONA.ada_verona.verification_module.attack_estimation_module import (
     AttackEstimationModule,
@@ -59,9 +66,12 @@ from VERONA.ada_verona.verification_module.attack_estimation_module import (
 from VERONA.ada_verona.verification_module.property_generator.one2any_property_generator import (
     One2AnyPropertyGenerator,
 )
-from VERONA.ada_verona.verification_module.property_generator.property_generator import PropertyGenerator
+from VERONA.ada_verona.verification_module.property_generator.property_generator import (
+    PropertyGenerator,
+)
 
 print("verona imports done")
+
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -163,20 +173,45 @@ def create_distribution(
     if NETWORK_TYPE == "pytorch":
         network = load_pt_network(NETWORK_NAME, NETWORK_PATH)
     else:
-        raise Exception(f"Only supported NETWORK_TYPE currently is 'pytorch'. Got {NETWORK_TYPE}.")
+        raise Exception(
+            f"Only supported NETWORK_TYPE currently is 'pytorch'. Got {NETWORK_TYPE}."
+        )
     print(f"network: {network}")
 
+
 def load_pt_network(network_name: str, network_path):
+    print(f"Loading network {network_name}")
     if network_name == "pixelreg":
-        print("load pixel reg")
+        model_info = torch.load(network_path)
+        model_hash = list(model_info.keys())[0]
+        state_dict = model_info[model_hash]["best_state"]
+        model = ResNet18(in_shape=(3, 32, 32), num_classes=10)
+        model.load_state_dict(state_dict)
+        network = PyTorchNetwork(model, (1, 3, 32, 32), network_name)
+        return network
     elif network_name == "khmodel":
         print("load khmodel")
     elif network_name == "eat":
-        print("load eat")
+        model, _, _, _ = model_dispatcher('cifar10', 'rgbedge', 'cifar10', 64, 10)
+        state_dict = torch.load(network_path)
+        model.load_state_dict(state_dict)
+        network = PyTorchNetwork(model, (1, 4, 64, 64), network_name)
+        return network
     elif network_name == "cnnf":
-        print("load cnnf")
+        model = WideResNet(40, 10, 2, 0.0, ind=5, cycles=2, res_param=0.1)
+        state_dict = torch.load(network_path)
+        model.load_state_dict(state_dict)
+        cycles_model = IterativeWrapper(model)
+        network = PyTorchNetwork(cycles_model, (1,3,32,32), network_name)
+        return network
     elif network_name == "vonenet":
-        print("load vonenet")
+        ckpt_data = torch.load(network_path)
+        state_dict = ckpt_data['state_dict']
+        vonenet = load_vonenet()
+        vonenet.load_state_dict(state_dict)
+        model = CIFARVOneNetWrapper(vonenet)
+        network = PyTorchNetwork(model, (1,3,32,32), network_name)
+        return network
     else:
         raise Exception(
             f"Supported architectures are pixelreg, khmodel, eat, cnnf, and vonenet. Update this script with relevant imports to add a new architecture."
@@ -294,8 +329,10 @@ if __name__ == "__main__":
     NETWORK_TYPE = model_dict["type"]
     NETWORK_PATH = Path(model_dict["paths"][model_ver])
     network_folder_str, network_full_name_str = os.path.split(NETWORK_PATH)
-    NETWORK_FOLDER, NETWORK_FULL_NAME = Path(network_folder_str), Path(network_full_name_str)
-    print(f"Network folder: {NETWORK_FOLDER} \nNetwork name: NETWORK_FULL_NAME")
+    NETWORK_FOLDER, NETWORK_FULL_NAME = Path(network_folder_str), Path(
+        network_full_name_str
+    )
+    print(f"Network folder: {NETWORK_FOLDER} \nNetwork name: {NETWORK_FULL_NAME}")
 
     PGD_NUM_ITER = args.pgd_num_iter
     PGD_STEP_SIZE = args.pgd_step_size
