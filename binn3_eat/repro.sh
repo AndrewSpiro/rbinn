@@ -4,9 +4,10 @@ set -e
 source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate eat
-SCRIPT_DIR=binn3_eat
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 DEBUG=true
+RUN_TRAIN=false
 
 NET_TYPE=rgbedge
 DATA_DIR=cifar10
@@ -15,7 +16,7 @@ if [ "$DEBUG" = true ] ; then
     ROOT="${SCRIPT_DIR}/debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
-    EPOCHS=1
+    EPOCHS=0
     echo "--- RUNNING IN DEBUG MODE ---"
 else
     ROOT="${SCRIPT_DIR}"
@@ -24,26 +25,31 @@ else
     EPOCHS=10
 fi
 
-for T_SEED in "${TRAIN_SEEDS[@]}"
-do
-    echo "Running training with seed $T_SEED"
+if [ "$RUN_TRAIN" = true ] ; then
+    for T_SEED in "${TRAIN_SEEDS[@]}"
+    do
+        echo "Running training with seed $T_SEED"
 
-    python "${SCRIPT_DIR}/train.py" \
-        --net_type $NET_TYPE \
-        --model cifar10 \
-        --sigmas 8 \
-        --data_dir $DATA_DIR  \
-        --classes 10 \
-        --epochs $EPOCHS \
-        --inp_size 64 \
-        --root_dir $ROOT \
-        --seed $T_SEED \
-        --attack_seeds ${ATTACK_SEEDS[@]}
-done
+        python "${SCRIPT_DIR}/train.py" \
+            --net_type $NET_TYPE \
+            --model cifar10 \
+            --sigmas 8 \
+            --data_dir $DATA_DIR  \
+            --classes 10 \
+            --epochs $EPOCHS \
+            --inp_size 64 \
+            --root_dir $ROOT \
+            --seed $T_SEED \
+            --attack_seeds ${ATTACK_SEEDS[@]}
+    done
+else
+    echo "Skipping training"
+fi
 
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
 python "${SCRIPT_DIR}/compute_stats.py" \
     --root_dir $ROOT \
     --data_dir $DATA_DIR \
     --seeds "${TRAIN_SEEDS[@]}" \
-    --out "${ROOT}/Res${DATA_DIR}/seeds_$SEED_STRING.json"
+    --out "${ROOT}/Res${DATA_DIR}/seeds_$SEED_STRING.json" \
+    --baselines_path "${SCRIPT_DIR}/orig_results.json"
