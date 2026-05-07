@@ -1,0 +1,4 @@
+{
+    "pixelreg": {"path": "experiments/attias_testset_nnenum_one2one_18-02-2026+22_31"},
+    "khmodel": {"path": "experiments/hulz_testset_nnenum_one2one_21-02-2026+15_30"}
+}
