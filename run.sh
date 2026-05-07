@@ -6,7 +6,7 @@ source $(conda info --base)/etc/profile.d/conda.sh
 
 DEBUG=true
 RUN_VALIDS=false
-GET_RDS=true
+GET_RDS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA_DIR="${SCRIPT_DIR}/data"
@@ -15,7 +15,7 @@ mkdir -p "$DATA_DIR"
 EXP_REPO_PATH="${SCRIPT_DIR}/experiments"
 
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
-MODELS=("eat")
+MODELS=("pixelreg")
 EPSILON_SPACE=berger
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -40,8 +40,9 @@ else
     echo "Skipping validations"
 fi
 
+conda activate verona_env
+
 if [ "${GET_RDS}" = true ]; then
-    conda activate verona_env
     for m in "${MODELS[@]}"; do
         echo "Obtaining robustness distribution for $m"
         python create_robustness_dist.py $m \
@@ -53,4 +54,16 @@ if [ "${GET_RDS}" = true ]; then
             --exp_repo_path "${EXP_REPO_PATH}"
     done
 fi
+
+echo "#### Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
+
+if [ "${DEBUG}" = true ]; then
+    RESULTS_DIR=${SCRIPT_DIR}/debug_rd_results
+else
+    RESULTS_DIR=${SCRIPT_DIR}/rd_results
+fi
+mkdir -p $RESULTS_DIR
+
+python rd_analysis.py --experiments_path experiments.json --results_dir "${RESULTS_DIR}" 
+
 echo "Completed all experiments successfully"
