@@ -16,16 +16,16 @@ import torchvision.transforms as transforms
 
 # MODEL IMPORTS
 # pixelreg
-# from binn1_pixelreg.models import ResNet18
-# print("pixelreg imports done")
+from binn1_pixelreg.models import ResNet18
+print("pixelreg imports done")
 
-# # khmodel
-# from binn2_khmodel.tests.context import *
-# from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
-# from binn2_khmodel.src.LocalLearning import Data
-# print("khmodel imports done")
+# khmodel
+from binn2_khmodel.tests.context import *
+from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
+from binn2_khmodel.src.LocalLearning import Data
+print("khmodel imports done")
 
-# # eat
+# eat
 from binn3_eat.model import model_dispatcher
 from binn3_eat.helper_class import AddEdgeMap
 
@@ -37,11 +37,12 @@ from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
 
 print("cnnf imports done")
 
-# # vonenet
-# from binn5_vonenet import vonenet
-# from binn5_vonenet.vonenet import CIFARVOneNetWrapper
-# from binn5_vonenet.train import load_model as load_vonenet
-# print("vonenet imports done")
+# vonenet
+from binn5_vonenet import vonenet
+from binn5_vonenet.vonenet import CIFARVOneNetWrapper
+from binn5_vonenet.train import load_model as load_vonenet
+
+print("vonenet imports done")
 
 # VERONA imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "VERONA"))
