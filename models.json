@@ -9,7 +9,10 @@
     },
     "eat": {
         "paths": {
-            "seed_0": "binn3_eat/Rescifar10/seed_0/FGSM/cifar10_rgbedge_8_robust.pth",
+            "seed_0": {
+                "clean": "binn3_eat/Rescifar10/seed_0/FGSM/cifar10_rgbedge.pth",
+                "robust": "binn3_eat/Rescifar10/seed_0/FGSM/cifar10_rgbedge_8_robust.pth"
+            },
             "seed_1": "binn3_eat/Rescifar10/seed_1/FGSM/cifar10_rgbedge_8_robust.pth",
             "seed_2": "binn3_eat/Rescifar10/seed_2/FGSM/cifar10_rgbedge_8_robust.pth"
         },
