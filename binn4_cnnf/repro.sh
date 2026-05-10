@@ -8,7 +8,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
-TRAIN_METHOD='adv' # should be 'adv' or 'clean'
+TRAIN_METHOD=adv # should be 'adv' or 'clean'
 echo "WARNING: so far only 'adv' supported"
 DEBUG=false
 RUN_TRAIN=true
@@ -44,11 +44,12 @@ do
     if [ "$RUN_TRAIN" = true ]; then
 
         echo "Running training with seed $T_SEED"
-        if [ $TRAIN_METHOD='adv' ]; then
+        if [ "$TRAIN_METHOD" = adv ]; then
             CLEAN='no'
         else
             echo "WARNING: currently only adversarial training is supported. Supclean is hybrid(?)"
             exit 1
+        fi
         
         python "${SCRIPT_DIR}/train.py" \
                         --dataset 'cifar10' \
@@ -69,7 +70,8 @@ do
                         --grad-clip \
                         --save-model $SAVE_MODEL \
                         --model-dir $MODEL_DIR \
-                        --bool-debug $DEBUG
+                        --bool-debug $DEBUG \
+                        --ckpt_path binn4_cnnf/models/adv_CNNF_seed_0-epoch149.pt
     fi        
 
     for A_SEED in "${ATTACK_SEEDS[@]}"
