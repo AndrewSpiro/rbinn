@@ -302,7 +302,7 @@ def main():
         base_path=EXPERIMENT_REPOSITORY_PATH, network_folder=NETWORK_FOLDER
     )
 
-    experiment_name = f"{NETWORK_NAME}_{model_ver}_rd"
+    experiment_name = f"{NETWORK_NAME}_{model_seed}_rd"
     epsilon_value_estimator = BinarySearchEpsilonValueEstimator(
         epsilon_value_list=epsilon_list.copy(), verifier=VERIFIER
     )
@@ -374,6 +374,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model_seed", type=int, help="the seed used to train this model"
     )
+    parser.add_argument(
+        "--train_type", choices=['clean', 'adv'], default = 'clean', help="whether model was trained normally or adversarially"
+    )
+    
     args = parser.parse_args()
 
     if args.bool_debug:
@@ -390,11 +394,16 @@ if __name__ == "__main__":
     NETWORK_NAME = args.model
     model_dict = models[NETWORK_NAME]
     if args.model_seed:
-        model_ver = f"seed_{args.model_seed}"
+        model_seed = f"seed_{args.model_seed}"
     else:
-        model_ver = list(model_dict["paths"].keys())[0]
+        model_seed = list(model_dict["paths"].keys())[0]
+
     NETWORK_TYPE = model_dict["type"]
-    NETWORK_PATH = Path(model_dict["paths"][model_ver])
+    if type(model_dict["paths"][model_seed]) == dict:
+        NETWORK_PATH = model_dict["paths"][model_seed][args.train_type]
+        print(f"Model trained with type {args.train_type}")
+    else:
+        NETWORK_PATH = Path(model_dict["paths"][model_seed])
     network_folder_str, network_full_name_str = os.path.split(NETWORK_PATH)
     NETWORK_FOLDER, NETWORK_FULL_NAME = Path(network_folder_str), Path(
         network_full_name_str

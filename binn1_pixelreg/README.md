@@ -1,8 +1,11 @@
 # Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+
 This repository extends the original implementation to automate multiple seeded training and evaluation runs.
 
 ## Quick Start
+
 In your root, run
+
 ```bash
 git clone https://github.com/AndrewSpiro/rbinn.git
 cd pixel-reg/
@@ -13,37 +16,49 @@ I have provied an `environment.yml` which contains the exact versions used in th
 To recreate the environment:
 
 For ALICE:
+
 ```bash
 module load Miniconda3/24.7.1-0
 conda init
 ```
 
 Then restart the shell and run
+
 ```bash
 conda ---version
 ```
-output should be 
+
+output should be
+
 ```bash
 conda 24.7.1
 ```
 
 From `pixel-reg`, run
+
 ```bash
 conda env create -f environment.yml
 conda activate pixelreg
 ```
 
 To reproduce the results, run
+
 ```bash
 bash repro.sh
 ```
 
+## Main Updates
+
+* Added ```attack``` flag and ```str2bool``` in ```train.py``` to control attacks at the end of the train script.
+
 ---
+
 # A Brain-Inspired Regularizer for Adversarial Robustness
 
 This repository is the official implementation of [**A Brain-Inspired Regularizer for Adversarial Robustness**](https://arxiv.org/abs/2410.03952).
 
 It is based on the codebase developed by Li et al. in [Learning from brains how to regularize machines](https://arxiv.org/abs/1911.05072).
+
 ## Requirements
 
 To install requirements:
@@ -53,9 +68,11 @@ pip install -r requirements.txt
 ```
 
 ## Training
+
 Training on grayscale images is the default setting in this codebase. To train and regularize on color images add the argument `rgb=True`.
 
 ### Training without regularization
+
 To train a ResNet18 to classify CIFAR-10 without regularization, execute:
 
 ```
@@ -69,6 +86,7 @@ To train a ResNet18 to classify CIFAR-10 regularized on images from CIFAR-10 usi
 ```
 python train.py --task=CIFAR10 --archi=ResNet18 --reg_data=CIFAR10 --reg_alpha=10 --reg_thresh=0.8
 ```
+
 ### Hyperparameters Used
 
 | Classification - Regularization | $\alpha$ | $Th$ |
@@ -88,21 +106,18 @@ python train.py --task=CIFAR10 --archi=ResNet18 --reg_data=CIFAR10 --reg_alpha=1
 
 The argument names associated with the hyperparameters presented in the paper are as follows:
 
-- **Number of regularization images $N$**: `--reg_image_num`
+* **Number of regularization images $N$**: `--reg_image_num`
   
-- **Regularization batch size $k$**: `--reg_batch_size`
-  - Note: This parameter considers the number of pairs passed through the regularization pathway, so the actual regularization batch size is $2\times k$.
+* **Regularization batch size $k$**: `--reg_batch_size`
+  * Note: This parameter considers the number of pairs passed through the regularization pathway, so the actual regularization batch size is $2\times k$.
 
-- **Range of similarities regularized on**: `--reg_range`
-  - For $S_{low}^{Th}$: add `--reg_range=low`
-  - For $S_{high}^{Th}$: add `--reg_range=high`
-  - For $S_{+}^{Th}$: add `--reg_range=positive`
-  - For $S_{-}^{Th}$: add `--reg_range=negative`
-  - For $S_{double}^{Th_1, Th_2}$: add `--reg_range=double --reg_thresh_2=Th_2` where you can choose `Th_2` and `Th_1` corresponds to $Th$ in `--reg_thresh`.
-
-
+* **Range of similarities regularized on**: `--reg_range`
+  * For $S_{low}^{Th}$: add `--reg_range=low`
+  * For $S_{high}^{Th}$: add `--reg_range=high`
+  * For $S_{+}^{Th}$: add `--reg_range=positive`
+  * For $S_{-}^{Th}$: add `--reg_range=negative`
+  * For $S_{double}^{Th_1, Th_2}$: add `--reg_range=double --reg_thresh_2=Th_2` where you can choose `Th_2` and `Th_1` corresponds to $Th$ in `--reg_thresh`.
 
 ## Adversarial Robustness Evaluation
 
 Evaluation of models is automatically performed at the end of training, with the argument `--attack=True` set by default.
-
