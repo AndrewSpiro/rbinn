@@ -11,41 +11,42 @@ AGG_RESULTS=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA_DIR="${SCRIPT_DIR}/data"
-echo "Data dir is here: ${DATA_DIR}"
+echo "[$SHELL] ## Data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 EXP_REPO_PATH="${SCRIPT_DIR}/experiments"
-
+echo "[$SHELL] ## Experiment repository is here: ${EXP_REPO_PATH}"
+mkdir -p "$EXP_REPO_PATH"
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
 MODELS=("eat")
 EPSILON_SPACE=berger
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
 
-echo "Starting full pipeline..."
+echo "[$SHELL] ## Starting full pipeline..."
 
 if [ "$RUN_VALIDS" = true ]; then
-    echo "Starting validations..."
+    echo "[$SHELL] ## Starting validations..."
 
     for m in "${MODELS[@]}"
     do
-        echo "Starting $m pipeline..."
+        echo "[$SHELL] ## Starting $m pipeline..."
     
         conda deactivate
         conda activate $m
 
         bash "${SCRIPT_DIR}/binn${MODEL_IDS[$m]}_"${m}"/repro.sh"
 
-        echo "Completed $m validation."
+        echo "[$SHELL] ## Completed $m validation."
     done
 else
-    echo "Skipping validations"
+    echo "[$SHELL] ## Skipping validations"
 fi
 
 conda activate verona_env
 
 if [ "${GET_RDS}" = true ]; then
     for m in "${MODELS[@]}"; do
-        echo "Obtaining robustness distribution for $m"
+        echo "[$SHELL] ## Obtaining robustness distribution for $m"
         python create_robustness_dist.py $m \
             --epsilon_space $EPSILON_SPACE \
             --bool_debug $DEBUG \
@@ -56,10 +57,12 @@ if [ "${GET_RDS}" = true ]; then
             --model_seed 0 \
             --train_type clean
     done
+else
+    echo "[$SHELL] ## Skipping obtaining RDs"
 fi
 
 if [ "${AGG_RESULTS}" = true ]; then
-    echo "#### Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
+    echo "[$SHELL] #### Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
 
     if [ "${DEBUG}" = true ]; then
         RESULTS_DIR=${SCRIPT_DIR}/debug_rd_results
@@ -69,6 +72,8 @@ if [ "${AGG_RESULTS}" = true ]; then
     mkdir -p $RESULTS_DIR
 
     python rd_analysis.py --experiments_path experiments.json --results_dir "${RESULTS_DIR}" 
+else
+    echo "[$SHELL] ## Skipping aggregating results"
 fi
 
-echo "Completed all experiments successfully"
+echo "[$SHELL] ## Completed all experiments successfully"
