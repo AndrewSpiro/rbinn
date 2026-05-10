@@ -1,3 +1,5 @@
+import faulthandler
+faulthandler.enable()
 import logging
 import argparse
 import json
@@ -218,16 +220,21 @@ def create_distribution(
 
     except Exception as e:
         logging.info(f"failed for network {network} with error {e}")
+    (print("Iterating through sampled data..."))
     for data_point in tqdm(sampled_data):
+        print("Creating verifcation context...")
         verification_context = experiment_repository.create_verification_context(
             network=network,
             data_point=data_point,
             property_generator=property_generator,
         )
+        print("Obtaining epsilon value result...")
         epsilon_value_result = epsilon_value_estimator.compute_epsilon_value(
             verification_context
         )
+        print("Saving results...")
         experiment_repository.save_result(epsilon_value_result)
+        print("Results saved")
 
     experiment_repository.save_plots()
 
