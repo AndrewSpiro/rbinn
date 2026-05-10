@@ -8,25 +8,27 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
-DEBUG=true
+TRAIN_METHOD='adv' # should be 'adv' or 'clean'
+echo "WARNING: so far only 'adv' supported"
+DEBUG=false
 RUN_TRAIN=true
 MODEL_DIR="${SCRIPT_DIR}/models"
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL_BASE='CNNF_debug'
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/results_debug"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF_debug"
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results_debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
-    EPOCHS=1
+    EPOCHS=2
     echo "Running in debug mode..."
 else
-    SAVE_MODEL_BASE='CNNF'
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/results"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF"
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results"
     EPOCHS=500
-    TRAIN_SEEDS=(0 1 2)
-    ATTACK_SEEDS=(100 101 102)
+    TRAIN_SEEDS=(0)
+    ATTACK_SEEDS=(100)
 fi
 
 
@@ -42,6 +44,11 @@ do
     if [ "$RUN_TRAIN" = true ]; then
 
         echo "Running training with seed $T_SEED"
+        if [ $TRAIN_METHOD='adv' ]; then
+            CLEAN='no'
+        else
+            echo "WARNING: currently only adversarial training is supported. Supclean is hybrid(?)"
+            exit 1
         
         python "${SCRIPT_DIR}/train.py" \
                         --dataset 'cifar10' \
@@ -50,7 +57,7 @@ do
                         --ind 5 \
                         --mse-parameter 0.1 \
                         --res-parameter 0.1 \
-                        --clean 'supclean' \
+                        --clean $CLEAN \
                         --clean-parameter 0.05 \
                         --lr 0.05 \
                         --batch-size $BATCH_SIZE \
