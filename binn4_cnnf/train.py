@@ -261,6 +261,7 @@ def main():
                         help='whether to run the script in debug mode')
 
     parser.add_argument('--ckpt_path', type=str, help="path for loading checkpoint model")
+    parser.add_argument('--ckpt_epoch', type=int, help="epoch of checkpoint model")
 
     args = parser.parse_args()
 
@@ -322,8 +323,8 @@ def main():
     if args.ckpt_path:
         ckpt_path = args.ckpt_path
         checkpoint = torch.load(ckpt_path)
-        model.load_state_dict(checkpoint['model'])
-        start_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint)
+        start_epoch = args.ckpt_epoch
         print(f"Loading model from checkpoint at epoch {start_epoch}")
     else:
         start_epoch = 0

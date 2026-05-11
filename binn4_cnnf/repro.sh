@@ -71,7 +71,6 @@ do
                         --save-model $SAVE_MODEL \
                         --model-dir $MODEL_DIR \
                         --bool-debug $DEBUG \
-                        --ckpt_path "${MODEL_DIR}/adv_CNNF_seed_0-epoch149.pt"
     fi        
 
     for A_SEED in "${ATTACK_SEEDS[@]}"
