@@ -296,6 +296,9 @@ def main():
     parser.add_argument('--bool-debug', type=str2bool, default=False,
                         help='whether to run the script in debug mode')
 
+    parser.add_argument('--ckpt_path', type=str, help="path for loading checkpoint model")
+    parser.add_argument('--ckpt_epoch', type=int, help="epoch of checkpoint model")
+
     args = parser.parse_args()
 
     if args.bool_debug:
@@ -353,6 +356,15 @@ def main():
         num_classes = 10
         model = WideResNet(args.layers, 10, args.widen_factor, args.droprate, args.ind, args.max_cycles, args.res_parameter).to(device)
     
+    if args.ckpt_path:
+        ckpt_path = args.ckpt_path
+        checkpoint = torch.load(ckpt_path)
+        model.load_state_dict(checkpoint)
+        start_epoch = args.ckpt_epoch
+        print(f"Loading model from checkpoint at epoch {start_epoch}")
+    else:
+        start_epoch = 0
+
     optimizer = torch.optim.SGD(
           model.parameters(),
           args.lr,
@@ -372,7 +384,7 @@ def main():
     start = time.time()
     best_acc = 0
 
-    for epoch in range(args.epochs):    
+    for epoch in range(start_epoch, args.epochs):    
         train_loss, train_acc = train_adv(args, model, device, train_loader, optimizer, scheduler, epoch, 
           cycles=args.max_cycles, mse_parameter=args.mse_parameter, clean_parameter=args.clean_parameter, clean=args.clean)
 
