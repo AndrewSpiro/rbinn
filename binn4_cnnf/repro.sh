@@ -9,7 +9,7 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 TRAIN_METHOD=clean
-DEBUG=true
+DEBUG=false
 RUN_TRAIN=true
 MODEL_DIR="${SCRIPT_DIR}/models"
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
@@ -21,7 +21,7 @@ if [ "$DEBUG" = true ]; then
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=2
-    echo "Running in debug mode..."
+    echo "[$SHELL] ## Running in debug mode..."
 else
     SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF"
     RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results"
@@ -32,7 +32,7 @@ fi
 
 
 DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
-echo "Data dir is here: ${DATA_DIR}"
+echo "[$SHELL] ## Data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 
 
@@ -42,7 +42,7 @@ do
 
     if [ "$RUN_TRAIN" = true ]; then
 
-        echo "Running $TRAIN_METHOD training with seed $T_SEED"
+        echo "[$SHELL] ## Running $TRAIN_METHOD training with seed $T_SEED"
         if [ "$TRAIN_METHOD" = adv ]; then
             CLEAN=no
 
@@ -85,7 +85,7 @@ do
             TARGET_MODEL=$SAVE_MODEL
         fi
 
-        echo "Running attack with seed $A_SEED"
+        echo "[$SHELL] ## Running attack with seed $A_SEED"
 
         RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
         mkdir -p "$RESULTS_DIR"

@@ -52,9 +52,6 @@ from advertorch.context import ctx_noparamgrad_and_eval
 def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
           cycles, mse_parameter=1.0, clean_parameter=1.0, clean='supclean'):
 
-    if 'only' in clean:
-        print("'only is in clean")
-
     model.train()
 
     correct = 0
