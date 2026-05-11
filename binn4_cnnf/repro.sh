@@ -8,16 +8,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
-TRAIN_METHOD='adv' # should be 'adv' or 'clean'
-echo "WARNING: so far only 'adv' supported"
-DEBUG=false
+TRAIN_METHOD=clean
+DEBUG=true
 RUN_TRAIN=true
 MODEL_DIR="${SCRIPT_DIR}/models"
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF_debug"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF_debug" # This is not a path- just a name that will be appended to a path
     RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results_debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
@@ -43,13 +42,18 @@ do
 
     if [ "$RUN_TRAIN" = true ]; then
 
-        echo "Running training with seed $T_SEED"
-        if [ $TRAIN_METHOD='adv' ]; then
-            CLEAN='no'
+        echo "Running $TRAIN_METHOD training with seed $T_SEED"
+        if [ "$TRAIN_METHOD" = adv ]; then
+            CLEAN=no
+
+        elif [ "$TRAIN_METHOD" = clean ]
+        then
+            CLEAN=only
         else
-            echo "WARNING: currently only adversarial training is supported. Supclean is hybrid(?)"
-            exit 1
-        
+            CLEAN=supclean
+            echo "[$SHELL] ## WARNING: Training with supclean. This is a clean-adversarial hybrid and probably not the desired method."
+        fi
+
         python "${SCRIPT_DIR}/train.py" \
                         --dataset 'cifar10' \
                         --data-dir "${DATA_DIR}" \

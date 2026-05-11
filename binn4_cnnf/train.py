@@ -52,6 +52,9 @@ from advertorch.context import ctx_noparamgrad_and_eval
 def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
           cycles, mse_parameter=1.0, clean_parameter=1.0, clean='supclean'):
 
+    if 'only' in clean:
+        print("'only is in clean")
+
     model.train()
 
     correct = 0
@@ -73,7 +76,10 @@ def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
         with ctx_noparamgrad_and_eval(model):
             adv_images = adversary.perturb(images, targets)
 
-        images_all = torch.cat((images, adv_images), 0)
+        if 'only' in clean:
+            images_all = images
+        else:
+            images_all = torch.cat((images, adv_images), 0)
               
         # Reset the model latent variables
         model.reset() 
@@ -82,15 +88,28 @@ def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
         elif (args.dataset == 'fashion'):
             logits, orig_feature_all, block1_all, block2_all = model(images_all, first=True, inter=True)
         ff_prev = orig_feature_all
-        # find the original feature of clean images
-        orig_feature, _ = torch.split(orig_feature_all, images.size(0))
-        block1_clean, _ = torch.split(block1_all, images.size(0))
-        block2_clean, _ = torch.split(block2_all, images.size(0))
+        if 'only' in clean:
+            orig_feature = orig_feature_all
+            block1_clean = block1_all
+            block2_clean = block2_all
+        else:
+            # find the original feature of clean images
+            orig_feature, _ = torch.split(orig_feature_all, images.size(0))
+            block1_clean, _ = torch.split(block1_all, images.size(0))
+            block2_clean, _ = torch.split(block2_all, images.size(0))
         if (args.dataset == 'cifar10'):
-            block3_clean, _ = torch.split(block3_all, images.size(0))
-        logits_clean, logits_adv = torch.split(logits, images.size(0))
+            if 'only' in clean:
+                block3_clean = block3_all
+            else:
+                block3_clean, _ = torch.split(block3_all, images.size(0))
+        if 'only' in clean:
+            logits_clean = logits
+        else:
+            logits_clean, logits_adv = torch.split(logits, images.size(0))
         
-        if not ('no' in clean):
+        if 'only' in clean:
+            loss = F.cross_entropy(logits_clean, targets) / (cycles+1)
+        elif not ('no' in clean):
             loss = (clean_parameter * F.cross_entropy(logits_clean, targets) + F.cross_entropy(logits_adv, targets)) / (2*(cycles+1))
         else:        
             loss = F.cross_entropy(logits_adv, targets) / (cycles+1) 
@@ -100,21 +119,38 @@ def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
                 recon, block1_recon, block2_recon, block3_recon = model(logits, step='backward', inter_recon=True)
             elif (args.dataset == 'fashion'):    
                 recon, block1_recon, block2_recon = model(logits, step='backward', inter_recon=True)
-            recon_clean, recon_adv = torch.split(recon, images.size(0))
-            recon_block1_clean, recon_block1_adv = torch.split(block1_recon, images.size(0))
-            recon_block2_clean, recon_block2_adv = torch.split(block2_recon, images.size(0))
+            if 'only' in clean:
+                recon_clean = recon
+                recon_block1_clean = block1_recon
+                recon_block2_clean = block2_recon
+            else:
+                recon_clean, recon_adv = torch.split(recon, images.size(0))
+                recon_block1_clean, recon_block1_adv = torch.split(block1_recon, images.size(0))
+                recon_block2_clean, recon_block2_adv = torch.split(block2_recon, images.size(0))
             if (args.dataset == 'cifar10'):
-                recon_block3_clean, recon_block3_adv = torch.split(block3_recon, images.size(0))
-                loss += (F.mse_loss(recon_adv, orig_feature) + F.mse_loss(recon_block1_adv, block1_clean) + F.mse_loss(recon_block2_adv, block2_clean) + F.mse_loss(recon_block3_adv, block3_clean)) * mse_parameter / (4*cycles)
+                if 'only' in clean:
+                    recon_block3_clean = block3_recon
+                    loss += (F.mse_loss(recon_clean, orig_feature) + F.mse_loss(recon_block1_clean, block1_clean) + F.mse_loss(recon_block2_clean, block2_clean) + F.mse_loss(recon_block3_clean, block3_clean)) * mse_parameter / (4*cycles)
+                else:
+                    recon_block3_clean, recon_block3_adv = torch.split(block3_recon, images.size(0))
+                    loss += (F.mse_loss(recon_adv, orig_feature) + F.mse_loss(recon_block1_adv, block1_clean) + F.mse_loss(recon_block2_adv, block2_clean) + F.mse_loss(recon_block3_adv, block3_clean)) * mse_parameter / (4*cycles)
             elif (args.dataset == 'fashion'):
-                loss += (F.mse_loss(recon_adv, orig_feature) + F.mse_loss(recon_block1_adv, block1_clean) + F.mse_loss(recon_block2_adv, block2_clean)) * mse_parameter / (3*cycles)
+                if 'only' in clean:
+                    loss += (F.mse_loss(recon_clean, orig_feature) + F.mse_loss(recon_block1_clean, block1_clean) + F.mse_loss(recon_block2_clean, block2_clean)) * mse_parameter / (3*cycles)
+                else:
+                    loss += (F.mse_loss(recon_adv, orig_feature) + F.mse_loss(recon_block1_adv, block1_clean) + F.mse_loss(recon_block2_adv, block2_clean)) * mse_parameter / (3*cycles)
 
             # feedforward    
             ff_current = ff_prev + args.res_parameter * (recon - ff_prev)
             logits = model(ff_current, first=False)
             ff_prev = ff_current
-            logits_clean, logits_adv = torch.split(logits, images.size(0)) 
-            if not ('no' in clean):
+            if 'only' in clean:
+                logits_clean = logits
+            else:
+                logits_clean, logits_adv = torch.split(logits, images.size(0)) 
+            if 'only' in clean:
+                loss += F.cross_entropy(logits_clean, targets) / (cycles+1)
+            elif not ('no' in clean):
                 loss += (clean_parameter * F.cross_entropy(logits_clean, targets) + F.cross_entropy(logits_adv, targets)) / (2*(cycles+1))
             else:
                 loss += F.cross_entropy(logits_adv, targets) / (cycles+1) 
@@ -232,8 +268,8 @@ def main():
                         help='attack step size')
     parser.add_argument('--nb_iter', type=int, default=7,
                         help='number of steps in pgd attack')
-    parser.add_argument('--clean', choices=['no', 'supclean'],
-                        default='supclean', help='whether to use clean data in adv training')
+    parser.add_argument('--clean', choices=['no', 'supclean', 'only'],
+                        default='supclean', help='whether to use clean data in adv training. no: only adversarial; only: only clean; supclean: both')
     
     # hyper-parameters
     parser.add_argument('--mse-parameter', type=float, default=1.0,
