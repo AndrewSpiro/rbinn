@@ -296,6 +296,9 @@ def main():
     parser.add_argument('--ckpt_path', type=str, help="path for loading checkpoint model")
     parser.add_argument('--ckpt_epoch', type=int, help="epoch of checkpoint model")
 
+    parser.add_argument('--num_workers', type=int, default=4, help="number of workers")
+
+
     args = parser.parse_args()
 
     if args.bool_debug:
@@ -346,10 +349,10 @@ def main():
             args.data_dir, train=False, transform=test_transform_cifar, download=True)
         train_loader = torch.utils.data.DataLoader(
           train_data, batch_size=args.batch_size,
-          shuffle=True, num_workers=4, pin_memory=True)
+          shuffle=True, num_workers=args.num_workers, pin_memory=True)
         test_loader = torch.utils.data.DataLoader(
           test_data, batch_size=args.test_batch_size,
-          shuffle=True, num_workers=4, pin_memory=True)
+          shuffle=True, num_workers=args.num_workers, pin_memory=True)
         num_classes = 10
         model = WideResNet(args.layers, 10, args.widen_factor, args.droprate, args.ind, args.max_cycles, args.res_parameter).to(device)
     
