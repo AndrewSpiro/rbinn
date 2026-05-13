@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=b3_clean
+#SBATCH --job-name=b4_clean
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
 #SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:15:00
+#SBATCH --time=00:10:00
 #SBATCH --ntasks=1
 #SBATCH --mem=1G
 
@@ -22,7 +22,7 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 HOME_DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
 echo "[$SHELL] ## Home data dir is here: ${HOME_DATA_DIR}"
-mkdir -p "$DATA_DIR"
+mkdir -p "$HOME_DATA_DIR"
 HOME_MODEL_DIR="${SCRIPT_DIR}/models"
 echo "[$SHELL] ## Home model dir is here: ${HOME_MODEL_DIR}"
 mkdir -p "$HOME_MODEL_DIR"
@@ -31,9 +31,10 @@ mkdir -p "$HOME_MODEL_DIR"
 SCRATCH_PATH="/scratchdata/${SLURM_JOB_USER}/${SLURM_JOB_ID}"
 SCRATCH_DATA_DIR="${SCRATCH_PATH}/data"
 SCRATCH_MODEL_DIR="${SCRATCH_PATH}/models"
+mkdir -p "$SCRATCH_DATA_DIR" "$SCRATCH_MODEL_DIR"
 
 # Copy data from home to scratch
-cp -r $HOME_DATA_DIR $SCRATCH_DATA_DIR
+cp -r "$HOME_DATA_DIR/" "$SCRATCH_DATA_DIR/"
 echo "[$SHELL] ## Data copied to scratch"
 echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
@@ -97,7 +98,8 @@ do
                         --grad-clip \
                         --save-model $SAVE_MODEL \
                         --model-dir $SCRATCH_MODEL_DIR \
-                        --bool-debug $DEBUG
+                        --bool-debug $DEBUG \
+                        --num_workers 1
     fi        
 
     for A_SEED in "${ATTACK_SEEDS[@]}"
@@ -121,7 +123,8 @@ do
                         --model-dir $SCRATCH_MODEL_DIR \
                         --bool-debug $DEBUG \
                         --seed $A_SEED \
-                        --target-model "${TARGET_MODEL}.pt"
+                        --target-model "${TARGET_MODEL}.pt" \
+                        --num_workers 1
     done
 done
 
