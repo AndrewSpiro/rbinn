@@ -1,0 +1,19 @@
+name: verna_env_man
+channels:
+  -conda-forge
+  -defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - pandas
+  - tqdm
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - opencv
+  - scikit-image
+  - tensorboardx
+  - fire
+  - result
+  - onnx
+  - onnx2torch  
