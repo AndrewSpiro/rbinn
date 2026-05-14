@@ -9,9 +9,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 
-DEBUG=true
-RUN_TRAINING=true
-RUN_ATTACKS=true
+DEBUG=false
+RUN_TRAINING=false
+TRAIN_ATTACK=fgsm
+TRAIN_EPSION=8/255
+RUN_ATTACKS=false
 
 TASK=CIFAR10
 ARCHI=ResNet18
@@ -61,6 +63,8 @@ do
         --epoch_num $EPOCHS \
         --train_seed $T_SEED \
         --save_dir $MODEL_DIR \
+        --train_attack $TRAIN_ATTACK \
+        --train_epsilon $TRAIN_EPSILON \
         >> "${MODEL_DIR}/train.log" 2>&1
     fi
 

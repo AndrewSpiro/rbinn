@@ -68,7 +68,7 @@ def plot_results(baselines, means, stds, attack_name, eps_min, eps_max, save_dir
     means = np.array(means)
     stds = np.array(stds)
 
-    plt.plot(x, means, label=f'Repro ({attack_name})', marker='o', markersize=4)
+    plt.plot(x, means, label=f'Repro', marker='o', markersize=4)
     plt.fill_between(x, means - stds, means + stds, alpha=0.2)
 
     # Plot relevant baselines

@@ -45,7 +45,7 @@ save/
 __pycache__/
 ./vscode/
 environment_copy.yml
-
+save_backup/
 
 #### binn2_khmodel ####
 # ignore data
