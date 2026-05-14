@@ -1,6 +1,7 @@
 #### rbinn ####
 experiments/
 *.out
+.VSCodeCounter/
 
 #### VERONA ####
 __pycache__/
