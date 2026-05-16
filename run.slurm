@@ -8,7 +8,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --time=00:15:00
 #SBATCH --ntasks=1
-#SBATCH --mem=1G
+#SBATCH --mem=2G
 
 set -e
 
@@ -99,7 +99,7 @@ else
 fi
 
 # Copy experiment results from scratch to home
-cp -r $SCRATCH_PATH $EXP_REPO_PATH
+cp -r $SCRATCH_EXP_REPO_PATH $HOME_EXP_REPO_PATH
 
 if [ "${AGG_RESULTS}" = true ]; then
     echo "[$SHELL] #### Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
