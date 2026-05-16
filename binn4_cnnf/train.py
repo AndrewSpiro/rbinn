@@ -164,7 +164,7 @@ def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(images[0]), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                100. * batch_idx / len(train_loader), loss.item()), flush=True)
     train_loss /= len(train_loader)
     acc = correct / len(train_loader.dataset)
     return train_loss, acc
@@ -296,6 +296,8 @@ def main():
     parser.add_argument('--ckpt_path', type=str, help="path for loading checkpoint model")
     parser.add_argument('--ckpt_epoch', type=int, help="epoch of checkpoint model")
 
+    parser.add_argument('--num_workers', type=int, default=4, help="number of workers")
+
     args = parser.parse_args()
 
     if args.bool_debug:
@@ -346,10 +348,10 @@ def main():
             args.data_dir, train=False, transform=test_transform_cifar, download=True)
         train_loader = torch.utils.data.DataLoader(
           train_data, batch_size=args.batch_size,
-          shuffle=True, num_workers=4, pin_memory=True)
+          shuffle=True, num_workers=args.num_workers, pin_memory=True)
         test_loader = torch.utils.data.DataLoader(
           test_data, batch_size=args.test_batch_size,
-          shuffle=True, num_workers=4, pin_memory=True)
+          shuffle=True, num_workers=args.num_workers, pin_memory=True)
         num_classes = 10
         model = WideResNet(args.layers, 10, args.widen_factor, args.droprate, args.ind, args.max_cycles, args.res_parameter).to(device)
     
