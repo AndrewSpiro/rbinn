@@ -47,6 +47,8 @@ def main():
     parser.add_argument('--attack-model', type=str, required=False, default=None, help='model for transfer attacks')
     parser.add_argument('--target-model', type=str, required=True, help='model being evaluated')
 
+    parser.add_argument('--num_workers', type=int, default=4, help='number of workers')
+
     args = parser.parse_args()
     print("Args parsed")
     seed_torch(seed=args.seed)
@@ -66,7 +68,7 @@ def main():
                 transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
             ])),
             batch_size=1, shuffle=False,
-            num_workers=4, pin_memory=True)
+            num_workers=args.num_workers, pin_memory=True)
         eps = 0.063
         eps_iter = 0.02
         nb_iter = 7

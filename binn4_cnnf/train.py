@@ -164,7 +164,7 @@ def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(images[0]), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                100. * batch_idx / len(train_loader), loss.item()), flush=True)
     train_loss /= len(train_loader)
     acc = correct / len(train_loader.dataset)
     return train_loss, acc
@@ -297,7 +297,6 @@ def main():
     parser.add_argument('--ckpt_epoch', type=int, help="epoch of checkpoint model")
 
     parser.add_argument('--num_workers', type=int, default=4, help="number of workers")
-
 
     args = parser.parse_args()
 
