@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, argparse
 from pathlib import Path
 import torch
 from torch.utils.data import DataLoader
@@ -13,8 +13,17 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
 
+parser=argparse.ArgumentParser()
+parser.add_argument('--model_path', type=str, help="path for the model")
+parser.add_argument('--figure_path', type=str, help="path for the figure")
+parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
+args = parser.parse_args()
+
+MODEL_PATH = Path(args.model_path)
+FIGURE_PATH = Path(args.figure_path)
+
 # Unsupervised Training Hyperparameters
-NO_EPOCHS = 1000
+NO_EPOCHS = args.epochs
 BATCH_SIZE = 1000
 
 def plot_weight_variance_histogram(ax, model: FKHL3, 
@@ -83,28 +92,21 @@ if __name__ == "__main__":
         <figurepath> (str): directory and file name the figure is supposed to be saved to
     '''
 
-    if len(sys.argv) != 3:
-        print("usage: python prune_and_plot_FKHL3_CIFAR.py <modelpath> <figurepath>")
-        os._exit(os.EX_USAGE)
-
     if torch.cuda.is_available():
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
 
-    model_path = Path(sys.argv[1])
-
-    figure_path = Path(sys.argv[2])
-    if figure_path.is_file():
+    if FIGURE_PATH.is_file():
         print("usage: figurepath is supposed to be a directory path, not a file!")
         os._exit(os.EX_USAGE)
 
-    if not os.path.exists(figure_path):
-        os.makedirs(figure_path)
+    if not os.path.exists(FIGURE_PATH):
+        os.makedirs(FIGURE_PATH)
 
     # load the FKHL3 model from data
     theFactory = ModelFactory()
-    state_dict = torch.load(model_path)
+    state_dict = torch.load(MODEL_PATH)
     model = theFactory.build_from_state(state_dict)
     model.eval()
     model.to(device)
@@ -116,7 +118,7 @@ if __name__ == "__main__":
     if cutoff is None:
         print(f"Only {no_components} detected, nothing to prune. Figure 1 is not generated.")
         os._exit(os.EX_OK)
-    model_path_pruned = model_path.parent / Path(model_path.stem + "_pruned" + model_path.suffix)
+    model_path_pruned = MODEL_PATH.parent / Path(MODEL_PATH.stem + "_pruned" + MODEL_PATH.suffix)
     # save the pruned model
     torch.save(
         {
@@ -263,6 +265,6 @@ if __name__ == "__main__":
     fig.text(0.35, 0.9, r"b)", ha='center')
     fig.text(0.35, 0.45, r"c)", ha='center')
     print("Saving the figure")
-    fig.savefig(figure_path / Path("FigureA1-FKHL3Spectra.eps"))
+    fig.savefig(FIGURE_PATH / Path("FigureA1-FKHL3Spectra.eps"))
     print("Figure saved")
 

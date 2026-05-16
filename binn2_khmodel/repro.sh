@@ -16,16 +16,19 @@ RUN_ATTACKS=true
 if [ "$DEBUG" = true ]; then
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(101)
+    EPOCHS=5
     echo "--- RUNNING IN DEBUG MODE ---"
 else
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
+    EPOCHS=1000
 fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
     if [ "$RUN_TRAINING" = true ]; then
         echo "Starting training for train seed $T_SEED"
+        python src/create_repro.py --epochs $EPOCHS --debug $DEBUG
     fi
     if [ "$RUN_ATTACKS" = true ]; then
         echo "Starting attacks for attack seeds $ATTACK_SEEDS"

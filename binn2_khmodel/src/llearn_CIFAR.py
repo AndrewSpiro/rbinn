@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, argparse
 from pathlib import Path
 import torch
 from torchvision.transforms import ToTensor
@@ -22,8 +22,16 @@ model_ps = {
     "R": 1.0,  # asymptotic weight norm radius
 }
 
+parser=argparse.ArgumentParser()
+parser.add_argument('--model_path', type=str, help="path for the model")
+parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
+parser.add_argument('--debug', type=bool, help='whether running in debug mode')
+args = parser.parse_args()
+
+MODEL_PATH = Path(args.model_path)
+
 # Unsupervised Training Hyperparameters
-NO_EPOCHS = 1000
+NO_EPOCHS = args.epochs
 BATCH_SIZE = 1000
 
 if __name__ == "__main__":
@@ -35,24 +43,19 @@ if __name__ == "__main__":
         <modelpath> (string):   path including file name to save the model to after training
     '''
 
-    if len(sys.argv) != 2:
-        print("usage: python train_CIFAR.py <modelpath>")
-        os._exit(os.EX_USAGE)
-
     if torch.cuda.is_available():
         device = torch.device("cuda")
     else:
         device = torch.device("cpu")
 
-    model_path = Path(sys.argv[1])
-    if not os.path.exists(model_path.parent):
-        os.makedirs(model_path.parent)
+    if not os.path.exists(MODEL_PATH.parent):
+        os.makedirs(MODEL_PATH.parent)
 
     model = FKHL3(model_ps, sigma=1.0)
     model.to(device=device)
 
     training_data = LpUnitCIFAR10(
-            root="../data/CIFAR10", train=True, transform=ToTensor(), p=model_ps["p"]
+            root="../data", train=True, transform=ToTensor(), p=model_ps["p"]
     )
 
     dataloader_train = DeviceDataLoader(
@@ -67,7 +70,7 @@ if __name__ == "__main__":
         dataloader_train,
         model,
         device,
-        model_path,
+        MODEL_PATH,
         no_epochs=NO_EPOCHS,
         checkpt_period=NO_EPOCHS,
         learning_rate=learning_rate,
@@ -75,16 +78,16 @@ if __name__ == "__main__":
 
     # check convergence criteria
     # weights converge towards 1.0
-    if not weight_convergence_criterion(model, 1e-2, 1e-1):
+    if (not weight_convergence_criterion(model, 1e-2, 1e-1)) and not args.debug:
         print("Less than 10pc of weights converged close enough. Model not saved. Try running again.")
         os._exit(os.EX_OK)
 
-    if not weight_mean_criterion(model):
+    if (not weight_mean_criterion(model)) and not args.debug:
         print("Weights converged to the wrong attractor. Model not saved. Try running again.")
         os._exit(os.EX_OK)  
 
 
     torch.save(
         model.state_dict(),
-        model_path,
+        MODEL_PATH,
     )
