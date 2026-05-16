@@ -62,7 +62,7 @@ else
 fi
 
 if [ "${AGG_RESULTS}" = true ]; then
-    echo "[$SHELL] #### Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
+    echo "[$SHELL] ## WARNING: Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
 
     if [ "${DEBUG}" = true ]; then
         RESULTS_DIR=${SCRIPT_DIR}/debug_rd_results

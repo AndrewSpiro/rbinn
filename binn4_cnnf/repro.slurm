@@ -1,17 +1,47 @@
 #!/bin/bash
+
+#SBATCH --job-name=b4_clean
+#SBATCH --output=%x_%j.out
+#SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
+#SBATCH --mail-type="ALL"
+#SBATCH --partition="testing"
+#SBATCH --gres=gpu:1
+#SBATCH --time=00:10:00
+#SBATCH --ntasks=1
+#SBATCH --mem=2G
+
 set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate cnnf
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Home directories
+SCRIPT_DIR=$PWD
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
+HOME_DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
+echo "[$SHELL] ## Home data dir is here: ${HOME_DATA_DIR}"
+mkdir -p "$HOME_DATA_DIR"
+HOME_MODEL_DIR="${SCRIPT_DIR}/models"
+echo "[$SHELL] ## Home model dir is here: ${HOME_MODEL_DIR}"
+mkdir -p "$HOME_MODEL_DIR"
 
+# Scratch directories for fast loading
+SCRATCH_PATH="/scratchdata/${SLURM_JOB_USER}/${SLURM_JOB_ID}"
+SCRATCH_DATA_DIR="${SCRATCH_PATH}/data"
+SCRATCH_MODEL_DIR="${SCRATCH_PATH}/models"
+mkdir -p "$SCRATCH_DATA_DIR" "$SCRATCH_MODEL_DIR"
+
+# Copy data from home to scratch
+cp -r "$HOME_DATA_DIR/" "$SCRATCH_DATA_DIR/"
+echo "[$SHELL] ## Data copied to scratch"
+echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
+
+#### Experiment pipeline ####
 TRAIN_METHOD=clean
-DEBUG=false
+DEBUG=true
 RUN_TRAIN=true
-MODEL_DIR="${SCRIPT_DIR}/models"
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
@@ -20,7 +50,7 @@ if [ "$DEBUG" = true ]; then
     RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results_debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
-    EPOCHS=2
+    EPOCHS=1
     echo "[$SHELL] ## Running in debug mode..."
 else
     SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF"
@@ -29,11 +59,6 @@ else
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
 fi
-
-
-DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
-echo "[$SHELL] ## Data dir is here: ${DATA_DIR}"
-mkdir -p "$DATA_DIR"
 
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
@@ -56,7 +81,7 @@ do
 
         python "${SCRIPT_DIR}/train.py" \
                         --dataset 'cifar10' \
-                        --data-dir "${DATA_DIR}" \
+                        --data-dir "${SCRATCH_DATA_DIR}" \
                         --max-cycles 2 \
                         --ind 5 \
                         --mse-parameter 0.1 \
@@ -72,8 +97,9 @@ do
                         --seed $T_SEED \
                         --grad-clip \
                         --save-model $SAVE_MODEL \
-                        --model-dir $MODEL_DIR \
-                        --bool-debug $DEBUG
+                        --model-dir $SCRATCH_MODEL_DIR \
+                        --bool-debug $DEBUG \
+                        --num_workers 1
     fi        
 
     for A_SEED in "${ATTACK_SEEDS[@]}"
@@ -92,14 +118,18 @@ do
 
         python "${SCRIPT_DIR}/test.py" --dataset 'cifar10' \
                         --test 'average' \
-                        --data-dir "${DATA_DIR}" \
+                        --data-dir "${SCRATCH_DATA_DIR}" \
                         --results-path "${RESULTS_DIR}/results.json" \
-                        --model-dir $MODEL_DIR \
+                        --model-dir $SCRATCH_MODEL_DIR \
                         --bool-debug $DEBUG \
                         --seed $A_SEED \
-                        --target-model "${TARGET_MODEL}.pt"
+                        --target-model "${TARGET_MODEL}.pt" \
+                        --num_workers 1
     done
 done
+
+cp -r $SCRATCH_MODEL_DIR $HOME_MODEL_DIR
+echo "[$SHELL] ## Model copied to home"
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
 ATTACK_SEED_STRING=$(echo "${ATTACK_SEEDS[*]}" | tr ' ' '_')

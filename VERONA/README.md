@@ -1,3 +1,11 @@
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+## Quick Setup
+```bash
+~/rbinn/VERONA$ conda env create -f environment.yml
+~/rbinn/VERONA$ conda activate verona_env
+```
+Follow instructions on https://pytorch.org/get-started/locally/ to install pytorch into ```verona_env```
+---
 [![codecov](https://codecov.io/gh/ADA-research/VERONA/graph/badge.svg?token=O0J6S4TSF2)](https://codecov.io/gh/ADA-research/VERONA)
 [![PyPI](https://img.shields.io/pypi/v/ada-verona)](https://pypi.org/project/ada-verona/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ADA-research/VERONA/blob/main/LICENSE)

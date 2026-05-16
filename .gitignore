@@ -382,6 +382,8 @@ data/
 **/models/
 **/results_debug/
 *.csv
+**/adv_results_debug/
+**/clean_results_debug/
 
 #### binn5_vonenet ####
 **/.vonenet/
