@@ -23,6 +23,8 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
     parser.add_argument('--debug', type=str2bool, help = 'whether running in debug mode')
     parser.add_argument('--train_seed', type=int, help='seed for training')
+    parser.add_argument('--model_path', type=str, help="path for models e.g., 'root/data/repro/models'")
+    parser.add_argument('--data_path', type=str, help="path for the data e.g., 'root/data'")
     args = parser.parse_args()
 
     ROOT = Path(__file__).resolve().parent.parent
@@ -30,7 +32,7 @@ if __name__ == "__main__":
         ROOT = ROOT/"debug"
 
     # create directory structure
-    model_path = ROOT / "data/repro/models"
+    model_path = args.model_path
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
@@ -44,8 +46,13 @@ if __name__ == "__main__":
 
     # learn bio-layer on CIFAR10 data according to Krotov and Hopfield
     fkhl3_name = Path("fkhl3_cifar10.pty")
+    print(f"data path: {args.data_path}", flush=True)
     subprocess.call(
-        f"python src/llearn_CIFAR.py --model_path {str(model_path / fkhl3_name)} --epochs {args.epochs} --debug {args.debug} --train_seed {args.train_seed}",
+        f"python src/llearn_CIFAR.py --model_path {str(model_path / fkhl3_name)} \
+            --epochs {args.epochs} \
+            --debug {args.debug} \
+            --train_seed {args.train_seed} \
+            --data_path {str(args.data_path)}",
         shell=True,
         )
 

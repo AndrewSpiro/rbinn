@@ -29,6 +29,7 @@ parser.add_argument('--model_path', type=str, help="path for the model")
 parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
 parser.add_argument('--debug', type=bool, help='whether running in debug mode')
 parser.add_argument('--train_seed', type=int, help='seed for training')
+parser.add_argument('--data_path', type=str, help="path to the data e.g., 'root/data'")
 args = parser.parse_args()
 
 MODEL_PATH = Path(args.model_path)
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     model.to(device=device)
 
     training_data = LpUnitCIFAR10(
-            root="../data", train=True, transform=ToTensor(), p=model_ps["p"]
+            root=args.data_path, train=True, transform=ToTensor(), p=model_ps["p"]
     )
 
     dataloader_train = DeviceDataLoader(
