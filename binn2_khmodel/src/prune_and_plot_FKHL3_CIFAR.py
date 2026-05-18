@@ -8,6 +8,8 @@ from LocalLearning import FKHL3
 from LocalLearning import StatisticGardener
 from LocalLearning.Data import LpUnitCIFAR10, GaussianData, DeviceDataLoader
 from LocalLearning.Statistics import cov_spectrum
+import random
+import numpy as np
 
 import numpy as np
 import matplotlib as mpl
@@ -17,6 +19,8 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, help="path for the model")
 parser.add_argument('--figure_path', type=str, help="path for the figure")
 parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
+parser.add_argument('--debug', type=bool, help='whether running in debug mode')
+parser.add_argument('--train_seed', type=int, help='seed for training')
 args = parser.parse_args()
 
 MODEL_PATH = Path(args.model_path)
@@ -25,6 +29,18 @@ FIGURE_PATH = Path(args.figure_path)
 # Unsupervised Training Hyperparameters
 NO_EPOCHS = args.epochs
 BATCH_SIZE = 1000
+
+def set_seed(seed):
+    print(f"Seed: {seed}")
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+print(args.train_seed)
+set_seed(args.train_seed)
 
 def plot_weight_variance_histogram(ax, model: FKHL3, 
                                    var_range=(1e-9, 3e-3), no_bins=50, clr='b', alpha=1.0,

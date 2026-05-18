@@ -8,6 +8,8 @@ from LocalLearning.Data import DeviceDataLoader
 from LocalLearning import train_unsupervised
 from LocalLearning import weight_convergence_criterion
 from LocalLearning import weight_mean_criterion
+import random
+import numpy as np
 
 # Model parameters
 
@@ -26,6 +28,7 @@ parser=argparse.ArgumentParser()
 parser.add_argument('--model_path', type=str, help="path for the model")
 parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
 parser.add_argument('--debug', type=bool, help='whether running in debug mode')
+parser.add_argument('--train_seed', type=int, help='seed for training')
 args = parser.parse_args()
 
 MODEL_PATH = Path(args.model_path)
@@ -33,6 +36,16 @@ MODEL_PATH = Path(args.model_path)
 # Unsupervised Training Hyperparameters
 NO_EPOCHS = args.epochs
 BATCH_SIZE = 1000
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
+set_seed(args.train_seed)
 
 if __name__ == "__main__":
     '''

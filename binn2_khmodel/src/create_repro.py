@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
     parser.add_argument('--debug', type=str2bool, help = 'whether running in debug mode')
+    parser.add_argument('--train_seed', type=int, help='seed for training')
     args = parser.parse_args()
 
     ROOT = Path(__file__).resolve().parent.parent
@@ -44,12 +45,12 @@ if __name__ == "__main__":
     # learn bio-layer on CIFAR10 data according to Krotov and Hopfield
     fkhl3_name = Path("fkhl3_cifar10.pty")
     subprocess.call(
-        f"python src/llearn_CIFAR.py --model_path {str(model_path / fkhl3_name)} --epochs {args.epochs} --debug {args.debug}",
+        f"python src/llearn_CIFAR.py --model_path {str(model_path / fkhl3_name)} --epochs {args.epochs} --debug {args.debug} --train_seed {args.train_seed}",
         shell=True,
         )
 
     # prune the previously learned model and create Figure A1
     subprocess.call(
-        f"python src/prune_and_plot_FKHL3_CIFAR.py --model_path {str(model_path / fkhl3_name)} --figure_path {str(figure_path)} --epochs {args.epochs}",
+        f"python src/prune_and_plot_FKHL3_CIFAR.py --model_path {str(model_path / fkhl3_name)} --figure_path {str(figure_path)} --epochs {args.epochs} --debug {args.debug} --train_seed {args.train_seed}",
         shell=True,
         )
