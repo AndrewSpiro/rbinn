@@ -1,4 +1,3 @@
-print("top o file")
 import os, sys, argparse
 from pathlib import Path
 import torch
