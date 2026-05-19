@@ -32,7 +32,7 @@ if __name__ == "__main__":
         ROOT = ROOT/"debug"
 
     # create directory structure
-    model_path = args.model_path
+    model_path = Path(args.model_path)
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
@@ -52,7 +52,7 @@ if __name__ == "__main__":
             --epochs {args.epochs} \
             --debug {args.debug} \
             --train_seed {args.train_seed} \
-            --data_path {str(args.data_path)}",
+            --data_path {args.data_path}",
         shell=True,
         )
 
