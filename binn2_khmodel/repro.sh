@@ -15,6 +15,7 @@ mkdir -p "$DATA_DIR"
 MODEL_DIR="${SCRIPT_DIR}/data/repro/models"
 echo "[$SHELL] ## Home model dir is here: ${MODEL_DIR}"
 mkdir -p "$MODEL_DIR"
+FIGURE_DIR="${SCRIPT_DIR}/data/repro/figures"
 
 
 DEBUG=false
@@ -41,7 +42,10 @@ do
         --debug $DEBUG \
         --train_seed $T_SEED \
         --model_path "$MODEL_DIR" \
-        --data_path "$DATA_DIR"
+        --data_path "$DATA_DIR" \
+        --figure_dir $FIGURE_DIR
+        
+        gs -dSAFER -dEPSCrop -r600 -sDEVICE=pngalpha -o "${FIGURE_DIR}/FigureA1-FKHL3Spectra.png" "${FIGURE_DIR}/FigureA1-FKHL3Spectra.eps"
     fi
     if [ "$RUN_ATTACKS" = true ]; then
         echo "Starting attacks for attack seeds $ATTACK_SEEDS"

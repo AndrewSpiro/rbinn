@@ -24,6 +24,7 @@ if __name__ == "__main__":
     parser.add_argument('--debug', type=str2bool, help = 'whether running in debug mode')
     parser.add_argument('--train_seed', type=int, help='seed for training')
     parser.add_argument('--model_path', type=str, help="path for models e.g., 'root/data/repro/models'")
+    parser.add_argument('--figure_path', type=str, help="path for figures e.g., 'root/data/repro/figures'")
     parser.add_argument('--data_path', type=str, help="path for the data e.g., 'root/data'")
     args = parser.parse_args()
     print("args parsed", flush=True)
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
-    figure_path = ROOT / "data/repro/figures"
+    figure_path = Path(args.figure_path)
     if not os.path.exists(figure_path):
         os.makedirs(figure_path)
 

@@ -4,9 +4,9 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="testing"
+#SBATCH --partition="interactive"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:02:00
+#SBATCH --time=00:05:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -20,12 +20,13 @@ conda activate khmodel
 SCRIPT_DIR=$PWD
 PARENT_DIR="$(dirname $SCRIPT_DIR)"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
-HOME_DATA_DIR="$(dirname "$PARENT_DIR")/data"
+HOME_DATA_DIR="$PARENT_DIR/data"
 echo "[$SHELL] ## Home data dir is here: ${HOME_DATA_DIR}"
 mkdir -p "$HOME_DATA_DIR"
 HOME_MODEL_DIR="${SCRIPT_DIR}/data/repro/models"
 echo "[$SHELL] ## Home model dir is here: ${HOME_MODEL_DIR}"
 mkdir -p "$HOME_MODEL_DIR"
+FIGURE_DIR="${SCRIPT_DIR}/data/repro/figures"
 
 # Scratch directories for fast loading
 SCRATCH_PATH="/scratchdata/${SLURM_JOB_USER}/${SLURM_JOB_ID}"
@@ -34,7 +35,7 @@ SCRATCH_MODEL_DIR="${SCRATCH_PATH}/models"
 mkdir -p "$SCRATCH_DATA_DIR" "$SCRATCH_MODEL_DIR"
 
 # Copy data from home to scratch
-cp -r "$HOME_DATA_DIR/" "$SCRATCH_DATA_DIR/"
+cp -r "$HOME_DATA_DIR/" "$SCRATCH_PATH/"
 echo "[$SHELL] ## Data copied to scratch"
 echo "[$SHELL] ## Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
@@ -63,7 +64,10 @@ do
             --debug $DEBUG \
             --train_seed $T_SEED \
             --model_path $SCRATCH_MODEL_DIR \
-            --data_path "${SCRATCH_DATA_DIR}"
+            --data_path "${SCRATCH_DATA_DIR}" \
+            --figure_path $FIGURE_DIR
+
+        gs -dSAFER -dEPSCrop -r600 -sDEVICE=pngalpha -o "${FIGURE_DIR}/FigureA1-FKHL3Spectra.png" "${FIGURE_DIR}/FigureA1-FKHL3Spectra.eps"
     fi
     if [ "$RUN_ATTACKS" = true ]; then
         echo "[$SHELL] ## Starting attacks for attack seeds $ATTACK_SEEDS"
