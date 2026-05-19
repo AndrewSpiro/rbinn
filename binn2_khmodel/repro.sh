@@ -3,7 +3,7 @@ set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
 
-conda activate khmodel_clone
+conda activate khmodel
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
