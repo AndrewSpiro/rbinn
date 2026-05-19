@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument('--attack_seed', type=int, help='seed for attacking')
     parser.add_argument('--data_path', type=str, help="path to the data e.g., 'root/data'")
     parser.add_argument('--model_path', type=str, help="path for the model e.g., 'root/binn2_khmodel/data/repro/models")
-    parser.add_argument('--model_name', type=str, default='fkhl3_cifar10_pruned.pty', help='name of the model')
+    parser.add_argument('--khlayer_name', type=str, default='fkhl3_cifar10_pruned.pty', help='name of the layer')
 
     args = parser.parse_args()
 
@@ -59,8 +59,10 @@ if __name__ == "__main__":
         os.makedirs(exp_path)
 
     # model filenames
-    model_name = Path(args.model_name)
-    print(f"model name type: {type(model_name)}", flush=True)
+    khlayer_name = Path(args.khlayer_name)
+    model_info = torch.load(model_path / khlayer_name)
+    state_dict = model_info['model_state_dict']
+    khlayer = FKHL3(state_dict)
                
     rp_fname = Path("random_perturbation_results.pkl")
     fgsm_fname = Path("fgsm_results.pkl")

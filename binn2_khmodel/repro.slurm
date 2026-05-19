@@ -88,7 +88,7 @@ do
             --attack_seed $A_SEED \
             --data_path $SCRATCH_DATA_DIR \
             --model_path $MODEL_DIR \
-            --model_name fkhl3_cifar10_pruned.pty
+            --khlayer_name fkhl3_cifar10_pruned.pty
         done
     fi
 done
