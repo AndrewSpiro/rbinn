@@ -1,3 +1,4 @@
+print("top o file")
 import os, sys, argparse
 from pathlib import Path
 import torch
@@ -56,7 +57,7 @@ if __name__ == "__main__":
     ARGS: 
         <modelpath> (string):   path including file name to save the model to after training
     '''
-
+    print("main called")
     if torch.cuda.is_available():
         device = torch.device("cuda")
     else:
@@ -67,11 +68,11 @@ if __name__ == "__main__":
 
     model = FKHL3(model_ps, sigma=1.0)
     model.to(device=device)
-
+    print("model intialized", flush=True)
     training_data = LpUnitCIFAR10(
             root=args.data_path, train=True, transform=ToTensor(), p=model_ps["p"]
     )
-
+    print("train data loaded", flush=True)
     dataloader_train = DeviceDataLoader(
             training_data, device=device, batch_size=BATCH_SIZE, num_workers=4, shuffle=True
     )
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     lr = 1.0 / model_ps["tau_l"] 
     def learning_rate(epoch: int) -> float:
         return (1.0 - epoch / NO_EPOCHS) * lr
-
+    print("learning rate defined", flush=True)
     train_unsupervised(
         dataloader_train,
         model,

@@ -504,7 +504,7 @@ def train_unsupervised(
     learning_rate=float - constant learning rate learning_rate
     learning_rate=function - learning according to the functional relation specified by learning_rate(epoch)
     """
-
+    print("in unsup training", flush=True)
     if type(learning_rate).__name__ != "function":
 
         if type(learning_rate).__name__ == "NoneType":
@@ -515,12 +515,16 @@ def train_unsupervised(
     else:
         lr = learning_rate
 
+    print("lr set", flush=True)
     with torch.no_grad():
         with tqdm(range(1, no_epochs + 1), unit="epoch") as tepoch:
             #tepoch.set_description(f"Epoch: {epoch}")
             tepoch.set_description(f"Training time [epochs]")
 
+            print("starting epochs", flush=True)
             for epoch in tepoch:
+                if epoch%5==0:
+                    print(f"epoch {epoch}", flush=True)
                 # catch lr(epoch) = 0 to avoid division by 0
                 if lr(epoch) != 0.0:
                     # if learning rate == 0 -> no learning

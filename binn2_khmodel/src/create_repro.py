@@ -26,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_path', type=str, help="path for models e.g., 'root/data/repro/models'")
     parser.add_argument('--data_path', type=str, help="path for the data e.g., 'root/data'")
     args = parser.parse_args()
-
+    print("args parsed", flush=True)
     ROOT = Path(__file__).resolve().parent.parent
     if args.debug:
         ROOT = ROOT/"debug"
