@@ -35,6 +35,10 @@ if __name__ == "__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument('--debug', type=str2bool, help = 'whether running in debug mode')
     parser.add_argument('--attack_seed', type=int, help='seed for attacking')
+    parser.add_argument('--data_path', type=str, help="path to the data e.g., 'root/data'")
+    parser.add_argument('--model_path', type=str, help="path for the model e.g., 'root/binn2_khmodel/data/repro/models")
+    parser.add_argument('--model_name', type=str, default='fkhl3_cifar10_pruned.pty', help='name of the model')
+
     args = parser.parse_args()
 
     ROOT = Path(__file__).resolve().parent.parent
@@ -42,7 +46,7 @@ if __name__ == "__main__":
         ROOT = ROOT/"debug"
 
     # create directory structure
-    model_path = ROOT / "data/repro/models"
+    model_path = Path(args.model_path)
     if not os.path.exists(model_path):
         os.makedirs(model_path)
 
@@ -55,9 +59,8 @@ if __name__ == "__main__":
         os.makedirs(exp_path)
 
     # model filenames
-    khmodel_name = Path("fkhl3_cifar10_pruned.pty")
-
-    fn_list = [khmodel_name]
+    model_name = Path(args.model_name)
+    print(f"model name type: {type(model_name)}", flush=True)
                
     rp_fname = Path("random_perturbation_results.pkl")
     fgsm_fname = Path("fgsm_results.pkl")
@@ -68,9 +71,9 @@ if __name__ == "__main__":
     else:
         device = torch.device('cpu')
 
+    print(f"args data path: {args.data_path}")
     cifar10Test = LpUnitCIFAR10(
-    root="../data/CIFAR10",
-    # root="../../data/CIFAR10",#acs
+    root=args.data_path,
     train=False,
     transform=ToTensor(),
     p=FKHL3.pSet["p"],
@@ -80,7 +83,7 @@ if __name__ == "__main__":
     eps = np.logspace(-6, np.log(2.5), num=400)
 
     rpE = RandomPerturbationExperiment(ce_loss)
-    rpE.run(model_path, fn_list, cifar10Test, eps, device, norm_p=2.0)
+    rpE.run(model_path, [model_name], cifar10Test, eps, device, norm_p=2.0)
     rpE.save(exp_path / rp_fname)
 
     breakpoint()

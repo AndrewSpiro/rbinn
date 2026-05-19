@@ -25,7 +25,7 @@ model_ps = {
 }
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--model_path', type=str, help="path for the model")
+parser.add_argument('--model_path', type=str, help="path for the model e.g., 'root/binn2_khmodel/data/repro/models")
 parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
 parser.add_argument('--debug', type=bool, help='whether running in debug mode')
 parser.add_argument('--train_seed', type=int, help='seed for training')
