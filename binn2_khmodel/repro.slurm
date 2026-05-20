@@ -6,7 +6,7 @@
 #SBATCH --mail-type="ALL"
 #SBATCH --partition="interactive"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:15:00
+#SBATCH --time=00:10:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -112,8 +112,8 @@ do
             --attack_seed $A_SEED \
             --data_path $SCRATCH_DATA_DIR \
             --model_path $MODEL_DIR \
-            --figure_path $FIGURE_DIR \
-            --exp_path $EXP_DIR
+            --figure_path "${FIGURE_DIR}/a_seed_${A_SEED}" \
+            --exp_path "${EXP_DIR}/a_seed_${A_SEED}"
         done
 
         # copy models from scratch to home
