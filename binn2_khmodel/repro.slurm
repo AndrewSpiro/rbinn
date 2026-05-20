@@ -78,7 +78,7 @@ do
     else
         echo "[$SHELL] ## Skipping layer training"
     fi
-    if [ "$TRAIN_LAYER" = true ]; then
+    if [ "$TRAIN_MODEL" = true ]; then
         echo "[$SHELL] ## Starting model training for train seed $T_SEED"
         python src/train.py \
         --epochs $EPOCHS \
