@@ -56,6 +56,7 @@ do
     else
         echo "[$SHELL] ## Skipping layer training"
     fi
+
     if [ "$TRAIN_MODEL" = true ]; then
         echo "[$SHELL] ## Starting model training for train seed $T_SEED"
         python src/train.py \
@@ -68,6 +69,7 @@ do
         --num_workers 1 \
         --train_models $TRAIN_MODELS
     fi
+    
     if [ "$RUN_ATTACKS" = true ]; then
         echo "[$SHELL] ## Starting attacks for attack seeds $ATTACK_SEEDS"
         for A_SEED in "${ATTACK_SEEDS[@]}"
@@ -79,8 +81,8 @@ do
             --attack_seed $A_SEED \
             --data_path $DATA_DIR \
             --model_path $MODEL_DIR \
-            --figure_path $FIGURE_DIR \
-            --exp_path $EXP_DIR \
+            --figure_path "${FIGURE_DIR}/a_seed_${A_SEED}" \
+            --exp_path "${EXP_DIR}/a_seed_${A_SEED}"
         done
     fi
 done
