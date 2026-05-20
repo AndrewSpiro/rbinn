@@ -116,6 +116,14 @@ def specreg_schedule_adj(epoch):
     if epoch >= 200:
         return 1e-3*np.exp(- (epoch - 200) / gamma )    
 
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
 if __name__ == "__main__":
 
     parser=argparse.ArgumentParser()
@@ -131,16 +139,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    NUMBER_OF_EPOCHS = args.lr
-    LEARNING_RATE = args.epochs
-
-    def set_seed(seed):
-        random.seed(seed)
-        np.random.seed(seed)
-        torch.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
+    NUMBER_OF_EPOCHS = args.epochs
+    LEARNING_RATE = args.lr
 
     set_seed(args.train_seed)
 
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     cifar10Train, TrainLoader, cifar10Test, TestLoader = create_datasets()
 
     clean_acc = get_clean_acc(khmodel)
-    print(f"Clean accuracy on KHModel: {clean_acc}")
+    print(f"Clean accuracy on KHModel: {clean_acc}", flush=True)
 
     if 'khmodel' in args.train_models:
         @JFReg(alpha_JF=0.0, n=3)
