@@ -6,7 +6,7 @@ source $(conda info --base)/etc/profile.d/conda.sh
 conda activate khmodel
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(dirname "$SCRIPT_DIR")"
+ROOT_DIR="$(dirname $SCRIPT_DIR)"
 echo "Root dir is $ROOT_DIR"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 DATA_DIR="${ROOT_DIR}/data"
@@ -81,7 +81,6 @@ do
             --model_path $MODEL_DIR \
             --figure_path $FIGURE_DIR \
             --exp_path $EXP_DIR \
-            --model_name fkhl3_cifar10_pruned.pty
         done
     fi
 done
