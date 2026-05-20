@@ -30,7 +30,7 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError('Boolean value expected.')
     
-def saveKHModelPerturbationResults(exp: PerturbationExperiment, attack: str):
+def saveKHModelPerturbationResults(exp: PerturbationExperiment, exp_path: str, attack: str):
     '''making this function to save epsilon values and accuracies -aspiro'''
     crit_norm = []
     for i, (key, results) in enumerate(exp):
@@ -39,7 +39,8 @@ def saveKHModelPerturbationResults(exp: PerturbationExperiment, attack: str):
         else:
             cns_nan = np.isnan(results['crit_eps'])
             crit_norm.append(results['crit_norm'][~cns_nan])
-            with open(f"{attack}_attack.txt", "w") as f:
+            file_path = f"{exp_path}/{attack}_attack.txt"
+            with open(file_path, "w") as f:
                 f.write("Epsilons\n")
                 for eps in results['eps']:
                     f.write(f"{eps}\n")
@@ -49,7 +50,49 @@ def saveKHModelPerturbationResults(exp: PerturbationExperiment, attack: str):
                 f.write("\nAccuracies\n")
                 for acc in results['acc']:
                     f.write(f"{acc}\n")
-            print("Saved adv attack results")
+            print(f"Saved adv attack results to {file_path}")
+
+def plotPerturbationResults(axs, exp: PerturbationExperiment, names: list, clrs: list) -> tuple:
+    crit_norm = []
+    left_ax, right_ax = axs
+    #fig, axs = plt.subplots(1, 2)
+    for i, (key, results) in enumerate(exp):      
+        left_ax.semilogx(results['eps'], results['acc'], color=clrs[i], label=names[i])
+        #crit_eps.append(results['crit_eps'])
+        # clean nans from data
+        cns_nan = np.isnan(results['crit_eps'])
+        crit_norm.append(results['crit_norm'][~cns_nan])
+        saveKHModelPerturbationResults(key, results['eps'], results['acc'], crit_norm[0])
+    #axs[1].boxplot(crit_eps, labels=names, showfliers=False)
+    right_ax.boxplot(crit_norm, labels=names, showfliers=False)
+    left_ax.legend(
+        handlelength=0.5,
+    )
+    left_ax.set_xlabel(r"$\epsilon$")
+    left_ax.set_ylabel("Rel. accuracy")
+    right_ax.set_ylabel(r"$\| \Delta x \|_{\mathrm{crit}}$")
+    
+    return left_ax, right_ax
+
+def plotAccVSRobustness(ax, exp: PerturbationExperiment, names: list, clrs: list, acc: dict):
+    
+    for i, (key, results) in enumerate(exp):
+        cns_nan = np.isnan(results['crit_eps'])
+        median = np.median(results['crit_norm'][~cns_nan])
+        acc_array = np.array([acc[names[i]]])
+        ax.scatter(acc_array, median, label=names[i], c=clrs[i])
+    ax.set_xlabel(r"Test accuracy")
+    # ax.set_ylabel(r"$\| \Delta x \|_{\textrm{crit}}$")
+    ax.set_ylabel(r"$\| \Delta x \|_{\mathrm{crit}}$")
+    return ax
+
+def set_seed(seed):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 if __name__ == "__main__":
 
@@ -61,10 +104,10 @@ if __name__ == "__main__":
     parser.add_argument('--figure_path', type=str, help="path for figures e.g., 'root/data/repro/figures'")
     parser.add_argument('--exp_path', type=str, help="path for the epxeriments e.g., 'root/binn2_khmodel/data/repro/experiments")
     parser.add_argument('--attack_models', choices=['khmodel', 'shlp', 'L2', 'jreg', 'specreg'], help="models to train")
-    parser.add_argument('--train_seed', type=int, help='seed for training')
-
 
     args = parser.parse_args()
+
+    set_seed(args.attack_seed)
 
     # create directory structure
     model_path = Path(args.model_path)
@@ -139,3 +182,157 @@ if __name__ == "__main__":
 
     clrs = ['c0','c1','c2','c3','c4','c5']
     names = ['KH', 'BP', 'L2', 'JReg', 'SpecReg']
+
+    experiments = [(pgdE, 'pgdE'), (fgsmE, 'fgsmE'), (rpE, 'rpE')]
+    for exp,name in experiments:
+        saveKHModelPerturbationResults(exp, name)
+
+    print('potting rd')
+    fig = plt.figure()
+    # fig.set_figheight(6.0)
+    # width_ratios = [5e-3, 0.5, 0.5]
+    # height_ratios = [0.05, 1.0, 0.05, 1.0, 0.05, 1.0]
+    # gs = mpl.gridspec.GridSpec(6, 3, width_ratios=width_ratios, height_ratios=height_ratios)
+
+    # RP_left_ax = fig.add_subplot(gs[1, 1])
+    # RP_right_ax = fig.add_subplot(gs[1, 2])
+    # RP_left_ax, RP_right_ax = plotPerturbationResults(
+    #     (RP_left_ax, RP_right_ax),
+    #     rpE, names, clrs,
+    # )
+
+    # fgsm_left_ax = fig.add_subplot(gs[3, 1])
+    # fgsm_right_ax = fig.add_subplot(gs[3, 2])
+    # fgsm_left_ax, fgsm_right_ax = plotPerturbationResults(
+    #     (fgsm_left_ax, fgsm_right_ax),
+    #     fgsmE, names, clrs,
+    # )
+
+    pdg_left_ax = fig.add_subplot() #aspiro
+    pdg_right_ax = fig.add_subplot() #aspiro
+    pdg_left_ax, pdg_right_ax = plotPerturbationResults( #aspiro
+        (pdg_left_ax, pdg_right_ax), #aspiro
+        pgdE, names, clrs, #aspiro
+    ) #aspiro
+    plt.show() #aspiro
+    # fig.text(0.1, 0.665, r"Random Perturbation", rotation='vertical', ha='center')
+    # fig.text(0.1, 0.45, r"FGSM", rotation='vertical', ha='center')
+    # fig.text(0.1, 0.2, r"PGD", rotation='vertical', ha='center')
+    # fig.savefig(figure_directory / Path("Figure1-AdversarialResults.eps"))
+    # fig.savefig(Path("AdversarialResults.pdf"))
+
+    print('plotting pbc and rd')
+    fig = plt.figure(constrained_layout=True)
+    fig.set_figheight(6.0)
+    width_ratios = [5e-3, 0.5, 0.5]
+    height_ratios = [0.05, 1.0, 0.05, 1.0, 0.05, 1.0]
+    gs = mpl.gridspec.GridSpec(6, 3, width_ratios=width_ratios, height_ratios=height_ratios)
+
+    # RP_left_ax = fig.add_subplot(gs[1, 1])
+    # RP_right_ax = fig.add_subplot(gs[1, 2])
+    # RP_left_ax, RP_right_ax = plotPerturbationResults(
+    #     (RP_left_ax, RP_right_ax),
+    #     rpE, names, clrs,
+    # )
+
+    # fgsm_left_ax = fig.add_subplot(gs[3, 1])
+    # fgsm_right_ax = fig.add_subplot(gs[3, 2])
+    # fgsm_left_ax, fgsm_right_ax = plotPerturbationResults(
+    #     (fgsm_left_ax, fgsm_right_ax),
+    #     fgsmE, names, clrs,
+    # )
+
+    pdg_left_ax = fig.add_subplot(gs[5, 1])
+    pdg_right_ax = fig.add_subplot(gs[5, 2])
+    pdg_left_ax, pdg_right_ax = plotPerturbationResults(
+        (pdg_left_ax, pdg_right_ax),
+        pgdE, names, clrs,
+    )
+
+    # fig.text(0.1, 0.665, r"Random Perturbation", rotation='vertical', ha='center')
+    # fig.text(0.1, 0.45, r"FGSM", rotation='vertical', ha='center')
+    fig.text(0.1, 0.2, r"PGD", rotation='vertical', ha='center')
+    fig.savefig(figure_directory / Path("Figure1-AdversarialResults.eps"))
+    #fig.savefig(Path("AdversarialResults.pdf"))
+
+    print('saving stats')
+    fig, axs = PlotResults(rpE, names, clrs)
+    plt.savefig(figure_directory / Path("RandomPerturbationStats.pdf"))
+
+    print('cell')
+    eps_fgsm = np.logspace(-6, -1.5, num=400)
+
+    print('saving fgsm exp')
+    fgsmE = FGSMExperiment(ce_loss)
+    fgsmE.run(directory, fn_list, cifar10Test, eps_fgsm, device, norm_p=2.0)
+    fgsmE.save(exp_directory / fgsm_fname)
+
+    print('plot results')
+    fig, axs = PlotResults(fgsmE, names, clrs)
+    fig.savefig(figure_directory / Path("FGSMStats.pdf"))
+
+    print('plot pgd exp')
+    eps_pgd = np.logspace(-6, -1.5, num=400)
+
+    pgdE = PGDExperiment(ce_loss)
+    pgdE.run(directory, fn_list, cifar10Test, eps_pgd, device, norm_p=2.0)
+    pgdE.save(exp_directory / pgd_fname)
+
+    print('save pgd stats')
+    fig, axs = PlotResults(pgdE, names, clrs)
+    fig.savefig(figure_directory / Path("PGDStats.pdf"))
+
+    print('log files')
+    # file names of the training log files
+    khmodel_log_name = Path("khmodel_cifar10_log.json")
+    shlp_log_name = Path("shlp_cifar10_log.json")
+    shlp_l2_log_name = Path("shlp_l2_log.json")
+    shlp_jreg_log_name = Path("shlp_jreg_log.json")
+    shlp_specreg_log_name = Path("shlp_specreg_log.json")
+
+    fn_log_list = [khmodel_log_name, shlp_log_name, shlp_l2_log_name, shlp_jreg_log_name, shlp_specreg_log_name]
+
+    model_accuracy = {}
+
+    for name, log_file in zip(names, fn_log_list):
+        log = Trainers.Trainer.Logger()
+        log.load(directory / log_file)
+        model_accuracy[name] = log['eval_acc'][-1]
+
+    print('acc robustness plots')
+    # accuracy - robustness plots
+
+    fig = plt.figure(constrained_layout=True)
+    fig.set_figheight(1.5)
+    width_ratios = [0.05, 0.5, 0.05, 0.5, 0.75]
+    height_ratios = [0.05, 1.0, 0.05]
+    gs = mpl.gridspec.GridSpec(3, 5, width_ratios=width_ratios, height_ratios=height_ratios)
+
+    RP_ax = fig.add_subplot(gs[1, 1])
+    RP_ax = plotAccVSRobustness(
+        RP_ax,
+        rpE, names, clrs, model_accuracy
+    )
+    RP_ax.set_xlim(0.42, 0.57)
+    RP_ax.set_ylim(0.5, 3.5)
+    # RP_ax.set_ylabel(r"$\| \Delta x \|_{\textrm{crit}}$")
+    RP_ax.set_ylabel(r"$\| \Delta x \|_{\mathrm{crit}}$")
+
+    pgd_ax = fig.add_subplot(gs[1, 3])
+    pgd_ax = plotAccVSRobustness(
+        pgd_ax,
+        pgdE, names, clrs, model_accuracy
+    )
+    pgd_ax.set_xlim(0.42, 0.57)
+    handles, labels = pgd_ax.get_legend_handles_labels()
+    fig.text(0.4, 0.0, r"Test accuracy", rotation='horizontal', ha='center')
+
+    legend_ax = fig.add_subplot(gs[1, 4])
+    legend_ax.axis("off")
+    legend_ax.legend(handles, labels)
+
+    #fig.text(0.1, 0.665, r"Random Perturbation", rotation='vertical', ha='center')
+    #fig.text(0.1, 0.45, r"FGSM", rotation='vertical', ha='center')
+    #fig.text(0.1, 0.2, r"PGD", rotation='vertical', ha='center')
+    fig.savefig(figure_directory / Path("FigureA2-AccVsRobustness.pdf"))
+    #fig.savefig(Path("AccVsRobustness.pdf"))
