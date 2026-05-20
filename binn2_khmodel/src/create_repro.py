@@ -23,14 +23,13 @@ if __name__ == "__main__":
     parser.add_argument('--epochs', type=int, help='number of epochs for unsupervised training')
     parser.add_argument('--debug', type=str2bool, help = 'whether running in debug mode')
     parser.add_argument('--train_seed', type=int, help='seed for training')
+    parser.add_argument('--data_path', type=str, help="path for the data e.g., 'root/data'")
     parser.add_argument('--model_path', type=str, help="path for models e.g., 'root/data/repro/models'")
     parser.add_argument('--figure_path', type=str, help="path for figures e.g., 'root/data/repro/figures'")
-    parser.add_argument('--data_path', type=str, help="path for the data e.g., 'root/data'")
+    parser.add_argument('--exp_path', type=str, help="path for the epxeriments e.g., 'root/binn2_khmodel/data/repro/experiments")
+    
     args = parser.parse_args()
     print("args parsed", flush=True)
-    ROOT = Path(__file__).resolve().parent.parent
-    if args.debug:
-        ROOT = ROOT/"debug"
 
     # create directory structure
     model_path = Path(args.model_path)
@@ -41,7 +40,7 @@ if __name__ == "__main__":
     if not os.path.exists(figure_path):
         os.makedirs(figure_path)
 
-    exp_path = ROOT / "data/repro/experiments"
+    exp_path = Path(args.exp_path)
     if not os.path.exists(exp_path):
         os.makedirs(exp_path)
 

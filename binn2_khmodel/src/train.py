@@ -122,10 +122,12 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', type=str, help="path to the data e.g., 'root/data'")
     parser.add_argument('--model_path', type=str, help="path for the model e.g., 'root/binn2_khmodel/data/repro/models")
     parser.add_argument('--figure_path', type=str, help="path for the figure e.g., 'root/binn2_khmodel/data/repro/figures")
+    parser.add_argument('--exp_path', type=str, help="path for the epxeriments e.g., 'root/binn2_khmodel/data/repro/experiments")
     parser.add_argument('--num_workers', type=int, help="number of workers to use")
-    parser.add_argument('--train_models', choice=['khmodel', 'shlp', 'L2', 'jreg', 'specreg', 'adj_exp'], help="models to train")
+    parser.add_argument('--train_models', choices=['khmodel', 'shlp', 'L2', 'jreg', 'specreg', 'adj_exp'], help="models to train")
     parser.add_argument('--lr', type=float, default=0.001, help="learning rate for training")
     parser.add_argument('--epochs', type=int, default=1000, help="number of epochs for training")
+    parser.add_argument('--train_seed', type=int, help='seed for training')
 
     args = parser.parse_args()
 
@@ -142,10 +144,6 @@ if __name__ == "__main__":
 
     set_seed(args.train_seed)
 
-    ROOT = Path(__file__).resolve().parent.parent
-    if args.debug:
-        ROOT = ROOT/"debug"
-
     # create directory structure
     model_path = Path(args.model_path)
     if not os.path.exists(model_path):
@@ -155,7 +153,7 @@ if __name__ == "__main__":
     if not os.path.exists(figure_path):
         os.makedirs(figure_path)
 
-    exp_path = ROOT / "data/repro/experiments"
+    exp_path = Path(args.exp_path)
     if not os.path.exists(exp_path):
         os.makedirs(exp_path)
 
