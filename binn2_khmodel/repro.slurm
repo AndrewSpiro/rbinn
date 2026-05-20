@@ -41,8 +41,10 @@ echo "[$SHELL] ## Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 #### Experiment pipeline ####
 DEBUG=false
-RUN_TRAINING=false
-RUN_ATTACKS=true
+TRAIN_LAYER=false
+TRAIN_MODEL=true
+RUN_ATTACKS=false
+TRAIN_MODELS=(khmodel)
 
 if [ "$DEBUG" = true ]; then
     TRAIN_SEEDS=(0)
@@ -58,7 +60,7 @@ fi
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
     MODEL_DIR="${SCRATCH_MODEL_DIR}/model_seed_${T_SEED}"
-    if [ "$RUN_TRAINING" = true ]; then
+    if [ "$TRAIN_LAYER" = true ]; then
         echo "[$SHELL] ## Starting training for train seed $T_SEED"
         python src/create_repro.py \
             --epochs $EPOCHS \
@@ -73,6 +75,19 @@ do
 
         # convert eps image to png
         gs -dSAFER -dEPSCrop -r600 -sDEVICE=pngalpha -o "${FIGURE_DIR}/FigureA1-FKHL3Spectra.png" "${FIGURE_DIR}/FigureA1-FKHL3Spectra.eps"
+    else
+        echo "[$SHELL] ## Skipping layer training"
+    fi
+    if [ "$TRAIN_LAYER" = true ]; then
+        echo "[$SHELL] ## Starting model training for train seed $T_SEED"
+        python src/train.py \
+        --epochs $EPOCHS \
+        --train_seed $T_SEED \
+        --data_path "$SCRATCH_DATA_DIR" \
+        --model_path $MODEL_DIR \
+        --figure_path $FIGURE_DIR \
+        --num_workers 1 \
+        --train_models $TRAIN_MODELS
     fi
 
     # copy models from home to scratch
