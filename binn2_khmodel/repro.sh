@@ -17,7 +17,6 @@ echo "[$SHELL] ## Home model dir is here: ${HOME_MODEL_DIR}"
 mkdir -p "$HOME_MODEL_DIR"
 FIGURE_DIR="${SCRIPT_DIR}/data/repro/figures"
 
-
 DEBUG=false
 TRAIN_LAYER=false
 TRAIN_MODEL=true
