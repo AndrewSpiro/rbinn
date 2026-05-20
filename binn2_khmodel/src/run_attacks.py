@@ -60,7 +60,6 @@ if __name__ == "__main__":
     parser.add_argument('--model_path', type=str, help="path for the model e.g., 'root/binn2_khmodel/data/repro/models")
     parser.add_argument('--figure_path', type=str, help="path for figures e.g., 'root/data/repro/figures'")
     parser.add_argument('--exp_path', type=str, help="path for the epxeriments e.g., 'root/binn2_khmodel/data/repro/experiments")
-    parser.add_argument('--khlayer_name', type=str, default='fkhl3_cifar10_pruned.pty', help='name of the layer')
     parser.add_argument('--attack_models', choices=['khmodel', 'shlp', 'L2', 'jreg', 'specreg'], help="models to train")
     parser.add_argument('--train_seed', type=int, help='seed for training')
 
