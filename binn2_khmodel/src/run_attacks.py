@@ -19,6 +19,7 @@ import pickle as pkl
 import numpy as np
 import matplotlib as mpl
 from matplotlib import pyplot as plt
+import random
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -103,7 +104,8 @@ if __name__ == "__main__":
     parser.add_argument('--model_path', type=str, help="path for the model e.g., 'root/binn2_khmodel/data/repro/models")
     parser.add_argument('--figure_path', type=str, help="path for figures e.g., 'root/data/repro/figures'")
     parser.add_argument('--exp_path', type=str, help="path for the epxeriments e.g., 'root/binn2_khmodel/data/repro/experiments")
-    parser.add_argument('--attack_models', choices=['khmodel', 'shlp', 'L2', 'jreg', 'specreg'], help="models to train")
+    parser.add_argument('--attack_models', nargs='+', choices=['khmodel', 'shlp', 'L2', 'jreg', 'specreg'], help="models to train")
+    parser.add_argument('--num_eps', type=int, default=400, help="number of epsilons to use in attacks")
 
     args = parser.parse_args()
 
@@ -138,6 +140,7 @@ if __name__ == "__main__":
         'specreg': (shlp_specreg_name,),
     }           
 
+    print(args.attack_models)
     fn_list = [fn for model in args.attack_models for fn in fn_dict[model]]
 
     rp_fname = Path("random_perturbation_results.pkl")
@@ -167,7 +170,8 @@ if __name__ == "__main__":
     rpE.run(model_path, fn_list, cifar10Test, eps, device, norm_p=2.0)
     rpE.save(exp_path / rp_fname)
 
-    eps_fgsm = np.logspace(-6, -1.5, num=400)
+    # eps_fgsm = np.logspace(-6, -1.5, num=400)
+    eps_fgsm = np.logspace(-6, np.log(2.5), num=400)
     fgsmE = FGSMExperiment(ce_loss)
     fgsmE.run(model_path, fn_list, cifar10Test, eps_fgsm, device, norm_p=2.0)
     fgsmE.save(exp_path / fgsm_fname)
