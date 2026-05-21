@@ -70,6 +70,8 @@ def get_clean_acc(model):
 
 def minmaxnorm(a):
     a_ = a - a.min()
+    # if a_.max() == 0: ## for debugging
+    #     return a_
     return a_ / a_.max()
 
 def draw_weights(synapses, n_hiddenx, n_hiddeny, n_pixelx=32, n_pixely=32, n_chan=3):
@@ -234,12 +236,12 @@ if __name__ == "__main__":
         axs[3].set_xlabel(r"$t \; [\mathrm{epochs}]$")
         axs[3].set_ylabel(r"$\|J\|_{F}$ - Test")
 
-        plt.savefig(str(figure_path)/"khmodel_training.png")
+        plt.savefig(figure_path/"khmodel_training.png")
 
         fig = plt.figure(figsize = (12.9, 10))
         draw_weights(khmodel.local_learning.W.T.detach().cpu().numpy(), 20, 20)
 
-        plt.savefig(str(figure_path)/"khmodel_weigths.png")
+        plt.savefig(figure_path/"khmodel_weigths.png")
 
     if 'shlp' in args.train_models:
         shlp_pSet["n"] = 1.0
@@ -275,7 +277,7 @@ if __name__ == "__main__":
         axs[3].set_xlabel(r"$t \; [\mathrm{epochs}]$")
         axs[3].set_ylabel(r"$\|J\|_{F}$ - Test")
 
-        plt.savefig(str(figure_path)/"shlp_training.png")
+        plt.savefig(figure_path/"shlp_training.png")
 
     if 'L2' in args.train_models:
         shlp_pSet["n"] = 1.0
@@ -311,7 +313,7 @@ if __name__ == "__main__":
         axs[3].set_xlabel(r"$t \; [\mathrm{epochs}]$")
         axs[3].set_ylabel(r"$\| \cdot \|_{L2}$ - Score")
 
-        plt.savefig(str(figure_path)/"L2_training.png")
+        plt.savefig(figure_path/"L2_training.png")
 
     if 'jreg' in args.train_models:
         shlp_jreg = SHLP(shlp_pSet)
@@ -346,7 +348,7 @@ if __name__ == "__main__":
         axs[3].set_xlabel(r"$t \; [\mathrm{epochs}]$")
         axs[3].set_ylabel(r"$\|J\|_{F}$ - Test")
 
-        plt.savefig(str(figure_path)/"jreg_training.png")
+        plt.savefig(figure_path/"jreg_training.png")
 
     if 'specreg' in args.train_models:
         shlp_specreg = SHLP(shlp_pSet, batch_norm=True)
@@ -387,7 +389,7 @@ if __name__ == "__main__":
         axs[2].set_xlabel(r"$t \; [\mathrm{n}]$")
         axs[2].set_ylabel(r"$\lambda_{n}$")
 
-        plt.savefig(str(figure_path)/"specreg_spectra.png")
+        plt.savefig(figure_path/"specreg_spectra.png")
 
         fig, axs = plt.subplots(1, 4)
         axs[0].plot(log_shlp_specreg["epoch"], log_shlp_specreg["ce_loss"])
@@ -406,7 +408,7 @@ if __name__ == "__main__":
         axs[3].set_xlabel(r"$t \; [\mathrm{epochs}]$")
         axs[3].set_ylabel(r"$\|J\|_{F}$ - Test")
 
-        plt.savefig(str(figure_path)/"specreg_training.png")
+        plt.savefig(figure_path/"specreg_training.png")
 
     if 'adj_exp' in args.train_models:
         shlp_specreg_kh = SHLP(shlp_pSet, batch_norm=True)
@@ -450,7 +452,7 @@ if __name__ == "__main__":
         axs[2].set_xlabel(r"$t \; [\mathrm{n}]$")
         axs[2].set_ylabel(r"$\lambda_{n}$")
 
-        plt.savefig(str(figure_path)/"adjexp_spectra.png")
+        plt.savefig(figure_path/"adjexp_spectra.png")
 
         fig, axs = plt.subplots(1, 4)
         axs[0].plot(log_shlp_specreg_kh["epoch"][1:], log_shlp_specreg_kh["ce_loss"][1:])
@@ -469,4 +471,4 @@ if __name__ == "__main__":
         axs[3].set_xlabel(r"$t \; [\mathrm{epochs}]$")
         axs[3].set_ylabel(r"$\|J\|_{F}$ - Test")
 
-        plt.savefig(str(figure_path)/"adjexp_training.png")
+        plt.savefig(figure_path/"adjexp_training.png")
