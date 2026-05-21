@@ -26,9 +26,9 @@ class PerturbationExperiment(ABC):
         for fn in model_fnlist:
             # load the model
             state_dict = torch.load(directory / fn)
-            print(f"state dict keys: {state_dict.keys()}")
-            print(f"model state dict keys: {state_dict['model_state_dict'].keys()}")
-            print(f"state dict: {state_dict}")
+            # print(f"state dict keys: {state_dict.keys()}")
+            # print(f"model state dict keys: {state_dict['model_state_dict'].keys()}")
+            # print(f"state dict: {state_dict}")
             model = self.theFactory.build_from_state(state_dict)
             model.to(device)
             model.eval()
