@@ -1,13 +1,25 @@
 #!/bin/bash
+
+#SBATCH --job-name=b1_val
+#SBATCH --output=%x_%j.out
+#SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
+#SBATCH --mail-type="ALL"
+#SBATCH --partition="testing"
+#SBATCH --gres=gpu:1
+#SBATCH --time=00:15:00
+#SBATCH --ntasks=1
+#SBATCH --mem=1G
+
 set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
  
 conda activate pixelreg
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR=$PWD
 
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
+SCRATCH_PATH="/scratchdata/${SLURM_JOB_USER}/${SLURM_JOB_ID}"
 
 DEBUG=true
 RUN_TRAINING=true
@@ -29,23 +41,32 @@ if [ "$DEBUG" = true ]; then
     EPOCHS=0
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(101)
-    SAVE_DIR="${SCRIPT_DIR}/save/debug"
+    HOME_SAVE_DIR="${SCRIPT_DIR}/save/debug"
     echo "--- RUNNING IN DEBUG MODE ---"
 else
     EPOCHS=40
     TRAIN_SEEDS=(0 1 2)
     ATTACK_SEEDS=(100 101 102)
-    SAVE_DIR="${SCRIPT_DIR}/save"
+    HOME_SAVE_DIR="${SCRIPT_DIR}/save"
 fi
+
+echo "[$SHELL] ## Home save dir is here: ${HOME_SAVE_DIR}"
+cp -r $HOME_SAVE_DIR "$SCRATCH_PATH/"
+echo "[$SHELL] ## Saves copied to scratch"
+SAVE_DIR="${SCRATCH_PATH}/$(basename $HOME_SAVE_DIR)"
+echo "[$SHELL] ## Contents of save dir: $(ls $SAVE_DIR)"
+
+HOME_DATA_DIR="${ROOT_DIR}/data"
+echo "[$SHELL] ## Home data dir is here: ${HOME_DATA_DIR}"
+cp -r "$HOME_DATA_DIR" "$SCRATCH_PATH/"
+echo "[$SHELL] ## Data copied to scratch"
+DATA_DIR="${SCRATCH_PATH}/$(basename $HOME_DATA_DIR)"
+echo "[$SHELL] ## Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
     MODEL_DIR="${SAVE_DIR}/model_seed_$T_SEED"
     mkdir -p "$MODEL_DIR"
-
-    DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
-    echo "Data dir is here: ${DATA_DIR}"
-    mkdir -p "$DATA_DIR"
 
     if [ "$RUN_TRAINING" = true ]; then
         #Train
@@ -66,6 +87,10 @@ do
         --train_attack $TRAIN_ATTACK \
         --train_epsilon $TRAIN_EPSILON \
         >> "${MODEL_DIR}/train.log" 2>&1
+
+        cp -r $SAVE_DIR/ $HOME_SAVE_DIR/
+        echo "[$SHELL] ## Data copied to scratch"
+        echo "[$SHELL] ## Contents of home save dir: $(ls $HOME_SAVE_DIR)"
     fi
 
     if [ "$RUN_ATTACKS" = true ]; then
@@ -120,8 +145,13 @@ do
             done
 
         done
+
+        cp -r $SAVE_DIR/ $HOME_SAVE_DIR/
+        echo "[$SHELL] ## Data copied to scratch"
+        echo "[$SHELL] ## Contents of home save dir: $(ls $HOME_SAVE_DIR)"
+
     fi
 done
 
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
+python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${HOME_SAVE_DIR}/results_${SEED_STRING}.txt"
