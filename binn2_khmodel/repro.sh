@@ -15,21 +15,24 @@ mkdir -p "$DATA_DIR"
 
 DEBUG=true
 TRAIN_LAYER=false
-TRAIN_MODEL=true
+TRAIN_MODEL=false
 RUN_ATTACKS=false
+AGG_RESULTS=true
 TRAIN_MODELS=(khmodel)
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(101)
-    EPOCHS=5
+    ATTACK_SEEDS=(102)
+    EPOCHS=2
+    NUM_EPS=5
     echo "[$SHELL] ## --- RUNNING IN DEBUG MODE ---"
 else
     RESULT_DIR="${SCRIPT_DIR}/data/repro"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(101)
     EPOCHS=1000
+    NUM_EPS=400
 fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
@@ -67,9 +70,9 @@ do
         --figure_path $FIGURE_DIR \
         --exp_path $EXP_DIR \
         --num_workers 1 \
-        --train_models $TRAIN_MODELS
+        --train_models "${TRAIN_MODELS[@]}"
     fi
-    
+
     if [ "$RUN_ATTACKS" = true ]; then
         echo "[$SHELL] ## Starting attacks for attack seeds $ATTACK_SEEDS"
         for A_SEED in "${ATTACK_SEEDS[@]}"
@@ -82,8 +85,14 @@ do
             --data_path $DATA_DIR \
             --model_path $MODEL_DIR \
             --figure_path "${FIGURE_DIR}/a_seed_${A_SEED}" \
-            --exp_path "${EXP_DIR}/a_seed_${A_SEED}"
+            --exp_path "${EXP_DIR}/a_seed_${A_SEED}" \
+            --attack_models "${TRAIN_MODELS[@]}" \
+            --num_eps $NUM_EPS
         done
+    fi
+    if [ "$AGG_RESULTS" = true ]; then
+        python src/aggregate_results.py \
+            --result_path $RESULT_DIR
     fi
 done
 echo "[$SHELL] ## all experiments completed successfully"
