@@ -4,9 +4,9 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="interactive"
+#SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:10:00
+#SBATCH --time=00:30:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -30,10 +30,10 @@ echo "[$SHELL] ## Data copied to scratch"
 SCRATCH_DATA_DIR="${SCRATCH_PATH}/$(basename $HOME_DATA_DIR)"
 echo "[$SHELL] ## Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
-DEBUG=true
-TRAIN_LAYER=false
+DEBUG=false
+TRAIN_LAYER=true
 TRAIN_MODEL=true
-RUN_ATTACKS=false
+RUN_ATTACKS=true
 TRAIN_MODELS=(khmodel)
 
 if [ "$DEBUG" = true ]; then
