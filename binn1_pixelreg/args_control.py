@@ -233,6 +233,8 @@ def get_configs(code_name, args):
             "phase_duration": args.phase_duration,
             "decay_rate": args.decay_rate,
             "epoch_num": args.epoch_num,
+            "train_attack": args.train_attack,
+            "train_epsilon": args.train_epsilon,
         }
         attack_config = {
             "attack_seed": args.attack_seed,
