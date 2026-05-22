@@ -60,7 +60,7 @@ class PerturbationExperiment(ABC):
             del rpTest
             
     def save(self, path: Path):
-        with open(path, "ab") as file:
+        with open(path, "wb") as file:
             pkl.dump(self.results, file)
             file.close()
         
