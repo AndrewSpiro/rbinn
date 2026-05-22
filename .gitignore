@@ -140,6 +140,7 @@ notebooks/__pycache__/
 **.pvd
 mesh
 tmp
+binn2_khmodel/data_backup/
 
 # track baseline csvs only
 !binn2_khmodel/data/
