@@ -62,7 +62,68 @@ def get_orig_results():
             }
     
     return pbc_baseline_dict, rd_baseline_dict
-                
+
+def make_stat_boxplots(repro, baseline_rd):
+    whislo, q1, median, q3, whishi = baseline_rd
+    baseline_stats = {
+        'whislo': whislo,
+        'q1': q1,
+        'med': median,
+        'q3': q3,
+        'whishi': whishi,
+        'fliers': []
+    }
+
+    repro_stats = {
+        'whislo': repro.min(),
+        'q1': np.percentile(repro, 25),
+        'med': np.median(repro),
+        'q3': np.percentile(repro, 75),
+        'whishi': repro.max(),
+        'fliers': []
+    }
+
+    fig, ax = plt.subplots()
+    ax.bxp([baseline_stats, repro_stats], positions=[1,2])
+    ax.set_xticks([1,2])
+    ax.set_xticklabels(['original', 'repro'])
+    ax.set_ylabel("critical norm")
+    fig.savefig(result_path/f'{name}_rd.png')
+    plt.close(fig)
+
+def make_raw_boxplots(repro, baseline_rd):
+
+    fig, ax = plt.subplots()
+    ax.boxplot([baseline_rd, repro], labels=['original', 'repro'], showfliers=False)
+    ax.set_ylabel("critical norm")
+    fig.savefig(result_path/f'{name}_rd.png')
+    plt.close(fig)
+
+def make_boxplots(repro, baseline_rd):
+    whislo, q1, median, q3, whishi = baseline_rd
+    baseline_stats = {
+        'whislo': whislo,
+        'q1': q1,
+        'med': median,
+        'q3': q3,
+        'whishi': whishi,
+        'fliers': []
+    }
+
+    fig, ax = plt.subplots()
+
+    ax.bxp([baseline_stats], positions=[1], showfliers=False)
+
+    ax.boxplot(repro, positions=[2], showfliers=False)
+
+    ax.set_xticks([1, 2])
+    ax.set_xticklabels(['original', 'repro'])
+    ax.set_xlim(0.5, 2.5)
+    ax.set_ylabel("critical norm")
+
+    fig.savefig(result_path / f'{name}_rd.png')
+    plt.close(fig)
+
 def create_plots(stats_dict, name, result_path):
 
     pbc_baseline_dict, rd_baseline_dict = get_orig_results()
@@ -91,33 +152,10 @@ def create_plots(stats_dict, name, result_path):
 
     repro = np.concatenate(all_crit_norm)
     baseline_rd = np.array(rd_baseline_dict[name]['x'], dtype=float)
-    whislo, q1, median, q3, whishi = baseline_rd
-    baseline_stats = {
-        'whislo': whislo,
-        'q1': q1,
-        'med': median,
-        'q3': q3,
-        'whishi': whishi,
-        'fliers': []
-    }
-
-    repro_stats = {
-        'whislo': repro.min(),
-        'q1': np.percentile(repro, 25),
-        'med': np.median(repro),
-        'q3': np.percentile(repro, 75),
-        'whishi': repro.max(),
-        'fliers': []
-    }
-
-    fig, ax = plt.subplots()
-    ax.bxp([baseline_stats, repro_stats], positions=[1,2])
-    ax.set_xticks([1,2])
-    ax.set_xticklabels(['original', 'repro'])
-    ax.set_ylabel("critical norm")
-    fig.savefig(result_path/f'{name}_rd.png')
-    plt.close(fig)
-
+    
+    # make_stat_boxplots(repro, baseline_rd)
+    # make_raw_boxplots(repro, baseline_rd)
+    make_boxplots(repro, baseline_rd)
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser()
