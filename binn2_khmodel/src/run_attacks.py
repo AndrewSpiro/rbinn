@@ -165,18 +165,18 @@ if __name__ == "__main__":
     
     ce_loss = torch.nn.CrossEntropyLoss()
     
-    eps = np.logspace(-6, np.log(2.5), num=400)
+    eps = np.logspace(-6, np.log(2.5), num=args.num_eps)
     rpE = RandomPerturbationExperiment(ce_loss)
     rpE.run(model_path, fn_list, cifar10Test, eps, device, norm_p=2.0)
     rpE.save(exp_path / rp_fname)
 
-    # eps_fgsm = np.logspace(-6, -1.5, num=400)
-    eps_fgsm = np.logspace(-6, np.log(2.5), num=400)
+    # eps_fgsm = np.logspace(-6, -1.5, num=args.num_eps)
+    eps_fgsm = np.logspace(-6, np.log(2.5), num=args.num_eps)
     fgsmE = FGSMExperiment(ce_loss)
     fgsmE.run(model_path, fn_list, cifar10Test, eps_fgsm, device, norm_p=2.0)
     fgsmE.save(exp_path / fgsm_fname)
 
-    eps_pgd = np.logspace(-6, -1.5, num=400)
+    eps_pgd = np.logspace(-6, -1.5, num=args.num_eps)
     pgdE = PGDExperiment(ce_loss)
-    pgdE.run(model_path, fn_list, cifar10Test, eps, device, norm_p=2.0)
+    pgdE.run(model_path, fn_list, cifar10Test, eps_pgd, device, norm_p=2.0)
     pgdE.save(exp_path / pgd_fname)
