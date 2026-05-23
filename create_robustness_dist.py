@@ -17,32 +17,32 @@ import torchvision.transforms as transforms
 # MODEL IMPORTS
 # pixelreg
 from binn1_pixelreg.models import ResNet18
-print("pixelreg imports done")
+print("pixelreg imports done", flush=True)
 
 # khmodel
 from binn2_khmodel.tests.context import *
 from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
 from binn2_khmodel.src.LocalLearning import Data
-print("khmodel imports done")
+print("khmodel imports done", flush=True)
 
 # eat
 from binn3_eat.model import model_dispatcher
 from binn3_eat.helper_class import AddEdgeMap
 
-print("eat imports done")
+print("eat imports done", flush=True)
 
 # cnnf
 from binn4_cnnf.cnnf.model_cifar import WideResNet
 from binn4_cnnf.cnnf.iterative_wrapper import IterativeWrapper
 
-print("cnnf imports done")
+print("cnnf imports done", flush=True)
 
 # vonenet
 from binn5_vonenet import vonenet
 from binn5_vonenet.vonenet import CIFARVOneNetWrapper
 from binn5_vonenet.train import load_model as load_vonenet
 
-print("vonenet imports done")
+print("vonenet imports done", flush=True)
 
 # VERONA imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "VERONA"))
@@ -78,7 +78,7 @@ from ada_verona.verification_module.property_generator.property_generator import
     PropertyGenerator,
 )
 
-print("verona imports done")
+print("verona imports done", flush=True)
 
 logging.basicConfig(format="%(asctime)s %(levelname)s %(message)s", level=logging.INFO)
 torch.manual_seed(0)
@@ -97,12 +97,12 @@ def str2bool(v):
 
 def create_transforms(network_name):
     if network_name == "pixelreg":
-        print("Transforming for pixelreg")
+        print("Transforming for pixelreg", flush=True)
         return transforms.Compose(
             [transforms.ToTensor(), transforms.Lambda(lambda x: (x * 5) - 2.5)]
         )
     elif network_name == "vonenet":
-        print("Transforming for vonenet")
+        print("Transforming for vonenet", flush=True)
         return transforms.Compose(
             [
                 transforms.ToTensor(),
@@ -110,12 +110,12 @@ def create_transforms(network_name):
             ]
         )
     elif network_name == "cnnf":
-        print("Transforming for cnnf")
+        print("Transforming for cnnf", flush=True)
         return transforms.Compose(
             [transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]
         )
     elif network_name == "eat":
-        print("Transforming for eat")
+        print("Transforming for eat", flush=True)
         return transforms.Compose(
             [
                 transforms.Resize((64, 64)),
@@ -127,7 +127,7 @@ def create_transforms(network_name):
             ]
         )
     else:
-        print("Not performing any special datatransforms")
+        print("Not performing any special datatransforms", flush=True)
         return transforms.ToTensor()
 
 
@@ -162,14 +162,14 @@ def normalize_epsilon_list(dataset, epsilon_list: list, eps_max, eps_min):
 
     data_max = max([torch.max(dataset[i][0]) for i in range(len(dataset))])
     data_min = min([torch.min(dataset[i][0]) for i in range(len(dataset))])
-    print(f"Normalizing. Dataset max is {data_max}, dataset min is {data_min}")
+    print(f"Normalizing. Dataset max is {data_max}, dataset min is {data_min}", flush=True)
 
     normalized_list = []
     for eps in epsilon_list:
         eps_normalized = eps * ((data_max - data_min)) / (eps_max - eps_min)
         normalized_list.append(np.float64(eps_normalized.numpy()))
     print(
-        f"Max and min epsilons were {max(epsilon_list), min(epsilon_list)}, now they are {max(normalized_list), min(normalized_list)}"
+        f"Max and min epsilons were {max(epsilon_list), min(epsilon_list)}, now they are {max(normalized_list), min(normalized_list)}", flush=True
     )
     return normalized_list
 
@@ -187,33 +187,29 @@ def create_distribution(
         raise Exception(
             f"Only supported NETWORK_TYPE currently is 'pytorch'. Got {NETWORK_TYPE}."
         )
-    print(f"network: {network}")
+    print(f"network: {network}", flush=True)
 
     try:
         if args.bool_debug:
             num_samples = 10
             sampled_data = dataset.get_subset(range(num_samples))
             print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
-            start_time = time.time()
-            correct_data = dataset_sampler.sample(network, sampled_data)
-            end_time = time.time()
-            print(f"time to sample was {end_time - start_time}")
-            save_correct_instances(correct_data, experiment_repository)
-            print(f"Clean accuracy on subset is {len(correct_data)/num_samples}")
         else:
             sampled_data = dataset
-            print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
-            if hasattr(network.model, "run_average"):
-                print("model has 'run_average' attr")
-            else:
-                print("model does not have 'run_average' attr")
-                print("Sampling started")
-                correct_data = dataset_sampler.sample(network, sampled_data)
-                print("Sampling finished")
-                save_correct_instances(correct_data, experiment_repository)
-                print(
-                    f"Clean accuracy on subset is {len(correct_data)/len(sampled_data)}"
-                )
+        breakpoint()
+        if hasattr(network.model, "run_average"):
+            print("model has 'run_average' attr")
+        else:
+            print("model does not have 'run_average' attr")
+        start_time = time.time()
+        print("Sampling started")
+        correct_data = dataset_sampler.sample(network, sampled_data)
+        end_time = time.time()
+        print("Sampling finished")
+        print(f"time to sample was {end_time - start_time}")
+        save_correct_instances(correct_data, experiment_repository)
+        print(f"Clean accuracy on subset is {len(correct_data)/len(sampled_data)}")
+
         print("Data sampled")
 
     except Exception as e:
