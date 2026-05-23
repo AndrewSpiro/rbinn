@@ -1,0 +1,14 @@
+name: pixelreg
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - wandb
+  - foolbox
+  - Pillow
+  - matplotlib
+  - pip
+  - pip:
+    - dotenv
+    - utils
