@@ -11,7 +11,7 @@ export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 
 DEBUG=true
 RUN_TRAINING=true
-TRAIN_ATTACK=fgsm
+TRAIN_ATTACK=clean # set to clean for clean training
 TRAIN_EPSILON=8/255
 RUN_ATTACKS=true
 
@@ -40,7 +40,7 @@ fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
-    MODEL_DIR="${SAVE_DIR}/model_seed_$T_SEED"
+    MODEL_DIR="${SAVE_DIR}/${TRAIN_ATTACK}/model_seed_$T_SEED"
     mkdir -p "$MODEL_DIR"
 
     DATA_DIR="$(dirname "$SCRIPT_DIR")/data"
@@ -63,8 +63,8 @@ do
         --epoch_num $EPOCHS \
         --train_seed $T_SEED \
         --save_dir $MODEL_DIR \
-        --train_attack $TRAIN_ATTACK \
-        --train_epsilon $TRAIN_EPSILON \
+        --train_attack "$TRAIN_ATTACK" \
+        --train_epsilon "$TRAIN_EPSILON" \
         >> "${MODEL_DIR}/train.log" 2>&1
     fi
 
@@ -116,6 +116,8 @@ do
                 --save_dir $MODEL_DIR \
                 --attack_list "$TYPE" \
                 --epsilon_range $RANGE \
+                --train_attack "$TRAIN_ATTACK" \
+                --train_epsilon "$TRAIN_EPSILON" \
                 >> "${TRIAL_DICT}/train.log" 2>&1
             done
 

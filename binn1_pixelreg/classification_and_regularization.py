@@ -63,9 +63,11 @@ def train(
         train_attack = train_config['train_attack']
         train_epsilon = train_config['train_epsilon']
 
-        if train_attack:
-            if train_attack != 'fgsm':
-                raise Warning("Adversarial training only supported with FGSM")
+        if train_attack in ['clean', 'fgsm']:
+            if train_attack == 'clean':
+                print("Performing clean training")
+                resnet_images, labels = resnet_images.to(device), labels.to(device)
+                resnet_outputs = resnet(resnet_images)
             else:
                 print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
                 attack = attacks[train_attack]
@@ -73,8 +75,8 @@ def train(
                 resnet_adv_images, labels = resnet_adv_images.to(device), labels.to(device)
                 resnet_outputs = resnet(resnet_adv_images)
         else:
-            resnet_images, labels = resnet_images.to(device), labels.to(device)
-            resnet_outputs = resnet(resnet_images)
+            raise NotImplementedError("Only clean training or training with FGSM are supported currently")
+
         cls_loss = cls_criterion(resnet_outputs, labels)
 
         if reg_config["reg_alpha"]:
