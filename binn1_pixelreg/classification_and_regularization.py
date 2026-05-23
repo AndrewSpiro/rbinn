@@ -55,27 +55,31 @@ def train(
             task=task_config["task"],
         )
 
-        attacks = {'transfer_fgsm' : TransferredFGSM,
-                   'random_attack' : RandomAttack,
-                   'boundary_attack' : BoundaryAttack,
-                   'fgsm' : FGSM}
+        attacks = {
+            # 'transfer_fgsm' : TransferredFGSM(task=task_config["task"]),
+            # 'random_attack' : RandomAttack(task=task_config["task"]),
+            # 'boundary_attack' : BoundaryAttack(task=task_config["task"]),
+            'fgsm' : FGSM(task=task_config["task"], device=device)
+            }
 
         train_attack = train_config['train_attack']
         train_epsilon = train_config['train_epsilon']
 
         if train_attack in ['clean', 'fgsm']:
             if train_attack == 'clean':
-                print("Performing clean training")
+                if batch_id == 0:
+                    print("Performing clean training")
                 resnet_images, labels = resnet_images.to(device), labels.to(device)
                 resnet_outputs = resnet(resnet_images)
             else:
-                print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
+                if batch_id == 0:
+                    print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
                 attack = attacks[train_attack]
+                resnet_images, labels = resnet_images.to(device), labels.to(device)
                 resnet_adv_images = attack.get_adversarial(model=resnet, X=resnet_images, Y=labels, epsilon=train_epsilon)
-                resnet_adv_images, labels = resnet_adv_images.to(device), labels.to(device)
                 resnet_outputs = resnet(resnet_adv_images)
         else:
-            raise NotImplementedError("Only clean training or training with FGSM are supported currently")
+            raise NotImplementedError(f"Only clean training or training with FGSM are supported currently. Got train attack {train_attack}")
 
         cls_loss = cls_criterion(resnet_outputs, labels)
 
