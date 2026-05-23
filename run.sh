@@ -14,7 +14,8 @@ DATA_DIR="${SCRIPT_DIR}/data"
 echo "[$SHELL] ## Data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 EXP_REPO_PATH="${SCRIPT_DIR}/experiments"
-
+echo "[$SHELL] ## Experiment repository is here: ${EXP_REPO_PATH}"
+mkdir -p "$EXP_REPO_PATH"
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
 MODELS=("eat")
 EPSILON_SPACE=berger
@@ -56,6 +57,8 @@ if [ "${GET_RDS}" = true ]; then
             --model_seed 0 \
             --train_type clean
     done
+else
+    echo "[$SHELL] ## Skipping obtaining RDs"
 fi
 
 if [ "${AGG_RESULTS}" = true ]; then
@@ -69,6 +72,8 @@ if [ "${AGG_RESULTS}" = true ]; then
     mkdir -p $RESULTS_DIR
 
     python rd_analysis.py --experiments_path experiments.json --results_dir "${RESULTS_DIR}" 
+else
+    echo "[$SHELL] ## Skipping aggregating results"
 fi
 
 echo "[$SHELL] ## Completed all experiments successfully"

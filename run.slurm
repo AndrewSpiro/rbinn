@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=rd_b3
+#SBATCH --job-name=rd_b4
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="testing"
+#SBATCH --partition="gpu-l4-24g"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:15:00
+#SBATCH --time=48:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -14,7 +14,7 @@ set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
 
-DEBUG=true
+DEBUG=false
 RUN_VALIDS=false
 GET_RDS=true
 AGG_RESULTS=false
@@ -39,7 +39,7 @@ echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 #### Experiment pipeline ####
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
-MODELS=("eat")
+MODELS=("cnnf")
 EPSILON_SPACE=berger
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -99,7 +99,7 @@ else
 fi
 
 # Copy experiment results from scratch to home
-cp -r $SCRATCH_EXP_REPO_PATH $HOME_EXP_REPO_PATH
+cp -r $SCRATCH_EXP_REPO_PATH $SCRIPT_DIR
 
 if [ "${AGG_RESULTS}" = true ]; then
     echo "[$SHELL] #### Aggregating results. Please manually update your experiments json with the desired experiments to include. ####"
