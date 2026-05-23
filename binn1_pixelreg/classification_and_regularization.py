@@ -5,7 +5,12 @@ import numpy as np
 import torch, wandb, time
 import utils
 from utils import ATanhSquare
-
+from adversarialAttacks.adversarialBase import AdversarialAttack
+from binn1_pixelreg.adversarialAttacks.adversarialBase import AdversarialAttack
+from binn1_pixelreg.adversarialAttacks.transferredFGSM import TransferredFGSM
+from binn1_pixelreg.adversarialAttacks.randomNoise import RandomAttack
+from binn1_pixelreg.adversarialAttacks.BoundaryAttack import BoundaryAttack
+from binn1_pixelreg.adversarialAttacks.FGSM import FGSM
 
 def train(
     resnet_loader,
@@ -19,6 +24,8 @@ def train(
     reg_config,
     run_config,
     wandb_log=False,
+    train_attack= None,
+    train_epsilon = 8/255
 ):
 
     device = run_config["device"]
@@ -47,8 +54,33 @@ def train(
             device,
             task=task_config["task"],
         )
-        resnet_images, labels = resnet_images.to(device), labels.to(device)
-        resnet_outputs = resnet(resnet_images)
+
+        attacks = {
+            # 'transfer_fgsm' : TransferredFGSM(task=task_config["task"]),
+            # 'random_attack' : RandomAttack(task=task_config["task"]),
+            # 'boundary_attack' : BoundaryAttack(task=task_config["task"]),
+            'fgsm' : FGSM(task=task_config["task"], device=device)
+            }
+
+        train_attack = train_config['train_attack']
+        train_epsilon = train_config['train_epsilon']
+
+        if train_attack in ['clean', 'fgsm']:
+            if train_attack == 'clean':
+                if batch_id == 0:
+                    print("Performing clean training")
+                resnet_images, labels = resnet_images.to(device), labels.to(device)
+                resnet_outputs = resnet(resnet_images)
+            else:
+                if batch_id == 0:
+                    print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
+                attack = attacks[train_attack]
+                resnet_images, labels = resnet_images.to(device), labels.to(device)
+                resnet_adv_images = attack.get_adversarial(model=resnet, X=resnet_images, Y=labels, epsilon=train_epsilon)
+                resnet_outputs = resnet(resnet_adv_images)
+        else:
+            raise NotImplementedError(f"Only clean training or training with FGSM are supported currently. Got train attack {train_attack}")
+
         cls_loss = cls_criterion(resnet_outputs, labels)
 
         if reg_config["reg_alpha"]:

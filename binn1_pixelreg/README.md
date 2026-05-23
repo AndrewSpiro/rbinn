@@ -4,42 +4,17 @@ This repository extends the original implementation to automate multiple seeded 
 
 ## Quick Start
 
-In your root, run
-
 ```bash
-git clone https://github.com/AndrewSpiro/rbinn.git
-cd pixel-reg/
+~/rbinn$ cd binn1_pixelreg
+~/rbinn/binn1_pixelreg$ conda env create -f environment.yml
+~/rbinn/binn1_pixelreg$ conda activate pixelreg
 ```
 
-I have provied an `environment.yml` which contains the exact versions used in this thesis.
-
-To recreate the environment:
-
-For ALICE:
-
-```bash
-module load Miniconda3/24.7.1-0
-conda init
-```
-
-Then restart the shell and run
-
-```bash
-conda ---version
-```
-
-output should be
-
-```bash
-conda 24.7.1
-```
-
-From `pixel-reg`, run
-
-```bash
-conda env create -f environment.yml
-conda activate pixelreg
-```
+In repro.sh performs the validation experiments. 
+Main parameters:
+* RUN_TRAINING: whether to perform training, if models have already been trained, this can be false to only perform attacks.
+* TRAIN_ATTACK: adversarial attack used in training. Set this to 'clean' to perform clean training.
+* TRAIN_EPSILON: the epsilon used in adversarial training.
 
 To reproduce the results, run
 

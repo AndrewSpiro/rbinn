@@ -188,7 +188,7 @@ def main(
             task_config,
             reg_config,
             run_config,
-            wandb_log=wandb_log,
+            wandb_log=wandb_log
         )
 
         epoch_num += 1

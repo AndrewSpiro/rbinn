@@ -35,7 +35,7 @@ class FGSM(AdversarialAttack):
             loss.backward()
             data_grad_sign = data.grad.data.sign()
             gradient_signs.append(data_grad_sign)
-        return torch.stack(gradient_signs).squeeze(2)
+        return torch.stack(gradient_signs).squeeze(1)
 
     def get_adversarial(self, model, X, Y, epsilon) -> torch.tensor:
         gradient_signs = self.get_gradient_sign(model, X, Y)

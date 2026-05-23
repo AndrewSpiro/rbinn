@@ -1,6 +1,66 @@
-#### Global ####
+#### rbinn ####
+experiments/
+*.out
+.VSCodeCounter/
+
+#### VERONA ####
 __pycache__/
 **/__pycache__/
+dist/
+tests/test_experiment/*
+!tests/test_experiment/data
+.coverage*
+.vscode/
+site/
+examples/example_experiment/results/
+data/
+**/data/
+**/datasets/
+**/MNIST/
+**/ciar-10*/
+*.tar.gz
+*.gz
+*.onnx
+*.pt
+*.pyc
+
+aspiro_experiment/**
+!aspiro_experiment/
+!aspiro_experiment/binn_architectures/
+!aspiro_experiment/binn_architectures/**
+!aspiro_experiment/notebooks/
+!aspiro_experiment/notebooks/**
+!aspiro_experiment/convert_to_onnx.ipynb
+
+*.png
+*.csv
+*.txt
+*.log
+
+
+#### binn1_pixelreg ####
+.DS_Store
+./adversarialAttacks/__pycache__/
+data/
+save/
+__pycache__/
+./vscode/
+environment_copy.yml
+save_backup/
+
+#### binn2_khmodel ####
+# ignore data
+data/**
+*.pth
+
+# ignore figures
+*.pdf
+
+# ignore logs
+*.log
+
+# ignore compiled code
+__pycache__/
 *.py[cod]
 *$py.class
 *.so

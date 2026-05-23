@@ -15,6 +15,11 @@ def str2bool(v):
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
 
+def float_eval(x):
+    try:
+        return float(eval(x))
+    except:
+        raise argparse.ArgumentTypeError(f"Invalid float expression: '{x}'")
 
 def runtime_parser(code_name):
     parser = argparse.ArgumentParser()
@@ -105,6 +110,8 @@ def runtime_parser(code_name):
         parser.add_argument("--epoch_num", default=40, type=int, help="epoch number")
 
         parser.add_argument("--num_epsilons", default=10, type=int)
+        parser.add_argument("--train_attack", choices=['clean', 'fgsm'], default='clean', help="attack to use for adv training or clean training if 'clean'")
+        parser.add_argument("--train_epsilon", type=float_eval, default=float(8/255), help='epsilon to use for adv training')
 
     if code_name in ["create_jobs", "process_jobs", "clean_jobs"]:
         parser.add_argument("--job_type", choices=["train_resnet"])
@@ -233,6 +240,8 @@ def get_configs(code_name, args):
             "phase_duration": args.phase_duration,
             "decay_rate": args.decay_rate,
             "epoch_num": args.epoch_num,
+            "train_attack": args.train_attack,
+            "train_epsilon": args.train_epsilon,
         }
         attack_config = {
             "attack_seed": args.attack_seed,
