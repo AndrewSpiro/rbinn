@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=b2_test
+#SBATCH --job-name=b2_val
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
 #SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:30:00
+#SBATCH --time=00:05:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -30,23 +30,26 @@ echo "[$SHELL] ## Data copied to scratch"
 SCRATCH_DATA_DIR="${SCRATCH_PATH}/$(basename $HOME_DATA_DIR)"
 echo "[$SHELL] ## Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
-DEBUG=false
-TRAIN_LAYER=true
-TRAIN_MODEL=true
-RUN_ATTACKS=true
+DEBUG=true
+TRAIN_LAYER=false
+TRAIN_MODEL=false
+RUN_ATTACKS=false
+AGG_RESULTS=true
 TRAIN_MODELS=(khmodel)
 
 if [ "$DEBUG" = true ]; then
     HOME_RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(101)
-    EPOCHS=5
+    EPOCHS=2
+    NUM_EPS=5
     echo "[$SHELL] ## --- RUNNING IN DEBUG MODE ---"
 else
     HOME_RESULT_DIR="${SCRIPT_DIR}/data/repro"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(101)
     EPOCHS=1000
+    NUM_EPS=400
 fi
 
 echo "[$SHELL] ## Home result dir is here: ${HOME_RESULT_DIR}"
@@ -95,10 +98,10 @@ do
         --figure_path $FIGURE_DIR \
         --exp_path $EXP_DIR \
         --num_workers 1 \
-        --train_models $TRAIN_MODELS
+        --train_models "${TRAIN_MODELS[@]}"
 
         # copy models from scratch to home
-        cp -r $MODEL_DIR $HOME_RESULT_DIR
+        cp -r $MODEL_DIR $FIGURE_DIR $HOME_RESULT_DIR
     fi
 
     if [ "$RUN_ATTACKS" = true ]; then
@@ -113,11 +116,17 @@ do
             --data_path $SCRATCH_DATA_DIR \
             --model_path $MODEL_DIR \
             --figure_path "${FIGURE_DIR}/a_seed_${A_SEED}" \
-            --exp_path "${EXP_DIR}/a_seed_${A_SEED}"
-        done
+            --exp_path "${EXP_DIR}/a_seed_${A_SEED}" \
+            --attack_models "${TRAIN_MODELS[@]}" \
+            --num_eps $NUM_EPS
 
-        # copy models from scratch to home
-        cp -r $FIGURE_DIR $EXP_DIR $HOME_RESULT_DIR
+            # copy models from scratch to home
+            cp -r $FIGURE_DIR $EXP_DIR $HOME_RESULT_DIR
+        done
+    fi
+    if [ "$AGG_RESULTS" = true ]; then
+        python src/aggregate_results.py \
+        --result_path "$HOME_RESULT_DIR"
     fi
 done
 echo "[$SHELL] ## all experiments completed successfully"
