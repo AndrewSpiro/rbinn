@@ -2,6 +2,7 @@
 experiments/
 *.out
 .VSCodeCounter/
+baselinemodels/
 
 #### VERONA ####
 __pycache__/
