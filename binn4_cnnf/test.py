@@ -28,6 +28,16 @@ from eval import Evaluator
 import numpy as np
 import os
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
 def main():
 
     print("Running main")
@@ -43,7 +53,7 @@ def main():
     parser.add_argument('--model-dir', default='models',
                         help='Directory for Saved Models')
     parser.add_argument('--seed', type=int, default=0) # for variance in tests -acs
-    parser.add_argument('--bool-debug', type=bool, default=False, help='flag for debugging')
+    parser.add_argument('--bool-debug', type=str2bool, default=False, help='flag for debugging')
     parser.add_argument('--attack-model', type=str, required=False, default=None, help='model for transfer attacks')
     parser.add_argument('--target-model', type=str, required=True, help='model being evaluated')
 
@@ -54,6 +64,7 @@ def main():
     seed_torch(seed=args.seed)
 
     if args.bool_debug:
+        print("### Running in debug mode ####")
         print(args)
 
     use_cuda = torch.cuda.is_available()
@@ -119,6 +130,7 @@ def main():
     eval = Evaluator(device, model)
     print("getting clean accuracy...")
     clean_acc = eval.clean_accuracy(dataloader, test=evalmethod)
+    print(f"clean acc is {clean_acc}")
     results['clean_acc'] = clean_acc
 
     if args.bool_debug:    
@@ -128,19 +140,25 @@ def main():
         return
 
     # adv attack
+    print("running pgd...")
     pgd_acc_first = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=False, nb_iter=nb_iter)
     results['pgd_acc_first'] = pgd_acc_first
     pgd_acc_ete = eval.attack_pgd(dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, ete=True, nb_iter=nb_iter)
     results['pgd_acc_ete'] = pgd_acc_ete
+    print(f"pgd_acc_first: {pgd_acc_first}, pgd_acc_ete: {pgd_acc_ete}")
 
+    print("running spsa...")
     spsa_acc_first = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=False, nb_iter=nb_iter)
     results['spsa_acc_first'] = spsa_acc_first
     spsa_acc_ete = eval.attack_spsa(dataloader, test=evalmethod, epsilon=eps, ete=True, nb_iter=nb_iter)
     results['spsa_acc_ete'] = spsa_acc_ete
+    print(f"spsa first: {spsa_acc_first}, spsa ete: {spsa_acc_ete}")
 
     if model1:
+        print("running transfer attack...")
         transfer_acc = eval.attack_pgd_transfer(model1, dataloader, test=evalmethod, epsilon=eps, eps_iter=eps_iter, nb_iter=nb_iter)
         results['transfer_acc'] = transfer_acc
+        print(f"transfer acc: {transfer_acc}")
 
     with open(args.results_path, "w") as f:
         json.dump(results, f)
