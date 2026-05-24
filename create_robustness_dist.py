@@ -196,7 +196,6 @@ def create_distribution(
             print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
         else:
             sampled_data = dataset
-        breakpoint()
         if hasattr(network.model, "run_average"):
             print("model has 'run_average' attr")
         else:

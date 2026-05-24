@@ -20,7 +20,7 @@
     },
     "cnnf": {
         "paths": {
-            "seed_0": "binn4_cnnf/models/CNNF_seed_0-best.pt",
+            "seed_0": "binn4_cnnf/models/clean_CNNF_seed_0.pt",
             "baseline": "binn4_cnnf/models/huang_CNNF_2_cifar.pt"
         },
         "type": "pytorch"
