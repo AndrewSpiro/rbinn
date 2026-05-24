@@ -6,7 +6,7 @@
 #SBATCH --mail-type="ALL"
 #SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:05:00
+#SBATCH --time=00:02:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -33,7 +33,7 @@ echo "[$SHELL] ## Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 DEBUG=true
 TRAIN_LAYER=false
 TRAIN_MODEL=false
-RUN_ATTACKS=false
+RUN_ATTACKS=true
 AGG_RESULTS=true
 TRAIN_MODELS=(khmodel)
 
@@ -102,6 +102,8 @@ do
 
         # copy models from scratch to home
         cp -r $MODEL_DIR $FIGURE_DIR $HOME_RESULT_DIR
+    else
+        echo "[$SHELL] ## Skipping model training"        
     fi
 
     if [ "$RUN_ATTACKS" = true ]; then
@@ -123,10 +125,18 @@ do
             # copy models from scratch to home
             cp -r $FIGURE_DIR $EXP_DIR $HOME_RESULT_DIR
         done
+    else
+        echo "[$SHELL] ## Skipping attacks"        
     fi
+    
     if [ "$AGG_RESULTS" = true ]; then
+        echo "[$SHELL] ## Starting results aggregation for attack seed $A_SEED"
+        
         python src/aggregate_results.py \
         --result_path "$HOME_RESULT_DIR"
+    else
+        echo "[$SHELL] ## Skipping results aggregations"
     fi
+
 done
 echo "[$SHELL] ## all experiments completed successfully"
