@@ -27,9 +27,6 @@ def make_stats_dict(exp_dict):
     }        
     stats['crit_eps'] = grouped_dict['crit_eps']
     stats['crit_norm'] = grouped_dict['crit_norm']
-    print(f"max eps: {max(stats['eps'])}, min eps: {min(stats['eps'])}")
-    print(f"max crit_eps: {max([max(x) for x in stats['crit_eps']])}, min eps: {min([min(x) for x in stats['crit_eps']])}")
-    print(f"max crit_norm: {max([max(x) for x in stats['crit_norm']])}, min eps: {min([min(x) for x in stats['crit_norm']])}")
     return stats
 
 def get_orig_results():
