@@ -16,9 +16,9 @@ mkdir -p "$DATA_DIR"
 EXP_REPO_PATH="${SCRIPT_DIR}/experiments"
 echo "[$SHELL] ## Experiment repository is here: ${EXP_REPO_PATH}"
 mkdir -p "$EXP_REPO_PATH"
-declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
-MODELS=("eat")
-EPSILON_SPACE=berger
+declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5 ["cifar_7_1024"]=6 ["convbig"]=7)
+MODELS=("khmodel")
+EPSILON_SPACE=bosman
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
 

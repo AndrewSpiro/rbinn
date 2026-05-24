@@ -30,5 +30,23 @@
             "seed_0": "binn5_vonenet/resnet50_vonenet_seed_0/output/epoch_70.pth.tar"
         },
         "type": "pytorch"
+    },
+    "cifar_7_1024": {
+        "paths": {
+            "seed_0": {
+                "clean": "baseline_models/cifar_7_1024_standard.onnx",
+                "robust": "baseline_models/cifar_7_1024_fgsm.onnx"
+            }
+        },
+        "type": "onnx"
+    },
+    "convbig": {
+        "paths": {
+            "seed_0": {
+                "clean": "baseline_models/conv_big_standard.onnx",
+                "fgsm": "baseline_models/conv_big_fgsm.onnx"
+            }
+        },
+        "type": "onnx"
     }
 }

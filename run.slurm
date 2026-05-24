@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=rd_b4
+#SBATCH --job-name=rd_cifar7
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="gpu-l4-24g"
+#SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=48:00:00
+#SBATCH --time=00:05:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -14,7 +14,7 @@ set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
 
-DEBUG=false
+DEBUG=true
 RUN_VALIDS=false
 GET_RDS=true
 AGG_RESULTS=false
@@ -38,9 +38,9 @@ echo "[$SHELL] ## Data copied to scratch"
 echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 #### Experiment pipeline ####
-declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5)
-MODELS=("cnnf")
-EPSILON_SPACE=berger
+declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5 ["cifar_7_1024"]=6 ["convbig"]=7)
+MODELS=("cifar_7_1024")
+EPSILON_SPACE=bosman
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
 
