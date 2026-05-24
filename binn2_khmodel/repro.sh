@@ -13,24 +13,24 @@ DATA_DIR="${ROOT_DIR}/data"
 echo "[$SHELL] ## Home data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 
-DEBUG=true
+DEBUG=false
 TRAIN_LAYER=false
 TRAIN_MODEL=false
-RUN_ATTACKS=false
+RUN_ATTACKS=true
 AGG_RESULTS=true
 TRAIN_MODELS=(khmodel)
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(102)
-    EPOCHS=2
+    ATTACK_SEEDS=(102 103)
+    EPOCHS=100
     NUM_EPS=5
     echo "[$SHELL] ## --- RUNNING IN DEBUG MODE ---"
 else
     RESULT_DIR="${SCRIPT_DIR}/data/repro"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(101)
+    ATTACK_SEEDS=(102 103)
     EPOCHS=1000
     NUM_EPS=400
 fi
@@ -71,6 +71,8 @@ do
         --exp_path $EXP_DIR \
         --num_workers 1 \
         --train_models "${TRAIN_MODELS[@]}"
+    else
+        echo "[$SHELL] ## Skipping model training"
     fi
 
     if [ "$RUN_ATTACKS" = true ]; then
@@ -89,10 +91,15 @@ do
             --attack_models "${TRAIN_MODELS[@]}" \
             --num_eps $NUM_EPS
         done
+    else
+        echo "[$SHELL] ## Skipping attacks"
     fi
+
     if [ "$AGG_RESULTS" = true ]; then
         python src/aggregate_results.py \
             --result_path $RESULT_DIR
+    else
+        echo "[$SHELL] ## Skipping aggregating results"
     fi
 done
 echo "[$SHELL] ## all experiments completed successfully"
