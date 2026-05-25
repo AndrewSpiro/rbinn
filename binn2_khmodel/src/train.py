@@ -125,6 +125,12 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
+def float_eval(x):
+    try:
+        return float(eval(x))
+    except:
+        raise argparse.ArgumentTypeError(f"Invalid float expression: '{x}'")
     
 if __name__ == "__main__":
 
@@ -138,6 +144,8 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=0.001, help="learning rate for training")
     parser.add_argument('--epochs', type=int, default=1000, help="number of epochs for training")
     parser.add_argument('--train_seed', type=int, help='seed for training')
+    parser.add_argument("--train_attack", choices=['clean', 'fgsm'], default='clean', help="attack to use for adv training or clean training if 'clean'")
+    parser.add_argument("--train_epsilon", type=float_eval, default=float(8/255), help='epsilon to use for adv training')
 
     args = parser.parse_args()
 
@@ -213,7 +221,7 @@ if __name__ == "__main__":
 
         khmodel.train()
         ce_trainer = CETrainerJac(khmodel, learning_rate=LEARNING_RATE)
-        ce_trainer.run(TrainLoader, TestLoader, no_epochs=NUMBER_OF_EPOCHS)
+        ce_trainer.run(TrainLoader, TestLoader, no_epochs=NUMBER_OF_EPOCHS, train_attack='fgsm', train_epsilon=float(8/255))
         ce_trainer.save(model_path / khmodel_name, model_path / khmodel_log_name)
 
         log = Trainers.Trainer.Logger()

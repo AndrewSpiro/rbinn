@@ -15,7 +15,7 @@ mkdir -p "$DATA_DIR"
 
 DEBUG=true
 TRAIN_LAYER=false
-TRAIN_MODEL=false
+TRAIN_MODEL=true
 RUN_ATTACKS=true
 AGG_RESULTS=false
 TRAIN_MODELS=(khmodel)

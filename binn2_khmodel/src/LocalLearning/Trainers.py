@@ -167,7 +167,7 @@ class CETrainer(Trainer):
             testData: DataLoader=None,
             no_epochs: int=5,
             train_attack: str='clean',
-            eps: float=8/255
+            train_epsilon: float=8/255
                 ):
         # make dataloader accessible for decorators as well
         self.trainData = trainData
@@ -205,7 +205,7 @@ class CETrainer(Trainer):
                             if batch_nr == 0:
                                 print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
                             attack = FGSM(self.model)
-                            perturbed_imgs = attack.create_examples(eps, data = features, targets = labels, loss_fn = self.ce_loss_fn)
+                            perturbed_imgs = attack.create_examples(eps=train_epsilon, data = features, targets = labels, loss_fn = self.ce_loss_fn)
                             outputs, hidden_repr = self.model(perturbed_imgs)
                             loss = self._batch_loss(perturbed_imgs, labels, outputs, hidden_repr)
                     else:
