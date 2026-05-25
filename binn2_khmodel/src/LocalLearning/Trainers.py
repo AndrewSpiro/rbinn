@@ -14,6 +14,8 @@ from torch.optim.lr_scheduler import LambdaLR
 from tqdm.autonotebook import tqdm
 
 from .LocalLearning import HiddenLayerModel
+from .Attacks import AdversarialAttack, FGSM, PGD, WhiteGaussianPerturbation, AttackTest
+
 
 # define the training interface
 class Trainer(ABC):
@@ -164,6 +166,8 @@ class CETrainer(Trainer):
             trainData: DataLoader,
             testData: DataLoader=None,
             no_epochs: int=5,
+            train_attack: str='clean',
+            eps: float=8/255
                 ):
         # make dataloader accessible for decorators as well
         self.trainData = trainData
@@ -191,8 +195,23 @@ class CETrainer(Trainer):
                     
                     # batch optimization
                     optimizer.zero_grad()
-                    outputs, hidden_repr = self.model(features)
-                    loss = self._batch_loss(features, labels, outputs, hidden_repr)
+                    if train_attack in ['clean', 'fgsm']:
+                        if train_attack == 'clean':
+                            if batch_nr == 0:
+                                print("Performing clean training")
+                            outputs, hidden_repr = self.model(features)
+                            loss = self._batch_loss(features, labels, outputs, hidden_repr)
+                        else:
+                            if batch_nr == 0:
+                                print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
+                            attack = FGSM(self.model)
+                            perturbed_imgs = attack.create_examples(eps, data = features, targets = labels, loss_fn = self.ce_loss_fn)
+                            outputs, hidden_repr = self.model(perturbed_imgs)
+                            loss = self._batch_loss(perturbed_imgs, labels, outputs, hidden_repr)
+                    else:
+                        raise NotImplementedError(f"Only clean training or training with FGSM are supported currently. Got train attack {train_attack}")
+                    
+                    
                     cumm_loss += float(loss)
 
                     loss.backward()

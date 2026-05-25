@@ -13,12 +13,14 @@ DATA_DIR="${ROOT_DIR}/data"
 echo "[$SHELL] ## Home data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 
-DEBUG=false
+DEBUG=true
 TRAIN_LAYER=false
 TRAIN_MODEL=false
 RUN_ATTACKS=true
-AGG_RESULTS=true
+AGG_RESULTS=false
 TRAIN_MODELS=(khmodel)
+TRAIN_ATTACK=fgsm # set to clean for clean training
+TRAIN_EPSILON=8/255
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
@@ -37,9 +39,9 @@ fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
-    MODEL_DIR="${RESULT_DIR}/t_seed_${T_SEED}/models"
-    FIGURE_DIR="${RESULT_DIR}/t_seed_${T_SEED}/figures"
-    EXP_DIR="${RESULT_DIR}/t_seed_${T_SEED}/experiments"
+    MODEL_DIR="${RESULT_DIR}/${TRAIN_ATTACK}/t_seed_${T_SEED}/models"
+    FIGURE_DIR="${RESULT_DIR}/${TRAIN_ATTACK}/t_seed_${T_SEED}/figures"
+    EXP_DIR="${RESULT_DIR}/${TRAIN_ATTACK}/t_seed_${T_SEED}/experiments"
     echo "[$SHELL] ## model dir: ${MODEL_DIR}, figure dir: ${FIGURE_DIR}, exp dir: ${EXP_DIR}"
     mkdir -p $MODEL_DIR $FIGURE_DIR $EXP_DIR
     
@@ -70,7 +72,9 @@ do
         --figure_path $FIGURE_DIR \
         --exp_path $EXP_DIR \
         --num_workers 1 \
-        --train_models "${TRAIN_MODELS[@]}"
+        --train_models "${TRAIN_MODELS[@]}" \
+        --train_attack $TRAIN_ATTACK \
+        --train_epsilon $TRAIN_EPSILON
     else
         echo "[$SHELL] ## Skipping model training"
     fi
