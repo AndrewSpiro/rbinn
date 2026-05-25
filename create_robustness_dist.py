@@ -375,7 +375,7 @@ if __name__ == "__main__":
         "--model_seed", type=int, help="the seed used to train this model"
     )
     parser.add_argument(
-        "--train_type", choices=['clean', 'adv'], default = 'clean', help="whether model was trained normally or adversarially"
+        "--train_type", choices=['clean', 'fgsm'], default = 'clean', help="method of training the model"
     )
     
     args = parser.parse_args()
