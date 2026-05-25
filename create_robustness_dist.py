@@ -58,6 +58,9 @@ from ada_verona.database.experiment_repository import ExperimentRepository
 from ada_verona.database.machine_learning_model.pytorch_network import (
     PyTorchNetwork,
 )
+from ada_verona.database.machine_learning_model.onnx_network import (
+    ONNXNetwork,
+)
 
 from ada_verona.dataset_sampler.predictions_based_sampler import (
     PredictionsBasedSampler,
@@ -183,9 +186,11 @@ def create_distribution(
 ):
     if NETWORK_TYPE == "pytorch":
         network = load_pt_network(NETWORK_NAME, NETWORK_PATH)
+    elif NETWORK_TYPE == "onnx":
+        network = ONNXNetwork(Path(NETWORK_PATH))
     else:
         raise Exception(
-            f"Only supported NETWORK_TYPE currently is 'pytorch'. Got {NETWORK_TYPE}."
+            f"Only supported options for NETWORK_TYPE are 'pytorch' or 'onnx'. Got {NETWORK_TYPE}."
         )
     print(f"network: {network}", flush=True)
 
