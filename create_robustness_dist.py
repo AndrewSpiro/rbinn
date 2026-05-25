@@ -329,7 +329,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "model",
-        choices=["pixelreg", "eat", "cnnf", "vonenet"],
+        choices=["pixelreg", "eat", "cnnf", "vonenet","cifar_7_1024","convbig"],
         help="Model on which to obtain robustness distributions.",
     )
 
