@@ -206,6 +206,8 @@ class CETrainer(Trainer):
                                 print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
                             attack = FGSM(self.model)
                             perturbed_imgs = attack.create_examples(eps=train_epsilon, data = features, targets = labels, loss_fn = self.ce_loss_fn)
+                            perturbed_imgs = perturbed_imgs.requires_grad_(True)
+                            self.model.train()
                             outputs, hidden_repr = self.model(perturbed_imgs)
                             loss = self._batch_loss(perturbed_imgs, labels, outputs, hidden_repr)
                     else:
