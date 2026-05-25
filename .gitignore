@@ -228,6 +228,7 @@ binn4_cnnf/data/
 **/results_debug/
 **/adv_results_debug/
 **/clean_results_debug/
+**/clean_results/
 
 
 #### binn5_vonenet ####
