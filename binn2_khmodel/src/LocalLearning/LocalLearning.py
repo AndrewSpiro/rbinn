@@ -250,7 +250,7 @@ class HiddenLayerModel(nn.Module, ABC):
     def pred(self):
         def preds(x: torch.Tensor) -> torch.Tensor:
             logits, hidden = self._forward(x)
-            return (torch.argmax(logits, dim=-1), hidden)
+            return (torch.argmax(logits, dim=-1))
         setattr(self, 'forward', preds)
 
     def eval(self):
@@ -265,6 +265,7 @@ class HiddenLayerModel(nn.Module, ABC):
         super().to(dev)
         p0 = next(iter(self.parameters()))
         self.device = p0.device
+        return self
         
 
 
@@ -351,7 +352,7 @@ class KHModel(HiddenLayerModel):
     def _forward(self, x: Tensor) -> Tensor:
         hidden = self.hidden(x)
         latent_activation = torch.pow(self.relu_h(hidden), self.pSet["n"])
-        return (self.dense(latent_activation), hidden)
+        return (self.dense(latent_activation))
 
 
 class SHLP(HiddenLayerModel):
