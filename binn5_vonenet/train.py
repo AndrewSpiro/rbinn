@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import tqdm
 import fire
+from advertorch.attacks import GradientSignAttack
 
 parser = argparse.ArgumentParser(description='ImageNet / CIFAR-10 Training')
 ## General parameters
@@ -335,7 +336,12 @@ class ImageNetTrain(object):
         inp = inp.to(device)
         target = target.to(device)
 
-        output = self.model(inp)
+        if train_method == 'fgsm':
+            perturbed_inp = GradientSignAttack(predict = self.model, loss_fn = self.loss, eps = train_epsilon, clip_min = -1, clip_max = 1, targeted=False)
+        elif train_method == 'clean':
+            output = self.model(inp)
+        else:
+            raise Exception(f"valid train methods are 'clean' and 'fgsm', got {train_method} instead")
 
         record = {}
         loss = self.loss(output, target)
