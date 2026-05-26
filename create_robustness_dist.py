@@ -23,6 +23,7 @@ print("pixelreg imports done", flush=True)
 from binn2_khmodel.tests.context import *
 from binn2_khmodel.src.LocalLearning.LocalLearning import FKHL3, KHModel
 from binn2_khmodel.src.LocalLearning import Data
+from binn2_khmodel.src.LocalLearning.RDWrapper import KHModelWrapper
 print("khmodel imports done", flush=True)
 
 # eat
@@ -249,7 +250,7 @@ def load_pt_network(network_name: str, network_path):
         khmodel = KHModel(khlayer, no_classes = 10)
         model_info = torch.load(network_path + "/khmodel_cifar10_pruned.pty")
         khmodel.load_state_dict(model_info)
-        network = PyTorchNetwork(khmodel, (1,3,32,32), network_name)
+        network = PyTorchNetwork(KHModelWrapper(khmodel), (1,3,32,32), network_name)
         return network
     elif network_name == "eat":
         model, _, _, _ = model_dispatcher("cifar10", "rgbedge", "cifar10", 64, 10)
@@ -301,6 +302,7 @@ def main():
         layer_state_dict = layer_info["model_state_dict"]
         khlayer = FKHL3(layer_state_dict)
         torch_dataset = Data.LpUnitCIFAR10(root=DATASET_DIR, train=False, transform=transforms.ToTensor(), p=khlayer.pSet["p"])
+        torch_dataset.data = torch.tensor(torch_dataset.data).float()
     else:
         torch_dataset = getattr(torchvision.datasets, DATASET_NAME)(
             root=DATASET_DIR, train=False, download=True, transform=transform
