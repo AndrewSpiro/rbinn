@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=rd_cifar7
+#SBATCH --job-name=rd_convbig
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
@@ -39,7 +39,8 @@ echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 #### Experiment pipeline ####
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5 ["cifar_7_1024"]=6 ["convbig"]=7)
-MODELS=("cifar_7_1024")
+MODELS=("convbig")
+TRAIN_TYPE=fgsm
 EPSILON_SPACE=bosman
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -83,7 +84,7 @@ if [ "${GET_RDS}" = true ]; then
             --data_dir $SCRATCH_DATA_DIR \
             --exp_repo_path $SCRATCH_EXP_REPO_PATH \
             --model_seed 0 \
-            --train_type clean  &
+            --train_type $TRAIN_TYPE  &
         PID=$!
 
         # Every 60s, log what the process is waiting on

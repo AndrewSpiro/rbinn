@@ -58,6 +58,9 @@ from ada_verona.database.experiment_repository import ExperimentRepository
 from ada_verona.database.machine_learning_model.pytorch_network import (
     PyTorchNetwork,
 )
+from ada_verona.database.machine_learning_model.onnx_network import (
+    ONNXNetwork,
+)
 
 from ada_verona.dataset_sampler.predictions_based_sampler import (
     PredictionsBasedSampler,
@@ -183,9 +186,11 @@ def create_distribution(
 ):
     if NETWORK_TYPE == "pytorch":
         network = load_pt_network(NETWORK_NAME, NETWORK_PATH)
+    elif NETWORK_TYPE == "onnx":
+        network = ONNXNetwork(Path(NETWORK_PATH))
     else:
         raise Exception(
-            f"Only supported NETWORK_TYPE currently is 'pytorch'. Got {NETWORK_TYPE}."
+            f"Only supported options for NETWORK_TYPE are 'pytorch' or 'onnx'. Got {NETWORK_TYPE}."
         )
     print(f"network: {network}", flush=True)
 
@@ -238,7 +243,22 @@ def load_pt_network(network_name: str, network_path):
         network = PyTorchNetwork(model, (1, 3, 32, 32), network_name)
         return network
     elif network_name == "khmodel":
-        print("load khmodel")
+        print("loading khmodel", flush=True)
+        layer_info = torch.load(network_path + "/fkhl3_cifar10_pruned.pty")
+        print("info loaded", flush=True)
+        layer_state_dict = layer_info['model_state_dict']
+        print("got statedict", flush=True)
+        khlayer = FKHL3(layer_state_dict)
+        print("made khlayer", flush=True)
+        khmodel = KHModel(khlayer, no_classes = 10)
+        print("model made", flush=True)
+        model_info = torch.load(network_path + "/khmodel_cifar10_pruned.pty")
+        print("model info loaded", flush=True)
+        khmodel.load_state_dict(model_info)
+        print("state dict loaded", flush=True)
+        network = PyTorchNetwork(khmodel, (1,3,32,32), "khmodel")
+        print("network made", flush=True)
+        return network
     elif network_name == "eat":
         model, _, _, _ = model_dispatcher("cifar10", "rgbedge", "cifar10", 64, 10)
         state_dict = torch.load(network_path)
@@ -329,7 +349,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "model",
-        choices=["pixelreg", "eat", "cnnf", "vonenet","cifar_7_1024","convbig"],
+        choices=["pixelreg", "khmodel", "eat", "cnnf", "vonenet","cifar_7_1024","convbig"],
         help="Model on which to obtain robustness distributions.",
     )
 
@@ -370,7 +390,7 @@ if __name__ == "__main__":
         "--model_seed", type=int, help="the seed used to train this model"
     )
     parser.add_argument(
-        "--train_type", choices=['clean', 'adv'], default = 'clean', help="whether model was trained normally or adversarially"
+        "--train_type", choices=['clean', 'fgsm'], default = 'clean', help="method of training the model"
     )
     
     args = parser.parse_args()
