@@ -50,7 +50,7 @@ from advertorch.attacks import GradientSignAttack, LinfPGDAttack
 from advertorch.context import ctx_noparamgrad_and_eval
 
 def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
-          cycles, mse_parameter=1.0, clean_parameter=1.0, clean='supclean'):
+          cycles, mse_parameter=1.0, clean_parameter=1.0, clean='supclean', train_attack='fgsm'):
 
     model.train()
 
@@ -59,9 +59,18 @@ def train_adv(args, model, device, train_loader, optimizer, scheduler, epoch,
 
     model.reset()
 
-    adversary = LinfPGDAttack(
-        model, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=args.eps, 
-        nb_iter=args.nb_iter, eps_iter=args.eps_iter, rand_init=True, clip_min=-1.0, clip_max=1.0, targeted=False)
+    if train_attack=='fgsm':
+        adversary = GradientSignAttack(
+            model, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=args.eps,
+            clip_min=-1.0, clip_max=1.0, targeted=False)
+        print(f"Adversarially training with fgsm and eps {args.eps}")
+    elif train_attack=='pgd':
+        adversary = LinfPGDAttack(
+            model, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=args.eps, 
+            nb_iter=args.nb_iter, eps_iter=args.eps_iter, rand_init=True, clip_min=-1.0, clip_max=1.0, targeted=False)
+        print(f"Adversarially training with pgd and eps {args.eps}")
+    else:
+        raise Exception(f"train attack should be 'fgsm' or 'pgd', got {train_attack} instead")
  
     for batch_idx, (images, targets) in enumerate(train_loader):
             
@@ -202,13 +211,19 @@ def test(args, model, device, test_loader, cycles, epoch):
 
     return test_loss, correct / len(test_loader.dataset)
 
-def test_pgd(args, model, device, test_loader, epsilon=0.063):
+def test_pgd(args, model, device, test_loader, epsilon=0.063, train_attack='fgsm'):
     
     model.eval()
     model.reset()        
-    adversary = LinfPGDAttack(
-        model.forward_adv, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=epsilon, 
-        nb_iter=args.nb_iter, eps_iter=args.eps_iter, rand_init=True, clip_min=-1.0, clip_max=1.0, targeted=False)
+    
+    if train_attack == 'fgsm':
+        adversary = GradientSignAttack(
+            model, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=args.eps,
+            clip_min=-1.0, clip_max=1.0, targeted=False)
+    elif train_attack == 'pgd':
+        adversary = LinfPGDAttack(
+            model.forward_adv, loss_fn=nn.CrossEntropyLoss(reduction="sum"), eps=epsilon, 
+            nb_iter=args.nb_iter, eps_iter=args.eps_iter, rand_init=True, clip_min=-1.0, clip_max=1.0, targeted=False)
 
     correct = 0
     for batch_idx, (data, target) in enumerate(test_loader):
@@ -267,6 +282,8 @@ def main():
                         help='number of steps in pgd attack')
     parser.add_argument('--clean', choices=['no', 'supclean', 'only'],
                         default='supclean', help='whether to use clean data in adv training. no: only adversarial; only: only clean; supclean: both')
+    parser.add_argument('--train_attack', choices=['pgd', 'fgsm'],
+                        default='supclean', help='attack to use, if performing adversarial training')
     
     # hyper-parameters
     parser.add_argument('--mse-parameter', type=float, default=1.0,
@@ -385,7 +402,7 @@ def main():
 
     for epoch in range(start_epoch, args.epochs):    
         train_loss, train_acc = train_adv(args, model, device, train_loader, optimizer, scheduler, epoch, 
-          cycles=args.max_cycles, mse_parameter=args.mse_parameter, clean_parameter=args.clean_parameter, clean=args.clean)
+          cycles=args.max_cycles, mse_parameter=args.mse_parameter, clean_parameter=args.clean_parameter, clean=args.clean, train_attack=args.train_attack)
 
         test_loss, test_acc = test(args, model, device, test_loader, cycles=args.max_cycles, epoch=epoch)
         
