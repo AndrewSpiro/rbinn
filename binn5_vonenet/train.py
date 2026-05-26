@@ -6,6 +6,13 @@ import tqdm
 import fire
 from advertorch.attacks import GradientSignAttack
 
+def float_eval(x):
+    try:
+        return float(eval(x))
+    except:
+        raise argparse.ArgumentTypeError(f"Invalid float expression: '{x}'")
+
+
 parser = argparse.ArgumentParser(description='ImageNet / CIFAR-10 Training')
 ## General parameters
 parser.add_argument('--in_path', default='../data',
@@ -80,7 +87,8 @@ parser.add_argument('--noise_scale', default=1, type=float,
                     help='noise scale factor')
 parser.add_argument('--noise_level', default=1, type=float,
                     help='noise level')
-
+parser.add_argument('--train_method', choices=['clean', 'fgsm'], help='whether to perform clean or adversarial training with fgsm')
+parser.add_argument('--train_epsilon', type=float_eval, help='whether to perform clean or adversarial training with fgsm')
 
 FLAGS, FIRE_FLAGS = parser.parse_known_args()
 
