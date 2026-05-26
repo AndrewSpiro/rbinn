@@ -1,9 +1,21 @@
 {
     "pixelreg": {
         "paths": {
-            "seed_0": "binn1_pixelreg/save/model_seed_0/ckpts/trainings_resnet/3C0F7B.pt",
+            "seed_0": {
+                "clean":  "binn1_pixelreg/save/clean/model_seed_0/ckpts/trainings_resnet/3C0F7B.pt",
+                "fgsm":  "binn1_pixelreg/save/fgsm/model_seed_0/ckpts/trainings_resnet/A79969.pt"
+            },
             "seed_1": "binn1_pixelreg/save/model_seed_1/ckpts/trainings_resnet/A08264.pt",
             "seed_2": "binn1_pixelreg/save/model_seed_2/ckpts/trainings_resnet/804BF6.pt"
+        },
+        "type": "pytorch"
+    },
+    "khmodel": {
+        "paths": {
+            "seed_0": {
+                "clean": "binn2_khmodel/data/repro/clean/t_seed_0/models",
+                "fgsm": "binn2_khmodel/data/repro/fgsm/t_seed_0/models"
+            }
         },
         "type": "pytorch"
     },
@@ -11,7 +23,7 @@
         "paths": {
             "seed_0": {
                 "clean": "binn3_eat/Rescifar10/seed_0/FGSM/cifar10_rgbedge.pth",
-                "robust": "binn3_eat/Rescifar10/seed_0/FGSM/cifar10_rgbedge_8_robust.pth"
+                "fgsm": "binn3_eat/Rescifar10/seed_0/FGSM/cifar10_rgbedge_8_robust.pth"
             },
             "seed_1": "binn3_eat/Rescifar10/seed_1/FGSM/cifar10_rgbedge_8_robust.pth",
             "seed_2": "binn3_eat/Rescifar10/seed_2/FGSM/cifar10_rgbedge_8_robust.pth"
@@ -20,7 +32,10 @@
     },
     "cnnf": {
         "paths": {
-            "seed_0": "binn4_cnnf/models/clean_CNNF_seed_0.pt",
+            "seed_0": {
+                "clean": "binn4_cnnf/models/clean_CNNF_seed_0.pt",
+                "fgsm": "binn4_cnnf/models/adv_CNNF_seed_0.pt"
+            },
             "baseline": "binn4_cnnf/models/huang_CNNF_2_cifar.pt"
         },
         "type": "pytorch"
@@ -35,7 +50,7 @@
         "paths": {
             "seed_0": {
                 "clean": "baseline_models/cifar_7_1024_standard.onnx",
-                "robust": "baseline_models/cifar_7_1024_fgsm.onnx"
+                "fgsm": "baseline_models/cifar_7_1024_fgsm.onnx"
             }
         },
         "type": "onnx"
