@@ -243,21 +243,13 @@ def load_pt_network(network_name: str, network_path):
         network = PyTorchNetwork(model, (1, 3, 32, 32), network_name)
         return network
     elif network_name == "khmodel":
-        print("loading khmodel", flush=True)
         layer_info = torch.load(network_path + "/fkhl3_cifar10_pruned.pty")
-        print("info loaded", flush=True)
         layer_state_dict = layer_info['model_state_dict']
-        print("got statedict", flush=True)
         khlayer = FKHL3(layer_state_dict)
-        print("made khlayer", flush=True)
         khmodel = KHModel(khlayer, no_classes = 10)
-        print("model made", flush=True)
         model_info = torch.load(network_path + "/khmodel_cifar10_pruned.pty")
-        print("model info loaded", flush=True)
         khmodel.load_state_dict(model_info)
-        print("state dict loaded", flush=True)
         network = PyTorchNetwork(khmodel, (1,3,32,32), network_name)
-        print("network made", flush=True)
         return network
     elif network_name == "eat":
         model, _, _, _ = model_dispatcher("cifar10", "rgbedge", "cifar10", 64, 10)
@@ -304,9 +296,15 @@ def save_correct_instances(
 def main():
     transform = create_transforms(NETWORK_NAME)
 
-    torch_dataset = getattr(torchvision.datasets, DATASET_NAME)(
-        root=DATASET_DIR, train=False, download=True, transform=transform
-    )
+    if NETWORK_NAME == 'khmodel':
+        layer_info = torch.load(NETWORK_PATH+"/fkhl3_cifar10_pruned.pty")
+        layer_state_dict = layer_info["model_state_dict"]
+        khlayer = FKHL3(layer_state_dict)
+        torch_dataset = Data.LpUnitCIFAR10(root=DATASET_DIR, train=False, transform=transforms.ToTensor(), p=khlayer.pSet["p"])
+    else:
+        torch_dataset = getattr(torchvision.datasets, DATASET_NAME)(
+            root=DATASET_DIR, train=False, download=True, transform=transform
+        )
 
     epsilon_list = normalize_epsilon_list(
         torch_dataset, EPSILON_LIST, ORIG_MAX, ORIG_MIN
