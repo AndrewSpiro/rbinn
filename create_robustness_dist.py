@@ -256,7 +256,7 @@ def load_pt_network(network_name: str, network_path):
         print("model info loaded", flush=True)
         khmodel.load_state_dict(model_info)
         print("state dict loaded", flush=True)
-        network = PyTorchNetwork(khmodel, (1,3,32,32), "khmodel")
+        network = PyTorchNetwork(khmodel, (1,3,32,32), network_name)
         print("network made", flush=True)
         return network
     elif network_name == "eat":
