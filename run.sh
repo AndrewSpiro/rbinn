@@ -18,6 +18,7 @@ echo "[$SHELL] ## Experiment repository is here: ${EXP_REPO_PATH}"
 mkdir -p "$EXP_REPO_PATH"
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5 ["cifar_7_1024"]=6 ["convbig"]=7)
 MODELS=("khmodel")
+TRAIN_TYPE=fgsm
 EPSILON_SPACE=bosman
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -55,7 +56,7 @@ if [ "${GET_RDS}" = true ]; then
             --data_dir $DATA_DIR \
             --exp_repo_path "${EXP_REPO_PATH}" \
             --model_seed 0 \
-            --train_type clean
+            --train_type $TRAIN_TYPE
     done
 else
     echo "[$SHELL] ## Skipping obtaining RDs"
