@@ -3,8 +3,10 @@ import json
 import os
 import numpy as np
 
+
 def load_jsons(paths):
     return [json.load(open(p, "r")) for p in paths]
+
 
 def aggregate(json_list):
     all_metrics = [list(result.keys()) for result in json_list]
@@ -13,49 +15,68 @@ def aggregate(json_list):
 
     stats = {}
     for metric in shared_metrics:
+        metric_vals = [result[metric] for result in json_list]
         stats[metric] = {
-            "mean": None,
-            "std": None
+            "mean": np.mean(metric_vals),
+            "std": np.std(metric_vals),
         }
-        metric_vals = []
-        for result in json_list:
-            metric_vals.append(result[metric])
-        stats[metric]["mean"] = np.mean(metric_vals)
-        stats[metric]["std"] = np.std(metric_vals)
+    return stats
 
-    print(stats)
-    json_save_path = f"{args.out}/num_summary.json"
-    os.makedirs(os.path.dirname(json_save_path), exist_ok=True)
-    with open(json_save_path, "w") as f:
-        json.dump(stats, f)
-    print(f"Aggregated results saved to {json_save_path}")
 
-    return
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--root", type=str, required=True, help="root where models are saved")    
-    parser.add_argument("--train_seeds", nargs="+", type=int, help="List of train seeds to aggregate over")
-    parser.add_argument("--model_arch", type=str, help="model architecture (e.g., resnet50)")
-    parser.add_argument("--out", type=str, help="save path for aggregated results")
-    args = parser.parse_args()
-
+def collect_stats(root, train_method, model_arch, train_seeds):
+    train_method_root = os.path.join(root, train_method)
     found_paths = []
-    for t_seed in args.train_seeds:
+    for t_seed in train_seeds:
         path = os.path.join(
-            args.root,
-            f"{args.model_arch}_vonenet_seed_{t_seed}",
-            "results.json"
+            train_method_root,
+            f"{model_arch}_vonenet_seed_{t_seed}",
+            "results.json",
         )
-
         if os.path.exists(path):
             found_paths.append(path)
         else:
-            print(f"Warning: File not found for t_seed {t_seed} at {path}")
+            print(
+                f"Warning: File not found for {train_method} t_seed {t_seed} at {path}"
+            )
 
     if not found_paths:
-        print("Error: No valid result files found for the provided seeds.")
-    else:
-        print(f"Aggregating {len(found_paths)} files...")
-        json_list = load_jsons(found_paths)
-        aggregated_data = aggregate(json_list)
+        print(f"Error: No valid result files found for train_method '{train_method}'.")
+        return None
+
+    print(f"Aggregating {len(found_paths)} files for train_method '{train_method}'...")
+    return aggregate(load_jsons(found_paths))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--root",
+        type=str,
+        required=True,
+        help="Root directory containing 'clean/' and 'fgsm/' subdirectories",
+    )
+    parser.add_argument(
+        "--train_seeds",
+        nargs="+",
+        type=int,
+        help="List of train seeds to aggregate over",
+    )
+    parser.add_argument(
+        "--model_arch", type=str, help="Model architecture (e.g., resnet50)"
+    )
+    parser.add_argument("--out", type=str, help="Save path for aggregated results JSON")
+    args = parser.parse_args()
+
+    combined = {}
+    for train_method in ("clean", "fgsm"):
+        stats = collect_stats(
+            args.root, train_method, args.model_arch, args.train_seeds
+        )
+        if stats is not None:
+            combined[train_method] = stats
+
+    print(combined)
+    os.makedirs(os.path.dirname(args.out), exist_ok=True)
+    with open(args.out, "w") as f:
+        json.dump(combined, f)
+    print(f"Aggregated results saved to {args.out}")
