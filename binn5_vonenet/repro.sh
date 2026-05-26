@@ -8,9 +8,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
-DEBUG=true
+DEBUG=false
 RUN_TRAIN=false
-RUN_EVAL=false
+RUN_EVAL=true
 MODEL_ARCH=resnet50
 TRAIN_METHOD='clean'
 TRAIN_EPSILON=0.063
@@ -37,13 +37,13 @@ mkdir -p "$DATA_DIR"
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
 
-    OUTPUT_PATH="${ROOT}/${MODEL_ARCH}_${TRAIN_METHOD}_vonenet_seed_${T_SEED}/output"
+    OUTPUT_PATH="${ROOT}/${TRAIN_METHOD}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/output"
     mkdir -p $OUTPUT_PATH
     
-    RESTORE_PATH="${ROOT}/${MODEL_ARCH}_${TRAIN_METHOD}_vonenet_seed_${T_SEED}/restore"
+    RESTORE_PATH="${ROOT}/${TRAIN_METHOD}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/restore"
     mkdir -p $RESTORE_PATH
     
-    RESULTS_PATH="${ROOT}/${MODEL_ARCH}_${TRAIN_METHOD}_vonenet_seed_${T_SEED}/results.json"
+    RESULTS_PATH="${ROOT}/${TRAIN_METHOD}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/results.json"
 
     if [ "$RUN_TRAIN" = true ]; then
 

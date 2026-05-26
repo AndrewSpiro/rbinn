@@ -57,13 +57,13 @@ fi
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
 
-    OUTPUT_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/output"
+    OUTPUT_PATH="${ROOT}/${TRAIN_METHOD}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/output"
     mkdir -p $OUTPUT_PATH
     
-    RESTORE_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/restore"
+    RESTORE_PATH="${ROOT}/${TRAIN_METHOD}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/restore"
     mkdir -p $RESTORE_PATH
     
-    RESULTS_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/results.json"
+    RESULTS_PATH="${ROOT}/${TRAIN_METHOD}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/results.json"
 
     if [ "$RUN_TRAIN" = true ]; then
 
