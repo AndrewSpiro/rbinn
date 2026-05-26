@@ -75,7 +75,7 @@ class LpUnitCIFAR10(datasets.CIFAR10):
         self.data = torch.tensor(self.data.astype('float32'))
         #self.data = self.data.to(self.device)
         self.data /= torch.norm(self.flat(self.data), p=self.p, dim=-1)[:, None, None, None]
-        # self.data = self.data.detach().cpu().numpy()
+        self.data = self.data.detach().cpu().numpy()
 
     def __len__(self):
         return len(self.data)
