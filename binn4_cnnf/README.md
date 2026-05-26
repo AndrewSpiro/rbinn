@@ -13,6 +13,8 @@ while
 ```
 is the model obtained after all epochs are completed. If training loss monotonically decreases, these models are the same.
 
+epsilon is 0.063 because we are using 8/255 for images in [0,1] and these are scaled to [-1,1] -> 2*8/255=~0.063
+
 ### Contributions
 
 Added a helper class 
