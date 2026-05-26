@@ -9,9 +9,11 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 DEBUG=true
-RUN_TRAIN=true
-RUN_EVAL=true
+RUN_TRAIN=false
+RUN_EVAL=false
 MODEL_ARCH=resnet50
+TRAIN_METHOD='clean'
+TRAIN_EPSILON=0.063
 
 if [ "$DEBUG" = true ]; then
     EPOCHS=0
@@ -35,13 +37,13 @@ mkdir -p "$DATA_DIR"
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
 
-    OUTPUT_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/output"
+    OUTPUT_PATH="${ROOT}/${MODEL_ARCH}_${TRAIN_METHOD}_vonenet_seed_${T_SEED}/output"
     mkdir -p $OUTPUT_PATH
     
-    RESTORE_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/restore"
+    RESTORE_PATH="${ROOT}/${MODEL_ARCH}_${TRAIN_METHOD}_vonenet_seed_${T_SEED}/restore"
     mkdir -p $RESTORE_PATH
     
-    RESULTS_PATH="${ROOT}/${MODEL_ARCH}_vonenet_seed_${T_SEED}/results.json"
+    RESULTS_PATH="${ROOT}/${MODEL_ARCH}_${TRAIN_METHOD}_vonenet_seed_${T_SEED}/results.json"
 
     if [ "$RUN_TRAIN" = true ]; then
 
@@ -55,7 +57,9 @@ do
         --batch_size 64 \
         -o $OUTPUT_PATH \
         -restore_path $RESTORE_PATH \
-        --model_arch $MODEL_ARCH
+        --model_arch $MODEL_ARCH \
+        --train_method $TRAIN_METHOD \
+        --train_epsilon $TRAIN_EPSILON
 
         echo 'Finished training.'
     fi
@@ -71,7 +75,7 @@ do
 done
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-AGG_RESULTS_DIR="${ROOT}/aggregated_results/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}"
+AGG_RESULTS_DIR="${ROOT}/aggregated_results/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}.json"
 python "${SCRIPT_DIR}/aggregate_results.py" --root $ROOT \
                             --train_seeds "${TRAIN_SEEDS[@]}" \
                             --model_arch $MODEL_ARCH \
