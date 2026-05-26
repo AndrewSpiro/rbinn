@@ -162,7 +162,33 @@ if __name__ == "__main__":
     transform=ToTensor(),
     p=FKHL3.pSet["p"],
     )
-    
+    breakpoint()
+    TestLoader = DeviceDataLoader(
+        cifar10Test,
+        device=device,
+        batch_size=BATCH_SIZE,
+        num_workers=1,
+        shuffle=False,
+    )
+
+    state_dict=torch.load(model_path/khmodel_name)
+    model=KHModel(state_dict)
+    model.to(device)
+    model.eval()
+    correct=0
+    total=0
+    with torch.no_grad():
+        for x, y in TestLoader:
+            x = x.to(device)
+            y = y.to(device)
+
+            logits, _ = model(x)
+            pred = logits.argmax(dim=1)
+
+            correct += (pred == y).sum().item()
+            total += y.size(0)
+    print(correct/total)
+    breakpoint()
     ce_loss = torch.nn.CrossEntropyLoss()
     
     eps = np.logspace(-6, np.log(2.5), num=args.num_eps)
