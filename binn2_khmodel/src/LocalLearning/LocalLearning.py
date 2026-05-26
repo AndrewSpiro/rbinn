@@ -250,7 +250,7 @@ class HiddenLayerModel(nn.Module, ABC):
     def pred(self):
         def preds(x: torch.Tensor) -> torch.Tensor:
             logits, hidden = self._forward(x)
-            return (torch.argmax(logits, dim=-1))
+            return torch.argmax(logits, dim=-1)
         setattr(self, 'forward', preds)
 
     def eval(self):
