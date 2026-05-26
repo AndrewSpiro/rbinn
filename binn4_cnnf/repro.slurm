@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=b4_clean
+#SBATCH --job-name=b4_fgsm
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="testing"
+#SBATCH --partition="gpu-l4-24g"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:10:00
+#SBATCH --time=48:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -39,22 +39,23 @@ echo "[$SHELL] ## Data copied to scratch"
 echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 #### Experiment pipeline ####
-TRAIN_METHOD=clean
-DEBUG=true
+TRAIN_METHOD=adv # 'clean' 'adv' or anything else for supclean
+TRAIN_ATTACK=fgsm
+DEBUG=false
 RUN_TRAIN=true
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF_debug" # This is not a path- just a name that will be appended to a path
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results_debug"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF_debug" # This is not a path- just a name that will be appended to a path
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results_debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=1
     echo "[$SHELL] ## Running in debug mode..."
 else
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF"
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF"
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results"
     EPOCHS=500
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
@@ -87,6 +88,7 @@ do
                         --mse-parameter 0.1 \
                         --res-parameter 0.1 \
                         --clean $CLEAN \
+                        --train_attack $TRAIN_ATTACK \
                         --clean-parameter 0.05 \
                         --lr 0.05 \
                         --batch-size $BATCH_SIZE \
@@ -124,6 +126,7 @@ do
                         --bool-debug $DEBUG \
                         --seed $A_SEED \
                         --target-model "${TARGET_MODEL}.pt" \
+                        --train_attack $TRAIN_ATTACK \
                         --num_workers 1
     done
 done

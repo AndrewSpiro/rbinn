@@ -9,6 +9,7 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 TRAIN_METHOD=clean
+TRAIN_ATTACK=fgsm
 DEBUG=false
 RUN_TRAIN=true
 MODEL_DIR="${SCRIPT_DIR}/models"
@@ -16,15 +17,15 @@ BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF_debug" # This is not a path- just a name that will be appended to a path
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results_debug"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF_debug" # This is not a path- just a name that will be appended to a path
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results_debug"
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     EPOCHS=2
     echo "[$SHELL] ## Running in debug mode..."
 else
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_CNNF"
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_results"
+    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF"
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results"
     EPOCHS=500
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
@@ -62,6 +63,7 @@ do
                         --mse-parameter 0.1 \
                         --res-parameter 0.1 \
                         --clean $CLEAN \
+                        --train_attack $TRAIN_ATTACK \
                         --clean-parameter 0.05 \
                         --lr 0.05 \
                         --batch-size $BATCH_SIZE \
@@ -97,7 +99,8 @@ do
                         --model-dir $MODEL_DIR \
                         --bool-debug $DEBUG \
                         --seed $A_SEED \
-                        --target-model "${TARGET_MODEL}.pt"
+                        --target-model "${TARGET_MODEL}.pt" \
+                        --train_attack $TRAIN_ATTACK
     done
 done
 
