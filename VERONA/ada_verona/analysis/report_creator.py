@@ -37,9 +37,12 @@ class ReportCreator:
 
         return figure
 
-    def create_box_figure(self) -> plt.Figure:
+    def create_box_figure(self, log_scale: bool = False) -> plt.Figure:
         box_plot = sns.boxplot(data=self.df, x="network", y="epsilon_value")
-        box_plot.set_xticklabels(box_plot.get_xticklabels(), rotation=90)
+        box_plot.set_xticklabels(box_plot.get_xticklabels(), rotation=23)
+
+        if log_scale:
+            box_plot.set_yscale("log")
 
         figure = box_plot.get_figure()
 
