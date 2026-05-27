@@ -35,7 +35,7 @@ def create_dfs(experiments):
             f"{experiment['path']}/results/result_df.csv", index_col=0
         )
         experiment["absolute_df"] = experiment["absolute_df"].rename(
-            columns={"epsilon_value": "scaled_epsilon_value"}
+            columns={"smallest_sat_value": "scaled_smallest_sat_value"}
         )
         print(experiment["absolute_df"].columns)
         experiment["absolute_df"]["network"] = name
@@ -72,10 +72,10 @@ def unscale_eps(row):
     }
 
     model = row["network"]
-    scaled_eps_val = row["scaled_epsilon_value"]
+    scaled_sat_val = row["scaled_smallest_sat_value"]
 
     if model not in unnorm_dict:
-        return scaled_eps_val
+        return scaled_sat_val
 
     config = unnorm_dict[model]
 
@@ -83,7 +83,7 @@ def unscale_eps(row):
         config["eps_max"] - config["eps_min"]
     )
 
-    return scaled_eps_val / factor
+    return scaled_sat_val / factor
 
 
 def create_figures(bool_relative: bool):
@@ -93,12 +93,12 @@ def create_figures(bool_relative: bool):
         zero_shifted = relative_dfs.copy()
     else:
         zero_shifted = absolute_dfs.copy()
-    zero_shifted["epsilon_value"] = (
-        zero_shifted["epsilon_value"] + 1e-6
-    )  # shifting so that plots are compatible with log-scaling
+        zero_shifted["smallest_sat_value"] = (
+            zero_shifted["smallest_sat_value"] + 1e-6
+        )  # shifting so that plots are compatible with log-scaling
     report_creator = ReportCreator(zero_shifted)
     hist_figure = report_creator.create_hist_figure()
-    box_figure = report_creator.create_box_figure()
+    box_figure = report_creator.create_box_figure(log_scale=True)
     kde_figure = report_creator.create_kde_figure()
     ecdf_figure = report_creator.create_ecdf_figure()
     anneplot = report_creator.create_anneplot()
@@ -128,28 +128,29 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
         # Calculate Percentiles for relative
         # 50th = Median; 90th = Value where 10% are greater or equal
         if not rel_net.empty:
-            eps_rel_values = rel_net["epsilon_value"]
-            p50_eps_rel = np.percentile(eps_rel_values, 50)
-            p90_eps_rel = np.percentile(eps_rel_values, 90)
+            sat_rel_values = rel_net["smallest_sat_value"]
+            p50_sat_rel = np.percentile(sat_rel_values, 50)
+            p90_sat_rel = np.percentile(sat_rel_values, 90)
             
-            min_eps_rel = eps_rel_values.min()
-            mean_eps_rel = eps_rel_values.mean()
-            median_eps_rel = eps_rel_values.median()
-            std_eps_rel = eps_rel_values.std()
+            min_sat_rel = sat_rel_values.min()
+            mean_sat_rel = sat_rel_values.mean()
+            median_sat_rel = sat_rel_values.median()
+            std_sat_rel = sat_rel_values.std()
+            assert(min_sat_rel > 0)
         else:
-            p50_eps_rel = p90_eps_rel = min_eps_rel = mean_eps_rel = std_eps_rel = np.nan
+            p50_sat_rel = p90_sat_rel = min_sat_rel = mean_sat_rel = std_sat_rel = np.nan
 
         summary_dict[experiment] = {
-            "min_eps_train_abs": abs_net["epsilon_value"].min() if not abs_net.empty else np.nan,
-            "mean_eps_train_abs": abs_net["epsilon_value"].mean() if not abs_net.empty else np.nan,
-            "med_eps_train_abs": abs_net["epsilon_value"].median() if not abs_net.empty else np.nan,
-            "std_eps_train_abs": abs_net["epsilon_value"].std() if not abs_net.empty else np.nan,
-            "min_eps_train_rel": min_eps_rel,
-            "mean_eps_train_rel": mean_eps_rel,
-            "med_eps_train_rel": median_eps_rel,
-            "std_eps_train_rel": std_eps_rel,
-            "p50_eps_train_rel": p50_eps_rel,
-            "p90_eps_train_rel": p90_eps_rel,
+            "min_sat_train_abs": abs_net["smallest_sat_value"].min() if not abs_net.empty else np.nan,
+            "mean_sat_train_abs": abs_net["smallest_sat_value"].mean() if not abs_net.empty else np.nan,
+            "med_sat_train_abs": abs_net["smallest_sat_value"].median() if not abs_net.empty else np.nan,
+            "std_sat_train_abs": abs_net["smallest_sat_value"].std() if not abs_net.empty else np.nan,
+            "min_sat_train_rel": min_sat_rel,
+            "mean_sat_train_rel": mean_sat_rel,
+            "med_sat_train_rel": median_sat_rel,
+            "std_sat_train_rel": std_sat_rel,
+            "p50_sat_train_rel": p50_sat_rel,
+            "p90_sat_train_rel": p90_sat_rel,
             "num_clean_corr": num_clean_corr,
             "clean_acc": clean_acc
         }
@@ -158,6 +159,7 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
 
 if __name__ == "__main__":
 
+    print("main called")
     parser = argparse.ArgumentParser(description="Stats and plots for RDs")
 
     parser.add_argument(
@@ -174,6 +176,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    print("args parsed")
     experiments_path = args.experiments_path
     experiments = json.load(open(experiments_path, "r"))
     print(experiments)
@@ -181,13 +184,13 @@ if __name__ == "__main__":
     print(absolute_dfs.columns)
     print(relative_dfs.columns)
 
-    relative_dfs["epsilon_value"] = relative_dfs.apply(unscale_eps, axis=1)
-    absolute_dfs["epsilon_value"] = absolute_dfs.apply(unscale_eps, axis=1)
+    relative_dfs["smallest_sat_value"] = relative_dfs.apply(unscale_eps, axis=1)
+    absolute_dfs["smallest_sat_value"] = absolute_dfs.apply(unscale_eps, axis=1)
 
-    figures = create_figures(bool_relative=True)
+    figures = create_figures(bool_relative=False)
     tables = create_tables(experiments, absolute_dfs, relative_dfs)
-    table_abs = tables[['min_eps_train_abs', 'mean_eps_train_abs','std_eps_train_abs','clean_acc']]
-    table_rel = tables[['min_eps_train_rel', 'mean_eps_train_rel','std_eps_train_rel','num_clean_corr']]
+    table_abs = tables[['min_sat_train_abs', 'mean_sat_train_abs','std_sat_train_abs','clean_acc']]
+    table_rel = tables[['min_sat_train_rel', 'mean_sat_train_rel','std_sat_train_rel','num_clean_corr']]
 
     table_abs.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/absolute.txt")
     table_rel.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/relative.txt")
