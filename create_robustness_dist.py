@@ -202,10 +202,10 @@ def create_distribution(
             print(f"{len(sampled_data)} images sampled from {len(dataset)}.")
         else:
             sampled_data = dataset
-        if hasattr(network.model, "run_average"):
-            print("model has 'run_average' attr")
-        else:
-            print("model does not have 'run_average' attr")
+        # if hasattr(network.model, "run_average"):
+        #     print("model has 'run_average' attr")
+        # else:
+        #     print("model does not have 'run_average' attr")
         start_time = time.time()
         print("Sampling started")
         correct_data = dataset_sampler.sample(network, sampled_data)
@@ -216,6 +216,7 @@ def create_distribution(
         print(f"Clean accuracy on subset is {len(correct_data)/len(sampled_data)}")
 
         print("Data sampled")
+        breakpoint()
 
     except Exception as e:
         logging.info(f"failed for network {network} with error {e}")
