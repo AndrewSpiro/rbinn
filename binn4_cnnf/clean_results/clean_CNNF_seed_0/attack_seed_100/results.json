@@ -1,1 +1,1 @@
-{"clean_acc": 0.932}
+{"clean_acc": 0.932, "pgd_acc_first": 0.1753, "pgd_acc_ete": 0.8589, "spsa_acc_first": 0.6, "spsa_acc_ete": 0.4}
