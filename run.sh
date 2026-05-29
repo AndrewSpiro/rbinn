@@ -4,10 +4,10 @@ set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
 
-DEBUG=true
+DEBUG=false
 RUN_VALIDS=false
-GET_RDS=true
-AGG_RESULTS=false
+GET_RDS=false
+AGG_RESULTS=true
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA_DIR="${SCRIPT_DIR}/data"
@@ -17,8 +17,8 @@ EXP_REPO_PATH="${SCRIPT_DIR}/experiments"
 echo "[$SHELL] ## Experiment repository is here: ${EXP_REPO_PATH}"
 mkdir -p "$EXP_REPO_PATH"
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5 ["cifar_7_1024"]=6 ["convbig"]=7)
-MODELS=("khmodel")
-TRAIN_TYPE=fgsm
+MODELS=("convbig")
+TRAIN_TYPE=clean
 EPSILON_SPACE=bosman
 PGD_NUM_ITER=40
 PGD_STEP_SIZE=0.01
@@ -43,7 +43,7 @@ else
     echo "[$SHELL] ## Skipping validations"
 fi
 
-conda activate verona_env
+conda activate rbinn_env
 
 if [ "${GET_RDS}" = true ]; then
     for m in "${MODELS[@]}"; do
@@ -67,6 +67,7 @@ if [ "${AGG_RESULTS}" = true ]; then
 
     if [ "${DEBUG}" = true ]; then
         RESULTS_DIR=${SCRIPT_DIR}/debug_rd_results
+        echo "Running in debug mode"
     else
         RESULTS_DIR=${SCRIPT_DIR}/rd_results
     fi

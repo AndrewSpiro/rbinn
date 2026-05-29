@@ -65,7 +65,7 @@ else
     echo "[$SHELL] ## Skipping validations"
 fi
 
-conda activate verona_env
+conda activate rbinn_env
 
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1

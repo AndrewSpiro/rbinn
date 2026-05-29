@@ -226,13 +226,15 @@ def train(save_train_epochs=.2,  # how often save output during training
         save_model_steps = (np.arange(0, FLAGS.epochs + 1,
                                       save_model_epochs) * nsteps).astype(int)
 
-    for epoch in tqdm.trange(start_epoch, FLAGS.epochs + 1, initial=0, desc='epoch'):
-        print(epoch)
+    # for epoch in tqdm.trange(start_epoch, FLAGS.epochs + 1, initial=0, desc='epoch'):
+    for epoch in range(start_epoch, FLAGS.epochs + 1):
+        print(epoch, flush=True)
         data_load_start = np.nan
 
         data_loader_iter = trainer.data_loader
 
-        for step, data in enumerate(tqdm.tqdm(data_loader_iter, desc=trainer.name)):
+        # for step, data in enumerate(tqdm.tqdm(data_loader_iter, desc=trainer.name)):
+        for step, data in enumerate(data_loader_iter):
             data_load_time = time.time() - data_load_start
             global_step = epoch * nsteps + step
 
@@ -344,12 +346,14 @@ class ImageNetTrain(object):
         inp = inp.to(device)
         target = target.to(device)
 
-        if train_method == 'fgsm':
-            perturbed_inp = GradientSignAttack(predict = self.model, loss_fn = self.loss, eps = train_epsilon, clip_min = -1, clip_max = 1, targeted=False)
-        elif train_method == 'clean':
+        if FLAGS.train_method == 'fgsm':
+            attack = GradientSignAttack(predict = self.model, loss_fn = self.loss, eps = FLAGS.train_epsilon, clip_min = -1, clip_max = 1, targeted=False)
+            perturbed_inp = attack.perturb(inp, target)
+            output = self.model(perturbed_inp)
+        elif FLAGS.train_method == 'clean':
             output = self.model(inp)
         else:
-            raise Exception(f"valid train methods are 'clean' and 'fgsm', got {train_method} instead")
+            raise Exception(f"valid train methods are 'clean' and 'fgsm', got {FLAGS.train_method} instead")
 
         record = {}
         loss = self.loss(output, target)
@@ -411,7 +415,8 @@ class ImageNetVal(object):
         start = time.time()
         record = {'loss': 0, 'top1': 0, 'top5': 0}
         with torch.no_grad():
-            for (inp, target) in tqdm.tqdm(self.data_loader, desc=self.name):
+            # for (inp, target) in tqdm.tqdm(self.data_loader, desc=self.name):
+            for (inp, target) in self.data_loader:
                 inp = inp.to(device)
                 target = target.to(device)
                 output = self.model(inp)

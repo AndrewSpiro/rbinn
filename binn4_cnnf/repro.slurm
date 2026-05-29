@@ -6,7 +6,7 @@
 #SBATCH --mail-type="ALL"
 #SBATCH --partition="gpu-l4-24g"
 #SBATCH --gres=gpu:1
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -101,7 +101,13 @@ do
                         --save-model $SAVE_MODEL \
                         --model-dir $SCRATCH_MODEL_DIR \
                         --bool-debug $DEBUG \
-                        --num_workers 1
+                        --num_workers 1 \
+                        --ckpt_path "${HOME_MODEL_DIR}/backup_fgsm_cnnf/adv_fgsm_CNNF_seed_0-epoch349.pt" \
+                        --ckpt_epoch 349
+    
+        cp -r $SCRATCH_MODEL_DIR $HOME_MODEL_DIR
+        echo "[$SHELL] ## Model copied to home"
+
     fi        
 
     for A_SEED in "${ATTACK_SEEDS[@]}"
@@ -126,7 +132,6 @@ do
                         --bool-debug $DEBUG \
                         --seed $A_SEED \
                         --target-model "${TARGET_MODEL}.pt" \
-                        --train_attack $TRAIN_ATTACK \
                         --num_workers 1
     done
 done

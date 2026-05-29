@@ -1,4 +1,14 @@
 {
-    "pixelreg": {"path": "experiments/attias_testset_nnenum_one2one_18-02-2026+22_31"},
-    "khmodel": {"path": "experiments/hulz_testset_nnenum_one2one_21-02-2026+15_30"}
+    "pixelreg_clean": {"path": "experiments/attias_testset_nnenum_one2one_18-02-2026+22_31"},
+    "pixelreg_fgsm": {"path": "experiments/pixelreg_seed_0_rd_26-05-2026+06_50"},
+    "khmodel_clean": {"path": "experiments/hulz_testset_nnenum_one2one_21-02-2026+15_30"},
+    "khmodel_fgsm": {"path": "experiments/khmodel_seed_0_rd_26-05-2026+19_21"},
+    "eat_clean": {"path": "experiments/eat_seed_0_rd_26-05-2026+04_20"},
+    "eat_fgsm": {"path": "experiments/borji_testset_nnenum_one2one_24-02-2026+19_02"},
+    "cnnf_clean": {"path": "experiments/huang_avg_nnenum_one2one_29-03-2026+21_49"},
+    "vonenet_clean": {"path": "experiments/dapellot_testset_nnenum_one2one_25-02-2026+16_43"},
+    "cifar_7_1024_clean": {"path": "experiments/cifar_7_1024_seed_0_rd_25-05-2026+17_04"},
+    "cifar_7_1024_fgsm": {"path": "experiments/cifar_7_1024_fgsm_testset_nnenum_one2one_18-02-2026+21_17"},
+    "convbig_clean": {"path": "experiments/convbig_testset_nnenum_one2one_19-02-2026+15_48"},
+    "convbig_fgsm": {"path": "experiments/convbig_seed_0_rd_26-05-2026+06_47"}
 }

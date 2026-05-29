@@ -8,15 +8,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
-DEBUG=false
-RUN_TRAIN=false
+DEBUG=true
+RUN_TRAIN=true
 RUN_EVAL=true
 MODEL_ARCH=resnet50
-TRAIN_METHOD='clean'
+TRAIN_METHOD='fgsm'
 TRAIN_EPSILON=0.063
 
 if [ "$DEBUG" = true ]; then
-    EPOCHS=0
+    EPOCHS=2
     TRAIN_SEEDS=(0)
     ATTACK_SEEDS=(100)
     RESTORE_EPOCH=1

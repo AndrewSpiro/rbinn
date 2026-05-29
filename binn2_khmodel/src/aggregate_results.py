@@ -102,7 +102,7 @@ def make_boxplots(repro_clean, repro_adv, baseline_rd, name, result_path):
     ax.boxplot(repro_adv,   positions=[3], showfliers=False)
 
     ax.set_xticks([1, 2, 3])
-    ax.set_xticklabels(['original', 'clean', 'fgsm'])
+    ax.set_xticklabels(['Original', 'Repro (clean)', 'FGSM'])
     ax.set_xlim(0.5, 3.5)
     ax.set_ylabel("critical norm")
 
@@ -118,28 +118,32 @@ def create_plots(clean_stats, adv_stats, name, result_path):
     eps_adv   = np.array(adv_stats["eps"],   dtype=float)
 
     fig, ax = plt.subplots()
-    ax.semilogx(
-        np.array(pbc_baseline_dict[name]['x'], dtype=float),
-        np.array(pbc_baseline_dict[name]['y'], dtype=float),
-        label="original"
-    )
-    ax.semilogx(eps_clean, clean_stats["acc"]["mean"], label="clean")
+    ax.semilogx(eps_clean, clean_stats["acc"]["mean"], label="Repro (clean)", color='C1')
     ax.fill_between(
         eps_clean,
         [m - s for m, s in zip(clean_stats["acc"]["mean"], clean_stats["acc"]["std"])],
         [m + s for m, s in zip(clean_stats["acc"]["mean"], clean_stats["acc"]["std"])],
-        alpha=0.3
+        alpha=0.3,
+        color='C1'
     )
-    ax.semilogx(eps_adv, adv_stats["acc"]["mean"], label="fgsm")
+    ax.semilogx(
+        np.array(pbc_baseline_dict[name]['x'], dtype=float),
+        np.array(pbc_baseline_dict[name]['y'], dtype=float),
+        '--',
+        label="Original",
+        color='C0'
+    )
+    ax.semilogx(eps_adv, adv_stats["acc"]["mean"], label="FGSM", color='C2')
     ax.fill_between(
         eps_adv,
         [m - s for m, s in zip(adv_stats["acc"]["mean"], adv_stats["acc"]["std"])],
         [m + s for m, s in zip(adv_stats["acc"]["mean"], adv_stats["acc"]["std"])],
-        alpha=0.3
+        alpha=0.3,
+        color='C2'
     )
-    ax.set_xlabel("eps")
-    ax.set_ylabel("accuracy")
-    ax.legend()
+    ax.set_xlabel("Epsilon")
+    ax.set_ylabel("Accuracy")
+    ax.legend(loc='lower left')
     fig.savefig(result_path / f'{name}_pbc.png')
     plt.close(fig)
 
