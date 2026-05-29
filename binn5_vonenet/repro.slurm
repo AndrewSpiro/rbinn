@@ -4,9 +4,9 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="gpu-l4-24g"
+#SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=48:00:00
+#SBATCH --time=00:05:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -34,7 +34,7 @@ DEBUG=true
 RUN_TRAIN=true
 RUN_EVAL=true
 MODEL_ARCH=resnet50
-TRAIN_METHOD='clean'
+TRAIN_METHOD='fgsm'
 TRAIN_EPSILON=0.063
 
 if [ "$DEBUG" = true ]; then
@@ -48,7 +48,7 @@ if [ "$DEBUG" = true ]; then
 else
     EPOCHS=70
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(100 101 102)
+    ATTACK_SEEDS=(100)
     RESTORE_EPOCH=5
     HOME_ROOT="${SCRIPT_DIR}"
     ROOT="${SCRATCH_PATH}"
@@ -71,13 +71,15 @@ do
 
         python "${SCRIPT_DIR}/train.py" train \
         --dataset cifar10 \
-        --in_path $DATA_DIR \
+        --in_path $SCRATCH_DATA_DIR \
         --ngpus 1 \
         --epochs $EPOCHS \
         --batch_size 64 \
         -o $OUTPUT_PATH \
         -restore_path $RESTORE_PATH \
-        --model_arch $MODEL_ARCH
+        --model_arch $MODEL_ARCH \
+        --train_method $TRAIN_METHOD \
+        --train_epsilon $TRAIN_EPSILON
 
         echo 'Finished training.'
     fi
@@ -86,7 +88,7 @@ do
 
     if [ "$RUN_EVAL" = true ]; then
         python "${SCRIPT_DIR}/run.py" \
-        --in_path $DATA_DIR \
+        --in_path $SCRATCH_DATA_DIR \
         --ngpus 1 \
         --vonenet_dir $OUTPUT_PATH \
         --epoch $EPOCHS \
@@ -98,7 +100,7 @@ do
 done
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
-AGG_RESULTS_DIR="${ROOT}/aggregated_results/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}"
+AGG_RESULTS_DIR="${ROOT}/aggregated_results/${MODEL_ARCH}_train_seeds_${TRAIN_SEED_STRING}.json"
 python "${SCRIPT_DIR}/aggregate_results.py" --root $ROOT \
                             --train_seeds "${TRAIN_SEEDS[@]}" \
                             --model_arch $MODEL_ARCH \
