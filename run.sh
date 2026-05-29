@@ -43,7 +43,7 @@ else
     echo "[$SHELL] ## Skipping validations"
 fi
 
-conda activate verona_env
+conda activate rbinn_env
 
 if [ "${GET_RDS}" = true ]; then
     for m in "${MODELS[@]}"; do
