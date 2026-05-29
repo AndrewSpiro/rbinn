@@ -122,6 +122,7 @@ if FLAGS.ngpus > 0:
     set_gpus(FLAGS.ngpus)
 
 import torch
+torch.autograd.set_detect_anomaly(True)
 import torch.nn as nn
 import torch.utils.model_zoo
 import torchvision
