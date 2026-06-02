@@ -64,7 +64,7 @@ def detect_edge_gtsrb(img):
 
 def detect_edge_new_cifar(img):
   img = img.permute(1,2,0)
-  gray = np.array(img.mean(axis=2)*255).astype('uint8')
+  gray = np.array(img.mean(axis=2).cpu()*255).astype('uint8')
   imgBLR = cv2.GaussianBlur(gray, (5,5), 3)
   imgEDG = cv2.Canny(imgBLR, 40, 150)
   # if (imgEDG.max() - imgEDG.min()) > 0:
