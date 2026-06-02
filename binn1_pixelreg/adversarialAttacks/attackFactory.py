@@ -39,7 +39,7 @@ def AttackFactory(
         AttackType.Uniform.value,
         AttackType.SaltPepper.value,
     ]:
-        return RandomAttack(attack_type, task=task, log=wandb_log, device=device, only_correct=only_correct)
+        return RandomAttack(attack_type, task=task, log=wandb_log, device=device)
     elif attack_type == AttackType.FGSM.value:
         return FGSM(log=wandb_log, device=device, task=task)
     else:

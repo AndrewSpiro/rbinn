@@ -117,7 +117,7 @@ def attack_resnet(
         epsilons = None
 
     # run attack
-    accuracies = attack(resnet, resnet_loader, epsilons)
+    accuracies = attack(resnet, resnet_loader, epsilons, only_correct=only_correct)
 
     print(
         f"\nAccuracies under {attack_config['attack_type']} attack: ", accuracies, "\n"
