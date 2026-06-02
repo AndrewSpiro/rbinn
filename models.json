@@ -42,7 +42,10 @@
     },
     "vonenet": {
         "paths": {
-            "seed_0": "binn5_vonenet/resnet50_vonenet_seed_0/output/epoch_70.pth.tar"
+            "seed_0": {
+                "clean": "binn5_vonenet/resnet50_vonenet_seed_0/output/epoch_70.pth.tar",
+                "fgsm": "binn5_vonenet/fgsm/resnet50_vonenet_seed_0/output/epoch_70.pth.tar"
+            }
         },
         "type": "pytorch"
     },
