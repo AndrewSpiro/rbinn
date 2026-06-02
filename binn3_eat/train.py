@@ -6,11 +6,6 @@ import random
 import numpy as np
 import json
 
-from binn3_eat.lib import *
-from binn3_eat.config import *
-from binn3_eat.model import model_dispatcher
-from binn3_eat.utils import * 
-
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
@@ -68,6 +63,13 @@ save_prefix = opt.save_prefix
 
 # Apply global training seed
 set_seed(opt.seed)
+
+# import that use randomness
+from binn3_eat.lib import *
+from binn3_eat.config import *
+from binn3_eat.model import model_dispatcher
+from binn3_eat.utils import * 
+
 
 # Define pathing based on root_dir and seed
 base_path = os.path.join(opt.root_dir, f'Res{opt.data_dir}', f'seed_{opt.seed}')
