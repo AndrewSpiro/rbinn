@@ -222,7 +222,8 @@ binn2_khmodel/data/**
 #### binn3_eat ####
 .python-version
 Rescifar10/
-
+Rescifar10_alpha_0.5/
+Rescifar10_gtsrb/
 
 #### binn4_cnnf ####
 binn4_cnnf/data/
