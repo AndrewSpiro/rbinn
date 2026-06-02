@@ -1,3 +1,6 @@
+### Changes
+* Fixed CUDA tensor to NumPy conversion error in `detect_edge_new_cifar()` by adding `.cpu()` before the NumPy cast.
+---
 # Shape Defense
 
 * This repository includes the following:
