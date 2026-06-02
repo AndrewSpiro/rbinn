@@ -78,16 +78,16 @@ def plot_results(baselines, clean_results, adv_results, attack_name,
         means, stds = clean_results[attack_name]
         x = np.linspace(eps_min, eps_max, len(means))
         means, stds = np.array(means), np.array(stds)
-        plt.plot(x, means, label="Repro (clean)", marker='o', markersize=4)
-        plt.fill_between(x, means - stds, means + stds, alpha=0.2)
+        plt.plot(x, means, label="Repro (clean)", marker='o', markersize=4, color = 'C1')
+        plt.fill_between(x, means - stds, means + stds, alpha=0.2, color='C1')
 
     # fgsm
     if attack_name in adv_results:
         means, stds = adv_results[attack_name]
         x = np.linspace(eps_min, eps_max, len(means))
         means, stds = np.array(means), np.array(stds)
-        plt.plot(x, means, label="Repro (fgsm)", marker='s', markersize=4)
-        plt.fill_between(x, means - stds, means + stds, alpha=0.2)
+        plt.plot(x, means, label="Repro (fgsm)", marker='s', markersize=4, color='C2')
+        plt.fill_between(x, means - stds, means + stds, alpha=0.2, color='C2')
 
     # baselines
     for b_name, b_data in baselines.items():
@@ -99,11 +99,11 @@ def plot_results(baselines, clean_results, adv_results, attack_name,
                 and np.isclose(b_range_min, eps_min)
                 and np.isclose(b_range_max, eps_max)):
             bx = np.linspace(eps_min, eps_max, len(b_data['means']))
-            plt.plot(bx, b_data['means'], '--', label=b_data['label'])
+            plt.plot(bx, b_data['means'], '--', label=b_data['label'], color='C0')
 
     plt.xlabel('Epsilon')
     plt.ylabel('Accuracy')
-    plt.title(f'BINN1 Pixelreg Comparison: {attack_name.capitalize()} Attack')
+    # plt.title(f'BINN1 Pixelreg Comparison: {attack_name.capitalize()} Attack')
     plt.legend()
     plt.grid(True, alpha=0.3)
 

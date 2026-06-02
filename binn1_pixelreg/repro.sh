@@ -9,11 +9,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 
-DEBUG=true
-RUN_TRAINING=true
+DEBUG=false
+RUN_TRAINING=false
 TRAIN_ATTACK=clean # set to clean for clean training
 TRAIN_EPSILON=8/255
-RUN_ATTACKS=true
+RUN_ATTACKS=false
 
 TASK=CIFAR10
 ARCHI=ResNet18
@@ -66,6 +66,8 @@ do
         --train_attack "$TRAIN_ATTACK" \
         --train_epsilon "$TRAIN_EPSILON" \
         >> "${MODEL_DIR}/train.log" 2>&1
+    else
+        echo "Skipping training"
     fi
 
     if [ "$RUN_ATTACKS" = true ]; then
@@ -122,6 +124,8 @@ do
             done
 
         done
+    else
+        echo "Skipping attacks"
     fi
 done
 

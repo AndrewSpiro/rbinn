@@ -34,7 +34,7 @@
         "paths": {
             "seed_0": {
                 "clean": "binn4_cnnf/models/clean_CNNF_seed_0.pt",
-                "fgsm": "binn4_cnnf/models/adv_CNNF_seed_0.pt"
+                "fgsm": "binn4_cnnf/models/adv_fgsm_CNNF_seed_0.pt"
             },
             "baseline": "binn4_cnnf/models/huang_CNNF_2_cifar.pt"
         },
