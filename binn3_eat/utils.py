@@ -142,8 +142,8 @@ def train_robust_model(net, dataloader_dict, criterior, optimizer, num_epochs, s
                     loss_adv = criterior(outputs_adv, labels)
                     _, preds_adv = torch.max(outputs_adv, axis=1)
 
-                    alpha = .5 
-                    #alpha = 0 # just experimenting
+                    # alpha = .5 
+                    alpha = 0 # just experimenting
                     loss = alpha*loss + (1-alpha)*loss_adv
 
 
