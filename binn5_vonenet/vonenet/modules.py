@@ -89,7 +89,7 @@ class VOneBlock(nn.Module):
         s_q1_complex = s_q1[:, self.simple_channels:, :, :].clone()
         s_q0_simple = s_q0[:, 0:self.simple_channels, :, :].clone()
         c = self.complex(torch.sqrt(s_q0_complex ** 2 +
-                                    s_q1_complex ** 2) / np.sqrt(2))
+                                    s_q1_complex ** 2 +  + 1e-12) / np.sqrt(2))
         s = self.simple(s_q0_simple)
         return self.gabors(self.k_exc * torch.cat((s, c), 1))
 

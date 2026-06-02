@@ -1,6 +1,9 @@
 # Thesis Repro
 * Note on environment: either dapello or vonenet. Delete the wrong one.
 
+### changes
+* Prevent division by zero during PGD by adding 1e-12 in gabors_f in VOneBlock
+---
 # VOneNet: CNNs with a Primary Visual Cortex Front-End
 
 A family of biologically-inspired Convolutional Neural Networks (CNNs). VOneNets have the following features:
