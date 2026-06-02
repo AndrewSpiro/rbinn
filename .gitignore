@@ -190,6 +190,8 @@ aspiro_experiment/**
 
 #### binn1_pixelreg ####
 binn1_pixelreg/save/
+binn1_pixelreg/save_absolute/
+binn1_pixelreg/save_relative/
 binn1_pixelreg/environment_copy.yml
 
 

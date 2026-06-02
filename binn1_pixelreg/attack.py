@@ -93,7 +93,7 @@ def attack_resnet(
         wandb.run.name = name_wandb_run(task_config, reg_config)
 
     # initialize attack
-    only_correct = True
+    only_correct = False
     if only_correct and (attack_config["attack_type"] not in ["Gaussian", "Uniform", "SaltPepper"]):
         raise Exception(f"Relative metrics currently only implemented for random attacks. Got {attack_config["attack_type"]}.")
 

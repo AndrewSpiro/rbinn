@@ -117,6 +117,7 @@ if __name__ == "__main__":
     baselines = {
         'cifar100_reg_baseline': {
             'means': [0.8465, 0.8384, 0.7973, 0.7288, 0.6438, 0.5562, 0.4685, 0.3945, 0.3342, 0.2822],
+            # 'means': [x + (1-0.8465) for x in [0.8465, 0.8384, 0.7973, 0.7288, 0.6438, 0.5562, 0.4685, 0.3945, 0.3342, 0.2822]], # for obtaining relative pbc
             'label': "Baseline: Regularized - CIFAR10",
             'attack_config': {
                 'type': 'Gaussian',
