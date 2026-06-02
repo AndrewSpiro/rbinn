@@ -19,6 +19,7 @@ def AttackFactory(
     attack_type: str,
     task: str,
     wandb_log: bool,
+    only_correct: bool = False,
     data_dir: str = "../data",
     save_dir: str = "../save",
     device: str = "cpu",
@@ -38,7 +39,7 @@ def AttackFactory(
         AttackType.Uniform.value,
         AttackType.SaltPepper.value,
     ]:
-        return RandomAttack(attack_type, task=task, log=wandb_log, device=device)
+        return RandomAttack(attack_type, task=task, log=wandb_log, device=device, only_correct=only_correct)
     elif attack_type == AttackType.FGSM.value:
         return FGSM(log=wandb_log, device=device, task=task)
     else:

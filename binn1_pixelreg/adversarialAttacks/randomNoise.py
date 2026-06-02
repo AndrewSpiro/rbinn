@@ -70,6 +70,15 @@ class RandomAttack(AdversarialAttack):
                 self.max_x = max(self.max_x, X.max().item())
 
                 # Filter to only include initially correctly classified examples if only_correct is True
+                if only_correct:
+                    with torch.no_grad():
+                        clean_outputs = model(X)
+                        _, clean_predicted = clean_outputs.max(1)
+                        correct_mask = clean_predicted.eq(Y)
+
+                    X = X[correct_mask]
+                    Y = Y[correct_mask]
+                    
                 X_adv, Y_adv = self.get_adversarial(model, (X, Y), epsilon)
                 X_adv, Y_adv = X_adv.to(self.device), Y_adv.to(self.device)
 

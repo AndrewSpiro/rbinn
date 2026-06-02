@@ -4,9 +4,9 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="testing"
+#SBATCH --partition="gpu-l4-24g"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:15:00
+#SBATCH --time=01:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem=1G
 
@@ -21,8 +21,8 @@ ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 SCRATCH_PATH="/scratchdata/${SLURM_JOB_USER}/${SLURM_JOB_ID}"
 
-DEBUG=true
-RUN_TRAINING=true
+DEBUG=false
+RUN_TRAINING=false
 TRAIN_ATTACK=fgsm
 TRAIN_EPSILON=8/255
 RUN_ATTACKS=true

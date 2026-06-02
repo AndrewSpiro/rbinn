@@ -13,7 +13,7 @@ DEBUG=false
 RUN_TRAINING=false
 TRAIN_ATTACK=clean # set to clean for clean training
 TRAIN_EPSILON=8/255
-RUN_ATTACKS=false
+RUN_ATTACKS=true
 
 TASK=CIFAR10
 ARCHI=ResNet18
