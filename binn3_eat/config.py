@@ -2,9 +2,9 @@ from .lib import *
 from . import edge_detector as edge_detector
 
 
-torch.manual_seed(42)
-np.random.seed(42)
-random.seed(42)
+# torch.manual_seed(42)
+# np.random.seed(42)
+# random.seed(42)
 
 
 # This specifies whether edge detection should be done only on RGB (when FALSE) or use 
@@ -13,7 +13,7 @@ EDGE_ALL_CHANNELS = False
 
 # edge_detect = None
 
-edge_detect = edge_detector.detect_edge_gtsrb
+# edge_detect = edge_detector.detect_edge_gtsrb
 
 # edge_detect = edge_detector.detect_edge_mnist
 
@@ -28,7 +28,7 @@ edge_detect = edge_detector.detect_edge_gtsrb
 # edge_detect = edge_detector.detect_edge_sobel
 
 
-# edge_detect = edge_detector.detect_edge_new_cifar
+edge_detect = edge_detector.detect_edge_new_cifar
 
 
 
