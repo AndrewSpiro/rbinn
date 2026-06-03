@@ -28,7 +28,7 @@ print("khmodel imports done", flush=True)
 
 # eat
 from binn3_eat.model import model_dispatcher
-from binn3_eat.helper_class import AddEdgeMap
+from binn3_eat.helper_class import AddEdgeMap, RedetectWrapper
 
 print("eat imports done", flush=True)
 
@@ -257,6 +257,7 @@ def load_pt_network(network_name: str, network_path):
         model, _, _, _ = model_dispatcher("cifar10", "rgbedge", "cifar10", 64, 10)
         state_dict = torch.load(network_path)
         model.load_state_dict(state_dict)
+        model = RedetectWrapper(model)
         network = PyTorchNetwork(model, (1, 4, 64, 64), network_name)
         return network
     elif network_name == "cnnf":
