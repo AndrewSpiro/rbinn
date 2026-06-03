@@ -115,7 +115,7 @@ def plot_results(aggregated_data, baselines_path, output_path="deep_clustered_pl
     ax.bar(x + offsets[4], repro_means_rf, width, yerr=repro_stds_rf, label='RF (Repro)', color='C2', capsize=3)
     ax.bar(x + offsets[5], baseline_means_rf, width, yerr=baseline_stds_rf, label='RF (Orig)', color = 'C2', alpha=0.6)
 
-    ax.set_ylabel('Accuracy (%)')
+    ax.set_ylabel('Accuracy')
     # ax.set_title(f'EAT Results Clustered by Model ({eps_key})') # omit title in favor of caption in report
     ax.set_xticks(x)
     ax.set_xticklabels([m.replace('_', ' ').title() for m in model_types])
