@@ -20,9 +20,9 @@ class RedetectWrapper(torch.nn.Module):
     def forward(self, x):
         x = x.squeeze(0)
         edge_map = torch.as_tensor(
-            detect_edge_new_cifar(x[:-1]),
+            detect_edge_new_cifar(x[:-1].detach()),
             dtype=torch.float32
-        )
+        ).to(x.device)
         x = torch.cat([x[:-1], edge_map[None]], dim=0)
         return self.model(x.unsqueeze(0))
 
