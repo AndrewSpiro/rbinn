@@ -37,7 +37,7 @@ def create_dfs(experiments):
         experiment["absolute_df"] = experiment["absolute_df"].rename(
             columns={"smallest_sat_value": "scaled_smallest_sat_value"}
         )
-        print(experiment["absolute_df"].columns)
+        # print(experiment["absolute_df"].columns)
         experiment["absolute_df"]["network"] = name
         experiment["relative_df"] = get_relative_df(experiment)
 
@@ -97,10 +97,10 @@ def create_figures(bool_relative: bool):
             zero_shifted["smallest_sat_value"] + 1e-6
         )  # shifting so that plots are compatible with log-scaling
     report_creator = ReportCreator(zero_shifted)
-    hist_figure = report_creator.create_hist_figure()
+    hist_figure = report_creator.create_hist_figure(log_scale=False)
     box_figure = report_creator.create_box_figure(log_scale=True)
-    kde_figure = report_creator.create_kde_figure()
-    ecdf_figure = report_creator.create_ecdf_figure()
+    kde_figure = report_creator.create_kde_figure(log_scale=False)
+    ecdf_figure = report_creator.create_ecdf_figure(log_scale=False)
     anneplot = report_creator.create_anneplot()
     # figures = [hist_figure, box_figure, kde_figure, ecdf_figure, anneplot]
     figures = [hist_figure, box_figure, kde_figure, ecdf_figure]
@@ -119,6 +119,8 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
         
         abs_net = absolute_dfs[absolute_dfs["network"] == experiment]
         rel_net = relative_dfs[relative_dfs["network"] == experiment]
+
+        # breakpoint()
         
         # Calculate base metrics
         num_clean_corr = len(rel_net)
@@ -179,15 +181,15 @@ if __name__ == "__main__":
     print("args parsed")
     experiments_path = args.experiments_path
     experiments = json.load(open(experiments_path, "r"))
-    print(experiments)
+    # print(experiments)
     absolute_dfs, relative_dfs = create_dfs(experiments)
-    print(absolute_dfs.columns)
-    print(relative_dfs.columns)
+    # print(absolute_dfs.columns)
+    # print(relative_dfs.columns)
 
     relative_dfs["smallest_sat_value"] = relative_dfs.apply(unscale_eps, axis=1)
     absolute_dfs["smallest_sat_value"] = absolute_dfs.apply(unscale_eps, axis=1)
 
-    figures = create_figures(bool_relative=False)
+    figures = create_figures(bool_relative=True)
     tables = create_tables(experiments, absolute_dfs, relative_dfs)
     table_abs = tables[['min_sat_train_abs', 'mean_sat_train_abs','std_sat_train_abs','clean_acc']]
     table_rel = tables[['min_sat_train_rel', 'mean_sat_train_rel','std_sat_train_rel','num_clean_corr']]
