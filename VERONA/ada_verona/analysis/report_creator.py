@@ -30,7 +30,8 @@ class ReportCreator:
         self.df = df
 
     def create_hist_figure(self, log_scale: bool = False) -> plt.Figure:
-        hist_plot = sns.histplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
+        # hist_plot = sns.histplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
+        hist_plot = sns.histplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack")
         hist_plot.set_xlabel("Epsilon value")
         
         if log_scale:
@@ -44,7 +45,8 @@ class ReportCreator:
         return figure
 
     def create_box_figure(self, log_scale: bool = False) -> plt.Figure:
-        box_plot = sns.boxplot(data=self.df, x="network", y="epsilon_value")
+        # box_plot = sns.boxplot(data=self.df, x="network", y="epsilon_value")
+        box_plot = sns.boxplot(data=self.df, x="network", y="smallest_sat_value")
         box_plot.set_xticklabels(box_plot.get_xticklabels(), rotation=23)
         box_plot.set_xlabel("Network")
         box_plot.set_ylabel("Epsilon values")
@@ -60,7 +62,8 @@ class ReportCreator:
         return figure
 
     def create_kde_figure(self, log_scale: bool = False) -> plt.Figure:
-        kde_plot = sns.kdeplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
+        # kde_plot = sns.kdeplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
+        kde_plot = sns.kdeplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack")
         kde_plot.set_xlabel("Epsilon value")
         
         if log_scale:
@@ -74,7 +77,8 @@ class ReportCreator:
         return figure
 
     def create_ecdf_figure(self, log_scale: bool = False) -> plt.Figure:
-        ecdf_plot = sns.ecdfplot(data=self.df, x="epsilon_value", hue="network")
+        # ecdf_plot = sns.ecdfplot(data=self.df, x="epsilon_value", hue="network")
+        ecdf_plot = sns.ecdfplot(data=self.df, x="smallest_sat_value", hue="network")
         ecdf_plot.set_xlabel("Epsilon value")
         
         if log_scale:
