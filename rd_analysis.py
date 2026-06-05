@@ -38,6 +38,7 @@ def create_dfs(experiments):
             columns={"smallest_sat_value": "scaled_smallest_sat_value"}
         )
         # print(experiment["absolute_df"].columns)
+        breakpoint()
         experiment["absolute_df"]["network"] = name
         experiment["relative_df"] = get_relative_df(experiment)
 
@@ -54,16 +55,24 @@ def create_dfs(experiments):
 def unscale_eps(row):
 
     unnorm_dict = {
-        "pixelreg": {
+        "PixelReg clean": {
             "data_max": 2.5,
             "data_min": -2.5,
             "eps_max": 0.4,
             "eps_min": 0.001,
         },
-        "khmodel": {"data_max": 0.311, "data_min": 0, "eps_max": 0.4, "eps_min": 0.001},
-        "eat": {"data_max": 2.64, "data_min": -1.25, "eps_max": 0.4, "eps_min": 0.001},
-        "cnnf": {"data_max": 1.0, "data_min": -1.0, "eps_max": 0.4, "eps_min": 0.001},
-        "vonenet": {
+        "PixelReg FGSM": {
+            "data_max": 2.5,
+            "data_min": -2.5,
+            "eps_max": 0.4,
+            "eps_min": 0.001,
+        },
+        "KHModel clean": {"data_max": 0.311, "data_min": 0, "eps_max": 0.4, "eps_min": 0.001},
+        "KHModel FGSM": {"data_max": 0.311, "data_min": 0, "eps_max": 0.4, "eps_min": 0.001},
+        "EAT clean": {"data_max": 2.64, "data_min": -1.25, "eps_max": 0.4, "eps_min": 0.001},
+        "EAT Orig": {"data_max": 2.64, "data_min": -1.25, "eps_max": 0.4, "eps_min": 0.001},
+        "CNNF": {"data_max": 1.0, "data_min": -1.0, "eps_max": 0.4, "eps_min": 0.001},
+        "VOneNet clean": {
             "data_max": 1.0,
             "data_min": -1.0,
             "eps_max": 0.4,
@@ -185,10 +194,10 @@ if __name__ == "__main__":
     absolute_dfs, relative_dfs = create_dfs(experiments)
     # print(absolute_dfs.columns)
     # print(relative_dfs.columns)
-
+    breakpoint()
     relative_dfs["smallest_sat_value"] = relative_dfs.apply(unscale_eps, axis=1)
     absolute_dfs["smallest_sat_value"] = absolute_dfs.apply(unscale_eps, axis=1)
-
+    breakpoint()
     figures = create_figures(bool_relative=True)
     tables = create_tables(experiments, absolute_dfs, relative_dfs)
     table_abs = tables[['min_sat_train_abs', 'mean_sat_train_abs','std_sat_train_abs','clean_acc']]
