@@ -47,10 +47,11 @@ RUN_ATTACKS=true
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
-if [ "$TRAIN_METHOD" = clean]; then
+if [ "$TRAIN_METHOD" = clean ]; then
     TRAIN_INFO="$TRAIN_METHOD"
 else
     TRAIN_INFO="${TRAIN_METHOD}_${TRAIN_ATTACK}"
+fi
 
 if [ "$DEBUG" = true ]; then
     SAVE_MODEL_BASE="${TRAIN_INFO}_CNNF_debug" # This is not a path- just a name that will be appended to a path
@@ -115,7 +116,7 @@ do
         echo "Skipping training"
     fi        
 
-    if [ "$RUN_ATTACKS" = true]; then
+    if [ "$RUN_ATTACKS" = true ]; then
         for A_SEED in "${ATTACK_SEEDS[@]}"
         do
             if [ "$DEBUG" = true ]; then
