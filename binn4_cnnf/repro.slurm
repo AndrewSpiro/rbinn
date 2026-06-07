@@ -4,9 +4,9 @@
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="gpu-l4-24g"
+#SBATCH --partition="testing"
 #SBATCH --gres=gpu:1
-#SBATCH --time=24:00:00
+#SBATCH --time=00:10:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -39,26 +39,32 @@ echo "[$SHELL] ## Data copied to scratch"
 echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
 
 #### Experiment pipeline ####
-TRAIN_METHOD=adv # 'clean' 'adv' or anything else for supclean
-TRAIN_ATTACK=fgsm
-DEBUG=false
-RUN_TRAIN=true
+TRAIN_METHOD=clean # 'clean' 'adv' or anything else for supclean
+TRAIN_ATTACK=clean # if train method is clean, this is ignored; otherwise, should be adv or pgd
+DEBUG=true
+RUN_TRAIN=false
+RUN_ATTACKS=true
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
+if [ "$TRAIN_METHOD" = clean]; then
+    TRAIN_INFO="$TRAIN_METHOD"
+else
+    TRAIN_INFO="${TRAIN_METHOD}_${TRAIN_ATTACK}"
+
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF_debug" # This is not a path- just a name that will be appended to a path
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results_debug"
+    SAVE_MODEL_BASE="${TRAIN_INFO}_CNNF_debug" # This is not a path- just a name that will be appended to a path
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_INFO}_results_debug"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(100)
-    EPOCHS=1
+    ATTACK_SEEDS=(102)
+    EPOCHS=2
     echo "[$SHELL] ## Running in debug mode..."
 else
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF"
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results"
+    SAVE_MODEL_BASE="${TRAIN_INFO}_CNNF"
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_INFO}_results"
     EPOCHS=500
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(100)
+    ATTACK_SEEDS=(102)
 fi
 
 
@@ -101,39 +107,42 @@ do
                         --save-model $SAVE_MODEL \
                         --model-dir $SCRATCH_MODEL_DIR \
                         --bool-debug $DEBUG \
-                        --num_workers 1 \
-                        --ckpt_path "${HOME_MODEL_DIR}/backup_fgsm_cnnf/adv_fgsm_CNNF_seed_0-epoch349.pt" \
-                        --ckpt_epoch 349
+                        --num_workers 1
     
         cp -r $SCRATCH_MODEL_DIR $HOME_MODEL_DIR
         echo "[$SHELL] ## Model copied to home"
-
+    else
+        echo "Skipping training"
     fi        
 
-    for A_SEED in "${ATTACK_SEEDS[@]}"
-    do
-        if [ "$DEBUG" = true ]; then
-            # ATTACK_MODEL='CNN_cifar'
-            TARGET_MODEL=$SAVE_MODEL
-        else
-            TARGET_MODEL=$SAVE_MODEL
-        fi
+    if [ "$RUN_ATTACKS" = true]; then
+        for A_SEED in "${ATTACK_SEEDS[@]}"
+        do
+            if [ "$DEBUG" = true ]; then
+                # ATTACK_MODEL='CNN_cifar'
+                TARGET_MODEL=$SAVE_MODEL
+            else
+                TARGET_MODEL=$SAVE_MODEL
+            fi
 
-        echo "[$SHELL] ## Running attack with seed $A_SEED"
+            echo "[$SHELL] ## Running attack with seed $A_SEED"
 
-        RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
-        mkdir -p "$RESULTS_DIR"
+            RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
+            mkdir -p "$RESULTS_DIR"
 
-        python "${SCRIPT_DIR}/test.py" --dataset 'cifar10' \
-                        --test 'average' \
-                        --data-dir "${SCRATCH_DATA_DIR}" \
-                        --results-path "${RESULTS_DIR}/results.json" \
-                        --model-dir $SCRATCH_MODEL_DIR \
-                        --bool-debug $DEBUG \
-                        --seed $A_SEED \
-                        --target-model "${TARGET_MODEL}.pt" \
-                        --num_workers 1
-    done
+            python "${SCRIPT_DIR}/test.py" --dataset 'cifar10' \
+                            --test 'average' \
+                            --data-dir "${SCRATCH_DATA_DIR}" \
+                            --results-path "${RESULTS_DIR}/results.json" \
+                            --model-dir $SCRATCH_MODEL_DIR \
+                            --bool-debug $DEBUG \
+                            --seed $A_SEED \
+                            --target-model "${TARGET_MODEL}.pt" \
+                            --num_workers 1
+        done
+    else
+        echo "Skipping attacks"
+    fi
 done
 
 cp -r $SCRATCH_MODEL_DIR $HOME_MODEL_DIR

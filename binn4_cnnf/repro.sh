@@ -8,27 +8,33 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
-TRAIN_METHOD=clean
-TRAIN_ATTACK=fgsm
-DEBUG=false
-RUN_TRAIN=true
+TRAIN_METHOD=clean # 'clean' 'adv' or anything else for supclean
+TRAIN_ATTACK=clean # if train method is clean, this is ignored; otherwise, should be adv or pgd
+DEBUG=true
+RUN_TRAIN=false
+RUN_ATTACKS=true
 MODEL_DIR="${SCRIPT_DIR}/models"
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
 
+if [ "$TRAIN_METHOD" = clean]; then
+    TRAIN_INFO="$TRAIN_METHOD"
+else
+    TRAIN_INFO="${TRAIN_METHOD}_${TRAIN_ATTACK}"
+
 if [ "$DEBUG" = true ]; then
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF_debug" # This is not a path- just a name that will be appended to a path
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results_debug"
+    SAVE_MODEL_BASE="${TRAIN_INFO}_CNNF_debug" # This is not a path- just a name that will be appended to a path
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_INFO}_results_debug"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(100)
+    ATTACK_SEEDS=(102)
     EPOCHS=2
     echo "[$SHELL] ## Running in debug mode..."
 else
-    SAVE_MODEL_BASE="${TRAIN_METHOD}_${TRAIN_ATTACK}_CNNF"
-    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_METHOD}_${TRAIN_ATTACK}_results"
+    SAVE_MODEL_BASE="${TRAIN_INFO}_CNNF"
+    RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_INFO}_results"
     EPOCHS=500
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(100)
+    ATTACK_SEEDS=(102)
 fi
 
 
@@ -76,32 +82,38 @@ do
                         --save-model $SAVE_MODEL \
                         --model-dir $MODEL_DIR \
                         --bool-debug $DEBUG
+    else
+        echo "Skipping training"
     fi        
 
-    for A_SEED in "${ATTACK_SEEDS[@]}"
-    do
-        if [ "$DEBUG" = true ]; then
-            # ATTACK_MODEL='CNN_cifar'
-            TARGET_MODEL=$SAVE_MODEL
-        else
-            TARGET_MODEL=$SAVE_MODEL
-        fi
+    if [ "$RUN_ATTACKS" = true]; then
+        for A_SEED in "${ATTACK_SEEDS[@]}"
+        do
+            if [ "$DEBUG" = true ]; then
+                # ATTACK_MODEL='CNN_cifar'
+                TARGET_MODEL=$SAVE_MODEL
+            else
+                TARGET_MODEL=$SAVE_MODEL
+            fi
 
-        echo "[$SHELL] ## Running attack with seed $A_SEED"
+            echo "[$SHELL] ## Running attack with seed $A_SEED"
 
-        RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
-        mkdir -p "$RESULTS_DIR"
+            RESULTS_DIR="${RESULTS_DIR_BASE}/${TARGET_MODEL}/attack_seed_${A_SEED}"
+            mkdir -p "$RESULTS_DIR"
 
-        python "${SCRIPT_DIR}/test.py" --dataset 'cifar10' \
-                        --test 'average' \
-                        --data-dir "${DATA_DIR}" \
-                        --results-path "${RESULTS_DIR}/results.json" \
-                        --model-dir $MODEL_DIR \
-                        --bool-debug $DEBUG \
-                        --seed $A_SEED \
-                        --target-model "${TARGET_MODEL}.pt" \
-                        --train_attack $TRAIN_ATTACK
-    done
+            python "${SCRIPT_DIR}/test.py" --dataset 'cifar10' \
+                            --test 'average' \
+                            --data-dir "${DATA_DIR}" \
+                            --results-path "${RESULTS_DIR}/results.json" \
+                            --model-dir $MODEL_DIR \
+                            --bool-debug $DEBUG \
+                            --seed $A_SEED \
+                            --target-model "${TARGET_MODEL}.pt" \
+                            --train_attack $TRAIN_ATTACK
+        done
+    else
+        echo "Skipping attacks"
+    fi
 done
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
