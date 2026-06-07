@@ -33,7 +33,7 @@ def aggregate(json_list):
 
     return stats
 
-def plot_results(aggregated_data, baselines_path, output_path='results_bar_plot.png'):
+def plot_results(aggregated_data, baselines_path, output_path='results'):
 
     orig_results = json.load(open(baselines_path, "r"))
     shared_keys = [k for k in aggregated_data.keys() if k in orig_results]
