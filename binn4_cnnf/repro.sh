@@ -109,8 +109,7 @@ do
                             --model-dir $MODEL_DIR \
                             --bool-debug $DEBUG \
                             --seed $A_SEED \
-                            --target-model "${TARGET_MODEL}.pt" \
-                            --train_attack $TRAIN_ATTACK
+                            --target-model "${TARGET_MODEL}.pt"
         done
     else
         echo "Skipping attacks"
