@@ -1,0 +1,1 @@
+{"clean_acc": {"mean": 0.5414, "std": 0.0}, "pgd_acc_first": {"mean": 0.0066, "std": 0.0}, "pgd_acc_ete": {"mean": 0.497, "std": 0.0}, "spsa_acc_first": {"mean": 0.0, "std": 0.0}, "spsa_acc_ete": {"mean": 0.0, "std": 0.0}}
