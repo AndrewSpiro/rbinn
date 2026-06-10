@@ -44,6 +44,8 @@ or
 ```bash
 run_cycles_adv
 ```.
+
+In the slurm script, data and models are copied to the remote machine. Models are copied back after training.
 ---
 # CNNF
 <img align="center" src="CNNF.png" width="750">
