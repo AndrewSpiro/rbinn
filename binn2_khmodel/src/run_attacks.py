@@ -162,7 +162,7 @@ if __name__ == "__main__":
     transform=ToTensor(),
     p=FKHL3.pSet["p"],
     )
-    breakpoint()
+
     TestLoader = DeviceDataLoader(
         cifar10Test,
         device=device,
