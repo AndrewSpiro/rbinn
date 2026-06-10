@@ -1,12 +1,12 @@
 #!/bin/bash
 
-#SBATCH --job-name=b4_fgsm
+#SBATCH --job-name=b4_clean_val
 #SBATCH --output=%x_%j.out
 #SBATCH --mail-user="s4015355@vuw.leidenuni.nl"
 #SBATCH --mail-type="ALL"
-#SBATCH --partition="testing"
+#SBATCH --partition="gpu-mig-40g"
 #SBATCH --gres=gpu:1
-#SBATCH --time=00:10:00
+#SBATCH --time=01:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem=2G
 
@@ -37,11 +37,13 @@ mkdir -p "$SCRATCH_DATA_DIR" "$SCRATCH_MODEL_DIR"
 cp -r "$HOME_DATA_DIR/" "$SCRATCH_DATA_DIR/"
 echo "[$SHELL] ## Data copied to scratch"
 echo "Contents of scratch data dir: $(ls $SCRATCH_DATA_DIR)"
+cp -r "$HOME_MODEL_DIR/." "$SCRATCH_MODEL_DIR/"
+echo "[$SHELL] ## Models copied to scratch"
 
 #### Experiment pipeline ####
 TRAIN_METHOD=clean # 'clean' 'adv' or anything else for supclean
 TRAIN_ATTACK=clean # if train method is clean, this is ignored; otherwise, should be adv or pgd
-DEBUG=true
+DEBUG=false
 RUN_TRAIN=false
 RUN_ATTACKS=true
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
@@ -110,7 +112,7 @@ do
                         --bool-debug $DEBUG \
                         --num_workers 1
     
-        cp -r $SCRATCH_MODEL_DIR $HOME_MODEL_DIR
+        cp -r "${SCRATCH_MODEL_DIR}/." "${HOME_MODEL_DIR}/"
         echo "[$SHELL] ## Model copied to home"
     else
         echo "Skipping training"
@@ -146,7 +148,7 @@ do
     fi
 done
 
-cp -r $SCRATCH_MODEL_DIR $HOME_MODEL_DIR
+cp -r "${SCRATCH_MODEL_DIR}/." "${HOME_MODEL_DIR}/"
 echo "[$SHELL] ## Model copied to home"
 
 TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
