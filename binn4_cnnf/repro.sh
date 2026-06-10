@@ -10,9 +10,9 @@ export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 TRAIN_METHOD=clean # 'clean' 'adv' or anything else for supclean
 TRAIN_ATTACK=clean # if train method is clean, this is ignored; otherwise, should be adv or pgd
-DEBUG=true
+DEBUG=false
 RUN_TRAIN=false
-RUN_ATTACKS=true
+RUN_ATTACKS=false
 MODEL_DIR="${SCRIPT_DIR}/models"
 BASELINES_PATH="${SCRIPT_DIR}/orig_results.json"
 BATCH_SIZE=64
@@ -27,7 +27,7 @@ if [ "$DEBUG" = true ]; then
     SAVE_MODEL_BASE="${TRAIN_INFO}_CNNF_debug" # This is not a path- just a name that will be appended to a path
     RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_INFO}_results_debug"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(102)
+    ATTACK_SEEDS=(100)
     EPOCHS=2
     echo "[$SHELL] ## Running in debug mode..."
 else
@@ -35,7 +35,7 @@ else
     RESULTS_DIR_BASE="${SCRIPT_DIR}/${TRAIN_INFO}_results"
     EPOCHS=500
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(102)
+    ATTACK_SEEDS=(100 101 102)
 fi
 
 
@@ -109,8 +109,7 @@ do
                             --model-dir $MODEL_DIR \
                             --bool-debug $DEBUG \
                             --seed $A_SEED \
-                            --target-model "${TARGET_MODEL}.pt" \
-                            --train_attack $TRAIN_ATTACK
+                            --target-model "${TARGET_MODEL}.pt"
         done
     else
         echo "Skipping attacks"
@@ -121,10 +120,13 @@ TRAIN_SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
 ATTACK_SEED_STRING=$(echo "${ATTACK_SEEDS[*]}" | tr ' ' '_')
 AGG_RESULTS_DIR="${RESULTS_DIR_BASE}/train_seeds_${TRAIN_SEED_STRING}/attack_seeds_${ATTACK_SEED_STRING}"
 mkdir -p "$AGG_RESULTS_DIR"
-python "${SCRIPT_DIR}/aggregate_results.py" --results_dir $RESULTS_DIR_BASE \
-                            --model_name_base $SAVE_MODEL_BASE \
-                            --bool_debug $DEBUG \
-                            --train_seeds "${TRAIN_SEEDS[@]}" \
-                            --attack_seeds "${ATTACK_SEEDS[@]}" \
-                            --out $AGG_RESULTS_DIR \
-                            --baselines_path $BASELINES_PATH
+python "${SCRIPT_DIR}/aggregate_results.py" \
+    --train_seeds "${TRAIN_SEEDS[@]}" \
+    --attack_seeds "${ATTACK_SEEDS[@]}" \
+    --out $AGG_RESULTS_DIR \
+    --orig_results_path $BASELINES_PATH \
+    --supclean_results_path "${SCRIPT_DIR}/my_first_results.json" \
+    --clean_results_dir "${SCRIPT_DIR}/clean_results" \
+    --clean_model_name_base "clean_CNNF" \
+    --adv_fgsm_results_dir "${SCRIPT_DIR}/adv_fgsm_results" \
+    --adv_fgsm_model_name_base "adv_fgsm_CNNF"
