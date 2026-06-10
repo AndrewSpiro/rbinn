@@ -38,7 +38,6 @@ def create_dfs(experiments):
             columns={"smallest_sat_value": "scaled_smallest_sat_value"}
         )
         # print(experiment["absolute_df"].columns)
-        breakpoint()
         experiment["absolute_df"]["network"] = name
         experiment["relative_df"] = get_relative_df(experiment)
 
@@ -53,30 +52,38 @@ def create_dfs(experiments):
 
 
 def unscale_eps(row):
+    '''eps_max and eps_min refer to the maximum and minimum pixel values assumed in the epsilon space'''
 
     unnorm_dict = {
         "PixelReg clean": {
             "data_max": 2.5,
             "data_min": -2.5,
-            "eps_max": 0.4,
-            "eps_min": 0.001,
+            "eps_max": 1,
+            "eps_min": 0,
         },
         "PixelReg FGSM": {
             "data_max": 2.5,
             "data_min": -2.5,
-            "eps_max": 0.4,
-            "eps_min": 0.001,
+            "eps_max": 1,
+            "eps_min": 0,
         },
-        "KHModel clean": {"data_max": 0.311, "data_min": 0, "eps_max": 0.4, "eps_min": 0.001},
-        "KHModel FGSM": {"data_max": 0.311, "data_min": 0, "eps_max": 0.4, "eps_min": 0.001},
-        "EAT clean": {"data_max": 2.64, "data_min": -1.25, "eps_max": 0.4, "eps_min": 0.001},
-        "EAT Orig": {"data_max": 2.64, "data_min": -1.25, "eps_max": 0.4, "eps_min": 0.001},
-        "CNNF": {"data_max": 1.0, "data_min": -1.0, "eps_max": 0.4, "eps_min": 0.001},
+        "KHModel clean": {"data_max": 0.31337952613830566, "data_min": 0, "eps_max": 1, "eps_min": 0},
+        "KHModel FGSM": {"data_max": 0.31337952613830566, "data_min": 0, "eps_max": 1, "eps_min": 0},
+        "EAT clean": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
+        "EAT FGSM": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
+        "EAT Orig": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
+        "CNNF": {"data_max": 1.0, "data_min": -1.0, "eps_max": 1, "eps_min": 0},
         "VOneNet clean": {
             "data_max": 1.0,
             "data_min": -1.0,
-            "eps_max": 0.4,
-            "eps_min": 0.001,
+            "eps_max": 1,
+            "eps_min": 0,
+        },
+        "VOneNet FGSM": {
+            "data_max": 1.0,
+            "data_min": -1.0,
+            "eps_max": 1,
+            "eps_min": 0,
         },
     }
 
@@ -144,24 +151,29 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
             p90_sat_rel = np.percentile(sat_rel_values, 90)
             
             min_sat_rel = sat_rel_values.min()
+            max_sat_rel = sat_rel_values.max()
             mean_sat_rel = sat_rel_values.mean()
             median_sat_rel = sat_rel_values.median()
             std_sat_rel = sat_rel_values.std()
+            print(min_sat_rel)
             assert(min_sat_rel > 0)
+            assert(max_sat_rel < 0.4)
         else:
-            p50_sat_rel = p90_sat_rel = min_sat_rel = mean_sat_rel = std_sat_rel = np.nan
+            p50_sat_rel = p90_sat_rel = min_sat_rel = max_sat_rel = mean_sat_rel = std_sat_rel = np.nan
 
         summary_dict[experiment] = {
-            "min_sat_train_abs": abs_net["smallest_sat_value"].min() if not abs_net.empty else np.nan,
-            "mean_sat_train_abs": abs_net["smallest_sat_value"].mean() if not abs_net.empty else np.nan,
-            "med_sat_train_abs": abs_net["smallest_sat_value"].median() if not abs_net.empty else np.nan,
-            "std_sat_train_abs": abs_net["smallest_sat_value"].std() if not abs_net.empty else np.nan,
-            "min_sat_train_rel": min_sat_rel,
-            "mean_sat_train_rel": mean_sat_rel,
-            "med_sat_train_rel": median_sat_rel,
-            "std_sat_train_rel": std_sat_rel,
-            "p50_sat_train_rel": p50_sat_rel,
-            "p90_sat_train_rel": p90_sat_rel,
+            "min_sat_test_abs": abs_net["smallest_sat_value"].min() if not abs_net.empty else np.nan,
+            "max_sat_test_abs": abs_net["smallest_sat_value"].max() if not abs_net.empty else np.nan,
+            "mean_sat_test_abs": abs_net["smallest_sat_value"].mean() if not abs_net.empty else np.nan,
+            "med_sat_test_abs": abs_net["smallest_sat_value"].median() if not abs_net.empty else np.nan,
+            "std_sat_test_abs": abs_net["smallest_sat_value"].std() if not abs_net.empty else np.nan,
+            "min_sat_test_rel": min_sat_rel,
+            "max_sat_test_rel": max_sat_rel,
+            "mean_sat_test_rel": mean_sat_rel,
+            "med_sat_test_rel": median_sat_rel,
+            "std_sat_test_rel": std_sat_rel,
+            "p50_sat_test_rel": p50_sat_rel,
+            "p90_sat_test_rel": p90_sat_rel,
             "num_clean_corr": num_clean_corr,
             "clean_acc": clean_acc
         }
@@ -194,14 +206,12 @@ if __name__ == "__main__":
     absolute_dfs, relative_dfs = create_dfs(experiments)
     # print(absolute_dfs.columns)
     # print(relative_dfs.columns)
-    breakpoint()
     relative_dfs["smallest_sat_value"] = relative_dfs.apply(unscale_eps, axis=1)
     absolute_dfs["smallest_sat_value"] = absolute_dfs.apply(unscale_eps, axis=1)
-    breakpoint()
     figures = create_figures(bool_relative=True)
     tables = create_tables(experiments, absolute_dfs, relative_dfs)
-    table_abs = tables[['min_sat_train_abs', 'mean_sat_train_abs','std_sat_train_abs','clean_acc']]
-    table_rel = tables[['min_sat_train_rel', 'mean_sat_train_rel','std_sat_train_rel','num_clean_corr']]
+    table_abs = tables[['max_sat_test_abs', 'mean_sat_test_abs','std_sat_test_abs','clean_acc']]
+    table_rel = tables[['max_sat_test_rel', 'mean_sat_test_rel','std_sat_test_rel','num_clean_corr']]
 
     table_abs.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/absolute.txt")
     table_rel.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/relative.txt")
