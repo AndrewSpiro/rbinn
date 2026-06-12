@@ -2,6 +2,7 @@
     "PixelReg clean": {"path": "experiments/attias_testset_nnenum_one2one_18-02-2026+22_31"},
     "KHModel clean": {"path": "experiments/hulz_testset_nnenum_one2one_21-02-2026+15_30"},
     "EAT clean": {"path": "experiments/eat_seed_0_rd_26-05-2026+04_20"},
+    "CNNF clean": {"path": "experiments/cnnf_seed_0_rd_25-05-2026+17_49"},
     "VOneNet clean": {"path": "experiments/dapellot_testset_nnenum_one2one_25-02-2026+16_43"},
     "CIFAR_7_1024 clean": {"path": "experiments/cifar_7_1024_seed_0_rd_25-05-2026+17_04"},
     "ConvBig clean": {"path": "experiments/convbig_testset_nnenum_one2one_19-02-2026+15_48"}
