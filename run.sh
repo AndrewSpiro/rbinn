@@ -8,6 +8,7 @@ DEBUG=false
 RUN_VALIDS=false
 GET_RDS=false
 AGG_RESULTS=true
+BOOL_RELATIVE=false
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA_DIR="${SCRIPT_DIR}/data"
@@ -73,7 +74,7 @@ if [ "${AGG_RESULTS}" = true ]; then
     fi
     mkdir -p $RESULTS_DIR
 
-    python rd_analysis.py --experiments_path experiments.json --results_dir "${RESULTS_DIR}" 
+    python rd_analysis.py --experiments_path experiments_clean.json --results_dir "${RESULTS_DIR}/clean" --bool_relative $BOOL_RELATIVE
 else
     echo "[$SHELL] ## Skipping aggregating results"
 fi
