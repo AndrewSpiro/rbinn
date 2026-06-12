@@ -5,10 +5,21 @@ import numpy as np
 import json
 import sys
 import argparse
+from scipy import stats
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "VERONA"))
 from ada_verona.analysis.report_creator import ReportCreator
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
 
 def get_relative_df(experiment):
 
@@ -70,9 +81,10 @@ def unscale_eps(row):
         "KHModel clean": {"data_max": 0.31337952613830566, "data_min": 0, "eps_max": 1, "eps_min": 0},
         "KHModel FGSM": {"data_max": 0.31337952613830566, "data_min": 0, "eps_max": 1, "eps_min": 0},
         "EAT clean": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
-        "EAT FGSM": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
+        "EAT FGSM a=0.5": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
         "EAT Orig": {"data_max": 2.64, "data_min": -1.25, "eps_max": 1, "eps_min": 0},
-        "CNNF": {"data_max": 1.0, "data_min": -1.0, "eps_max": 1, "eps_min": 0},
+        "CNNF SupClean": {"data_max": 1.0, "data_min": -1.0, "eps_max": 1, "eps_min": 0},
+        "CNNF clean": {"data_max": 1.0, "data_min": -1.0, "eps_max": 1, "eps_min": 0},
         "VOneNet clean": {
             "data_max": 1.0,
             "data_min": -1.0,
@@ -106,17 +118,19 @@ def create_figures(bool_relative: bool):
     """bool_relative: absolute if False, relative if True
     absolute includes originally misclassified instances, relative excludes them."""
     if bool_relative:
+        print("Obtaining relative figures")
         zero_shifted = relative_dfs.copy()
     else:
+        print("Obtaining absolute figures")
         zero_shifted = absolute_dfs.copy()
         zero_shifted["smallest_sat_value"] = (
             zero_shifted["smallest_sat_value"] + 1e-6
         )  # shifting so that plots are compatible with log-scaling
     report_creator = ReportCreator(zero_shifted)
-    hist_figure = report_creator.create_hist_figure(log_scale=False)
+    hist_figure = report_creator.create_hist_figure(log_scale=True)
     box_figure = report_creator.create_box_figure(log_scale=True)
-    kde_figure = report_creator.create_kde_figure(log_scale=False)
-    ecdf_figure = report_creator.create_ecdf_figure(log_scale=False)
+    kde_figure = report_creator.create_kde_figure(log_scale=True, base=2)
+    ecdf_figure = report_creator.create_ecdf_figure(log_scale=True)
     anneplot = report_creator.create_anneplot()
     # figures = [hist_figure, box_figure, kde_figure, ecdf_figure, anneplot]
     figures = [hist_figure, box_figure, kde_figure, ecdf_figure]
@@ -155,20 +169,24 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
             mean_sat_rel = sat_rel_values.mean()
             median_sat_rel = sat_rel_values.median()
             std_sat_rel = sat_rel_values.std()
-            print(min_sat_rel)
-            assert(min_sat_rel > 0)
+            assert(0.0011 > min_sat_rel > 0.0009)
             assert(max_sat_rel < 0.4)
         else:
             p50_sat_rel = p90_sat_rel = min_sat_rel = max_sat_rel = mean_sat_rel = std_sat_rel = np.nan
 
+        assert abs_net["smallest_sat_value"].min() == min_sat_rel
+        assert abs_net["smallest_sat_value"].max() == max_sat_rel
+
         summary_dict[experiment] = {
-            "min_sat_test_abs": abs_net["smallest_sat_value"].min() if not abs_net.empty else np.nan,
-            "max_sat_test_abs": abs_net["smallest_sat_value"].max() if not abs_net.empty else np.nan,
+            # "min_sat_test_abs": abs_net["smallest_sat_value"].min() if not abs_net.empty else np.nan,
+            # "max_sat_test_abs": abs_net["smallest_sat_value"].max() if not abs_net.empty else np.nan,
             "mean_sat_test_abs": abs_net["smallest_sat_value"].mean() if not abs_net.empty else np.nan,
             "med_sat_test_abs": abs_net["smallest_sat_value"].median() if not abs_net.empty else np.nan,
             "std_sat_test_abs": abs_net["smallest_sat_value"].std() if not abs_net.empty else np.nan,
-            "min_sat_test_rel": min_sat_rel,
-            "max_sat_test_rel": max_sat_rel,
+            "min_sat_test": min_sat_rel,
+            "max_sat_test": max_sat_rel,
+            # "min_sat_test_rel": min_sat_rel,
+            # "max_sat_test_rel": max_sat_rel,
             "mean_sat_test_rel": mean_sat_rel,
             "med_sat_test_rel": median_sat_rel,
             "std_sat_test_rel": std_sat_rel,
@@ -179,6 +197,41 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
         }
 
     return pd.DataFrame(summary_dict).transpose()
+
+def stat_test(df):
+
+    clean_df = df.dropna(subset=['network', 'epsilon_value'])
+    groups = [group['epsilon_value'].values for name, group in clean_df.groupby('network')]
+
+    # ANOVA
+    f_stat, p_val = stats.f_oneway(*groups)
+    anova_df = pd.DataFrame({
+        'Metric': ['F-statistic', 'p-value'],
+        'Value': [f_stat, p_val]
+    })
+
+    print("ANOVA latex Table")
+    print(anova_df.to_latex(index=False, float_format="%.3f", 
+                            caption="One-Way ANOVA Results", label="tab:anova"))
+
+    # Tukey HSD pairwise comparison
+    if p_val < 0.05:
+        tukey = pairwise_tukeyhsd(endog=clean_df['epsilon_value'], 
+                                groups=clean_df['network'], 
+                                alpha=0.05)
+        
+        data = tukey.summary().data
+        tukey_df = pd.DataFrame(data[1:], columns=data[0])
+
+        numeric_cols = ['meandiff', 'p-adj', 'lower', 'upper']
+        for col in numeric_cols:
+            tukey_df[col] = pd.to_numeric(tukey_df[col])
+
+        print("\nTukey HSD latex Table")
+        print(tukey_df.to_latex(index=False, float_format="%.3f",
+                                caption="Pairwise Comparisons (Tukey HSD)", 
+                                label="tab:tukey"))
+    return tukey_df
 
 if __name__ == "__main__":
 
@@ -197,6 +250,12 @@ if __name__ == "__main__":
         type = str,
         help="dir for saving tables and plots"
     )
+
+    parser.add_argument(
+        '--bool_relative',
+        type = str2bool,
+        help= 'whether to include (False) or exclude (True) misclassified instances')
+
     args = parser.parse_args()
 
     print("args parsed")
@@ -208,10 +267,12 @@ if __name__ == "__main__":
     # print(relative_dfs.columns)
     relative_dfs["smallest_sat_value"] = relative_dfs.apply(unscale_eps, axis=1)
     absolute_dfs["smallest_sat_value"] = absolute_dfs.apply(unscale_eps, axis=1)
-    figures = create_figures(bool_relative=True)
+    figures = create_figures(bool_relative=args.bool_relative)
     tables = create_tables(experiments, absolute_dfs, relative_dfs)
-    table_abs = tables[['max_sat_test_abs', 'mean_sat_test_abs','std_sat_test_abs','clean_acc']]
-    table_rel = tables[['max_sat_test_rel', 'mean_sat_test_rel','std_sat_test_rel','num_clean_corr']]
+    # table_abs = tables[['max_sat_test_abs', 'mean_sat_test_abs','std_sat_test_abs','clean_acc']]
+    # table_rel = tables[['max_sat_test_rel', 'mean_sat_test_rel','std_sat_test_rel','num_clean_corr']]
+    summ_table = tables[['min_sat_test', 'max_sat_test', 'mean_sat_test_abs','std_sat_test_abs','mean_sat_test_rel','std_sat_test_rel', 'clean_acc']]
 
-    table_abs.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/absolute.txt")
-    table_rel.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/relative.txt")
+    # table_abs.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/absolute.txt")
+    # table_rel.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/relative.txt")
+    summ_table.to_latex(escape=True, float_format="%.3f", buf = f"{args.results_dir}/summary.txt")
