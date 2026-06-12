@@ -21,7 +21,15 @@ import seaborn as sns
 
 matplotlib.use("Agg")
 sns.set_style("darkgrid")
-sns.set_theme(rc={"figure.figsize": (11.7, 8.27)})
+sns.set_theme(rc={
+    "figure.figsize": (11.7, 8.27),
+    "font.size": 18,
+    "axes.labelsize": 20,
+    "xtick.labelsize":18,
+    "ytick.labelsize": 18,
+    "legend.fontsize": 16,
+    "legend.title_fontsize": 18,
+    })
 sns.set_palette(sns.color_palette("Paired"))
 # matplotlib.rcParams["figure.figsize"]=(11.7, 8.27)
 
@@ -29,13 +37,13 @@ class ReportCreator:
     def __init__(self, df: pd.DataFrame):
         self.df = df
 
-    def create_hist_figure(self, log_scale: bool = False) -> plt.Figure:
+    def create_hist_figure(self, log_scale: bool = False, base = 10) -> plt.Figure:
         # hist_plot = sns.histplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
         hist_plot = sns.histplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack")
         hist_plot.set_xlabel("Epsilon value")
         
         if log_scale:
-            hist_plot.set_yscale("log")
+            hist_plot.set_yscale("log", base=base)
         
         plt.tight_layout()
         figure = hist_plot.get_figure()
@@ -44,7 +52,7 @@ class ReportCreator:
 
         return figure
 
-    def create_box_figure(self, log_scale: bool = False) -> plt.Figure:
+    def create_box_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
         # box_plot = sns.boxplot(data=self.df, x="network", y="epsilon_value")
         box_plot = sns.boxplot(data=self.df, x="network", y="smallest_sat_value")
         box_plot.set_xticklabels(box_plot.get_xticklabels(), rotation=23)
@@ -52,7 +60,7 @@ class ReportCreator:
         box_plot.set_ylabel("Epsilon values")
 
         if log_scale:
-            box_plot.set_yscale("log")
+            box_plot.set_yscale("log", base=base)
     
         plt.tight_layout()
         figure = box_plot.get_figure()
@@ -61,13 +69,14 @@ class ReportCreator:
 
         return figure
 
-    def create_kde_figure(self, log_scale: bool = False) -> plt.Figure:
+    def create_kde_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
         # kde_plot = sns.kdeplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
         kde_plot = sns.kdeplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack")
         kde_plot.set_xlabel("Epsilon value")
         
         if log_scale:
-            kde_plot.set_yscale("log")
+            # kde_plot.set_yscale("log", base=base)
+            kde_plot.set_xscale("log", base=base)
 
         plt.tight_layout()
         figure = kde_plot.get_figure()
@@ -76,13 +85,13 @@ class ReportCreator:
 
         return figure
 
-    def create_ecdf_figure(self, log_scale: bool = False) -> plt.Figure:
+    def create_ecdf_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
         # ecdf_plot = sns.ecdfplot(data=self.df, x="epsilon_value", hue="network")
         ecdf_plot = sns.ecdfplot(data=self.df, x="smallest_sat_value", hue="network")
         ecdf_plot.set_xlabel("Epsilon value")
         
         if log_scale:
-            ecdf_plot.set_yscale("log")
+            ecdf_plot.set_xscale("log", base=base)
 
         plt.tight_layout()
         figure = ecdf_plot.get_figure()
