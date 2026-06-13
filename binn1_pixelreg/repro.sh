@@ -9,11 +9,12 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 
-DEBUG=false
+DEBUG=true
 RUN_TRAINING=false
 TRAIN_ATTACK=clean # set to clean for clean training
-TRAIN_EPSILON=8/255
-RUN_ATTACKS=false
+TRAIN_EPSILON=8/255 # only matters if performing adversarial training
+RUN_ATTACKS=true
+ACC_TYPE=relative # relative or absolute accuracies for attacks
 
 TASK=CIFAR10
 ARCHI=ResNet18
@@ -21,7 +22,7 @@ REG_DATA=CIFAR10
 REG_ALPHA=10
 REG_THRESH=0.8
 RGB=true
-ATTACK=false
+ATTACK=false # whether to perform attacks during training- we suggest RUN_ATTACKS true and keep this false
 ATTACK_TYPES=(Gaussian)
 GAUSSIAN_RANGE="0.0 0.3"
 
@@ -78,10 +79,10 @@ do
         do
             for TYPE in "${ATTACK_TYPES[@]}"
             do
-                TRIAL_DICT="${MODEL_DIR}/attack_${TYPE}_seed_${A_SEED}"
+                TRIAL_DICT="${MODEL_DIR}/${ACC_TYPE}_attack_${TYPE}_seed_${A_SEED}"
                 mkdir -p "$TRIAL_DICT"
 
-                echo "Running $TYPE attack with attack seed $A_SEED on model $T_SEED"
+                echo "Running $ACC_TYPE $TYPE attack with attack seed $A_SEED on model $T_SEED"
         
                 case $TYPE in
                     "Gaussian")
@@ -117,6 +118,7 @@ do
                 --train_seed $T_SEED \
                 --save_dir $MODEL_DIR \
                 --attack_list "$TYPE" \
+                --acc_type $ACC_TYPE \
                 --epsilon_range $RANGE \
                 --train_attack "$TRAIN_ATTACK" \
                 --train_epsilon "$TRAIN_EPSILON" \
@@ -129,5 +131,7 @@ do
     fi
 done
 
-SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
+echo "Aggregating results..."
+SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')_${ACC_TYPE}
 python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
+echo "Finished aggregating"
