@@ -83,6 +83,7 @@ def runtime_parser(code_name):
         parser.add_argument("--fine_tune_epochs", default=0, type=int)
 
         parser.add_argument("--attack", default=True, type=str2bool)
+        parser.add_argument("--acc_type", choices=['relative', 'absolute'], help="'relative' if only correct classified instances are used in attacks; 'absolute' if all instances are used")
 
         parser.add_argument("--archi", default="ResNet18")
         parser.add_argument(
@@ -249,6 +250,7 @@ def get_configs(code_name, args):
             "num_epsilons": args.num_epsilons,
             "epsilon_range": args.epsilon_range,
             "attack_list": args.attack_list,
+            "acc_type": args.acc_type
         }
 
     if code_name in ["create_jobs", "process_jobs", "clean_jobs"]:

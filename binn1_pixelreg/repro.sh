@@ -9,11 +9,11 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 
-DEBUG=false
+DEBUG=true
 RUN_TRAINING=false
 TRAIN_ATTACK=clean # set to clean for clean training
-TRAIN_EPSILON=8/255
-RUN_ATTACKS=false
+TRAIN_EPSILON=8/255 # only matters if performing adversarial training
+RUN_ATTACKS=true
 ACC_TYPE=relative # relative or absolute accuracies for attacks
 
 TASK=CIFAR10
@@ -131,5 +131,7 @@ do
     fi
 done
 
+echo "Aggregating results..."
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')_${ACC_TYPE}
 python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
+echo "Finished aggregating"
