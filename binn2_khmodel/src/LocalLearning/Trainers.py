@@ -169,6 +169,8 @@ class CETrainer(Trainer):
             train_attack: str='clean',
             train_epsilon: float=8/255
                 ):
+
+        print(f"Train epsilon is {train_epsilon}")
         # make dataloader accessible for decorators as well
         self.trainData = trainData
         self.testData = testData
