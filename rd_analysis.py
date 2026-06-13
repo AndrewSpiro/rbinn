@@ -141,7 +141,49 @@ def create_figures(bool_relative: bool):
 
     return figures
 
+def stat_test(df, bool_relative):
+
+    if bool_relative:
+        suffix = "relative"
+    else:
+        suffix = "absolute"
+
+    clean_df = df.dropna(subset=['network', 'smallest_sat_value'])
+    groups = [group['epsilon_value'].values for name, group in clean_df.groupby('network')]
+
+    # ANOVA
+    f_stat, p_val = stats.f_oneway(*groups)
+    anova_df = pd.DataFrame({
+        'Metric': ['F-statistic', 'p-value'],
+        'Value': [f_stat, p_val]
+    })
+
+    anova_df.to_latex(index=False, float_format="%.3f", 
+                            caption="One-Way ANOVA Results", label="tab:anova",  buf = f"{args.results_dir}/anova_{suffix}.txt")
+
+    # Tukey HSD pairwise comparison
+    if p_val < 0.05:
+        tukey = pairwise_tukeyhsd(endog=clean_df['smallest_sat_value'], 
+                                groups=clean_df['network'], 
+                                alpha=0.05)
+        
+        data = tukey.summary().data
+        tukey_df = pd.DataFrame(data[1:], columns=data[0])
+
+        numeric_cols = ['meandiff', 'p-adj', 'lower', 'upper']
+        for col in numeric_cols:
+            tukey_df[col] = pd.to_numeric(tukey_df[col])
+
+        tukey_df.to_latex(index=False, float_format="%.3f",
+                                caption="Pairwise Comparisons (Tukey HSD)", 
+                                label="tab:tukey",  buf = f"{args.results_dir}/tukey_{suffix}.txt")
+    return tukey_df
+
 def create_tables(experiments, absolute_dfs, relative_dfs):
+    
+    stat_test(absolute_dfs, bool_relative=False)
+    stat_test(relative_dfs, bool_relative=True)
+    
     summary_dict = {}
 
     for experiment in experiments:
@@ -197,41 +239,6 @@ def create_tables(experiments, absolute_dfs, relative_dfs):
         }
 
     return pd.DataFrame(summary_dict).transpose()
-
-def stat_test(df):
-
-    clean_df = df.dropna(subset=['network', 'epsilon_value'])
-    groups = [group['epsilon_value'].values for name, group in clean_df.groupby('network')]
-
-    # ANOVA
-    f_stat, p_val = stats.f_oneway(*groups)
-    anova_df = pd.DataFrame({
-        'Metric': ['F-statistic', 'p-value'],
-        'Value': [f_stat, p_val]
-    })
-
-    print("ANOVA latex Table")
-    print(anova_df.to_latex(index=False, float_format="%.3f", 
-                            caption="One-Way ANOVA Results", label="tab:anova"))
-
-    # Tukey HSD pairwise comparison
-    if p_val < 0.05:
-        tukey = pairwise_tukeyhsd(endog=clean_df['epsilon_value'], 
-                                groups=clean_df['network'], 
-                                alpha=0.05)
-        
-        data = tukey.summary().data
-        tukey_df = pd.DataFrame(data[1:], columns=data[0])
-
-        numeric_cols = ['meandiff', 'p-adj', 'lower', 'upper']
-        for col in numeric_cols:
-            tukey_df[col] = pd.to_numeric(tukey_df[col])
-
-        print("\nTukey HSD latex Table")
-        print(tukey_df.to_latex(index=False, float_format="%.3f",
-                                caption="Pairwise Comparisons (Tukey HSD)", 
-                                label="tab:tukey"))
-    return tukey_df
 
 if __name__ == "__main__":
 
