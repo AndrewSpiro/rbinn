@@ -19,8 +19,10 @@ TRAIN_MODEL=true
 RUN_ATTACKS=true
 AGG_RESULTS=false
 TRAIN_MODELS=(khmodel)
-TRAIN_ATTACK=fgsm # set to clean for clean training
-TRAIN_EPSILON=8/255
+TRAIN_ATTACK=clean # set to clean for clean training
+TRAIN_EPSILON_NUMERATOR=4
+TRAIN_EPSILON="${TRAIN_EPSILON_NUMERATOR}/255"
+ACC_TYPE=absolute # either absolute or relative
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
@@ -39,9 +41,16 @@ fi
 
 for T_SEED in "${TRAIN_SEEDS[@]}"
 do
-    MODEL_DIR="${RESULT_DIR}/${TRAIN_ATTACK}/t_seed_${T_SEED}/models"
-    FIGURE_DIR="${RESULT_DIR}/${TRAIN_ATTACK}/t_seed_${T_SEED}/figures"
-    EXP_DIR="${RESULT_DIR}/${TRAIN_ATTACK}/t_seed_${T_SEED}/experiments"
+
+    if [ "${TRAIN_ATTACK}" = clean ]; then
+        TRAIN_CONFIG_DIR="${TRAIN_ATTACK}"
+    else
+        TRAIN_CONFIG_DIR="${TRAIN_ATTACK}_${TRAIN_EPSILON_NUMERATOR}"
+    fi
+
+    MODEL_DIR="${RESULT_DIR}/${TRAIN_CONFIG_DIR}/t_seed_${T_SEED}/models"
+    FIGURE_DIR="${RESULT_DIR}/${TRAIN_CONFIG_DIR}/t_seed_${T_SEED}/figures"
+    EXP_DIR="${RESULT_DIR}/${TRAIN_CONFIG_DIR}/t_seed_${T_SEED}/experiments/${ACC_TYPE}"
     echo "[$SHELL] ## model dir: ${MODEL_DIR}, figure dir: ${FIGURE_DIR}, exp dir: ${EXP_DIR}"
     mkdir -p $MODEL_DIR $FIGURE_DIR $EXP_DIR
     
@@ -93,7 +102,8 @@ do
             --figure_path "${FIGURE_DIR}/a_seed_${A_SEED}" \
             --exp_path "${EXP_DIR}/a_seed_${A_SEED}" \
             --attack_models "${TRAIN_MODELS[@]}" \
-            --num_eps $NUM_EPS
+            --num_eps $NUM_EPS \
+            --acc_type $ACC_TYPE
         done
     else
         echo "[$SHELL] ## Skipping attacks"

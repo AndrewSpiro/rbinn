@@ -22,7 +22,7 @@ class PerturbationExperiment(ABC):
     def get_attack(self, model: HiddenLayerModel) -> AdversarialAttack:
         pass
     
-    def run(self, directory: Path, model_fnlist: list, dataSet: torch.utils.data.Dataset, eps: np.array, device: torch.device, norm_p=2.0):
+    def run(self, directory: Path, model_fnlist: list, dataSet: torch.utils.data.Dataset, eps: np.array, device: torch.device, acc_type: str, norm_p=2.0):
         for fn in model_fnlist:
             # load the model
             state_dict = torch.load(directory / fn)
@@ -33,8 +33,14 @@ class PerturbationExperiment(ABC):
             model.to(device)
             model.eval()
             
-            # generate data subset for baseline testing
-            aTestData = BaselineAccurateTestData(model, dataSet)
+            if acc_type == 'relative':
+                # generate data subset for baseline testing
+                aTestData = BaselineAccurateTestData(model, dataSet)
+            elif acc_type == 'absolute':
+                aTestData = dataset
+            else:
+                raise Exception(f"acc_type must be 'relative' or 'absolute', got {acc_type} instead")
+            breakpoint()
             aTestLoader = DeviceDataLoader(
                 aTestData,
                 device=device,

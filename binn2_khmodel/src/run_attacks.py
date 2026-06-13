@@ -106,6 +106,7 @@ if __name__ == "__main__":
     parser.add_argument('--exp_path', type=str, help="path for the epxeriments e.g., 'root/binn2_khmodel/data/repro/experiments")
     parser.add_argument('--attack_models', nargs='+', choices=['khmodel', 'shlp', 'L2', 'jreg', 'specreg'], help="models to train")
     parser.add_argument('--num_eps', type=int, default=400, help="number of epsilons to use in attacks")
+    parser.add_argument('--acc_type', choices=['absolute', 'relative'], help="whether to include misclassified instances (absolute) in attacks or not (relative)")
 
     args = parser.parse_args()
 
@@ -188,21 +189,21 @@ if __name__ == "__main__":
             correct += (pred == y).sum().item()
             total += y.size(0)
     print(correct/total)
-    breakpoint()
+    # breakpoint()
     ce_loss = torch.nn.CrossEntropyLoss()
     
     eps = np.logspace(-6, np.log(2.5), num=args.num_eps)
     rpE = RandomPerturbationExperiment(ce_loss)
-    rpE.run(model_path, fn_list, cifar10Test, eps, device, norm_p=2.0)
+    rpE.run(model_path, fn_list, cifar10Test, eps, device, norm_p=2.0, acc_type=args.acc_type)
     rpE.save(exp_path / rp_fname)
 
     # eps_fgsm = np.logspace(-6, -1.5, num=args.num_eps)
     eps_fgsm = np.logspace(-6, np.log(2.5), num=args.num_eps)
     fgsmE = FGSMExperiment(ce_loss)
-    fgsmE.run(model_path, fn_list, cifar10Test, eps_fgsm, device, norm_p=2.0)
+    fgsmE.run(model_path, fn_list, cifar10Test, eps_fgsm, device, norm_p=2.0, acc_type=args.acc_type)
     fgsmE.save(exp_path / fgsm_fname)
 
     eps_pgd = np.logspace(-6, -1.5, num=args.num_eps)
     pgdE = PGDExperiment(ce_loss)
-    pgdE.run(model_path, fn_list, cifar10Test, eps_pgd, device, norm_p=2.0)
+    pgdE.run(model_path, fn_list, cifar10Test, eps_pgd, device, norm_p=2.0, acc_type=args.acc_type)
     pgdE.save(exp_path / pgd_fname)
