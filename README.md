@@ -2,7 +2,30 @@
 
 ## Quick Start
 
-### Setup
+### Overview
+
+1. The full pipeline including validations of the original BINNs, adversariral training and obtaining robustness distributions can be run from `run.sh`.
+2. Obtaining robustness distributions can be done from `run.sh`
+3. Validating the original BINNs and performing adversarial training can either be done from run.sh or by `cd`ing into the BINN of interest and running `repro.sh`. The latter option allows for more fine-grained control of the training and attacks.
+
+### BINN Env Setup
+
+Some BINNs require specific versions of packages, so separate environments should be created for each. To create the env for each BINN, the following steps should be taken
+
+```bash
+~/rbinn$ cd binn<binn-id>_<binn_name>
+~/rbinn/binn<binn-id>_<binn_name>$ conda env create -f environment.yml
+~/rbinn/binn<binn-id>_<binn_name>$ conda activate <binn_name>
+```
+for example, 
+
+```bash
+~/rbinn$ cd binn1_pixelreg
+~/rbinn/binn1_pixelreg$ conda env create -f environment.yml
+~/rbinn/binn1_pixelreg$ conda activate pixelreg
+```
+
+### RD Experiments Env Setup
 
 Using the various BINNs with the VERONA package requires additional packages. To create the VERONA environment so that it is compatible with the BINNs, run the following:
 
@@ -23,6 +46,11 @@ run.sh
 ```bash
 ~/rbinn$ bash pull_from_verona.sh
 ```
+
+### Running the Full Pipeline
+
+
+
 ## Experiments
 {
     "PixelReg clean": {"path": "experiments/attias_testset_nnenum_one2one_18-02-2026+22_31"},
