@@ -41,9 +41,70 @@ class RandomAttack(AdversarialAttack):
         # print("X_adv rescaled:", X_adv.min(), X_adv.max())
         return X_adv, Y
 
+    def compare_labels(self, model, loader):
+        accuracies = []
+
+        model = model.to(self.device)
+        model.eval()
+
+        self.min_x = float("inf")
+        self.max_x = float("-inf")
+        epsilon = 0.3
+        total = 0  # Total number of samples processed for current epsilon
+        correct = 0  # Total correct predictions for current epsilon
+
+        a,b,c,d = 0,0,0,0
+        total_corr_clean, total_corr_adv = 0,0
+        for batch in loader:
+            X, Y = utils.preprocess(
+                task=self.task,
+                dataset=self.task,
+                device=self.device,
+                batch=batch,
+            )  # between -2.5  and 2.5
+            X = X.to(self.device)
+            Y = Y.to(self.device)
+
+            # Update global min and max values
+            self.min_x = min(self.min_x, X.min().item())
+            self.max_x = max(self.max_x, X.max().item())
+
+
+            with torch.no_grad():
+                clean_outputs = model(X)
+                _, clean_predicted = clean_outputs.max(1)
+                correct_mask = clean_predicted.eq(Y)
+                
+            X_adv, Y_adv = self.get_adversarial(model, (X, Y), epsilon)
+            X_adv, Y_adv = X_adv.to(self.device), Y_adv.to(self.device)
+
+            with torch.no_grad():
+                outputs = model(X_adv)
+                _, predicted = outputs.max(1)
+                correct += predicted.eq(Y_adv).sum().item()
+                total += Y_adv.size(0)
+
+            # confirm that Y and Y_adv are equal
+            corr_clean = correct_mask
+            corr_adv = predicted.eq(Y_adv)
+            assert all([y == y_adv for y, y_adv in zip(Y, Y_adv)])
+            total_corr_clean += sum(corr_clean)
+            total_corr_adv += sum(corr_adv)
+            a += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==0 and a==0)])
+            b += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==0 and a==1)])
+            c += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==1 and a==0)])
+            d += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==1 and a==1)])
+        assert a+b+c+d == 10000
+        print(f"num corr clean: {total_corr_clean}, num corr adv: {total_corr_adv}")
+        print(f"a: {a}\nb: {b}\nc: {c}\nd: {d}")
+
     def __call__(
         self, model, loader, epsilons: torch.tensor, epoch_num=0, only_correct=False
     ):
+        
+        self.compare_labels(model=model, loader=loader)
+        exit()
+
         accuracies = []
 
         model = model.to(self.device)
