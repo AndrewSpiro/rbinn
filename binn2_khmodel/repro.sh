@@ -16,13 +16,13 @@ mkdir -p "$DATA_DIR"
 DEBUG=false
 TRAIN_LAYER=false
 TRAIN_MODEL=false
-RUN_ATTACKS=true
-AGG_RESULTS=false
+RUN_ATTACKS=false
+AGG_RESULTS=true
 TRAIN_MODELS=(khmodel)
-TRAIN_ATTACK=fgsm # set to clean for clean training
-TRAIN_EPSILON_NUMERATOR=16
+TRAIN_ATTACK=clean # set to clean for clean training
+TRAIN_EPSILON_NUMERATOR=8
 TRAIN_EPSILON="${TRAIN_EPSILON_NUMERATOR}/255"
-ACC_TYPE=relative # either absolute or relative
+ACC_TYPE=absolute # either absolute or relative
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
@@ -111,7 +111,8 @@ do
 
     if [ "$AGG_RESULTS" = true ]; then
         python src/aggregate_results.py \
-            --result_path $RESULT_DIR
+            --result_path $RESULT_DIR \
+            --train_configs clean fgsm_4 fgsm_8 fgsm_16
     else
         echo "[$SHELL] ## Skipping aggregating results"
     fi
