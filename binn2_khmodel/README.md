@@ -2,6 +2,7 @@
 * Fixed `HiddenLayerModel.to()` to return `self`, preventing `model.to(device)` from returning `None` and breaking downstream calls like `model.eval()`
 * Fixed `HiddenLayerModel.eval()` and `KHModel._forward()` to return logits only instead of a `(logits, hidden)` tuple, so the `forward` function unpacks correctly during inference
 * Fixed `LpUnitCIFAR10` to keep normalized data as a float32 tensor instead of converting it back to a numpy array
+* Fixed `BaselineAccurateTestData` to handle both numpy arrays and pytorch tensors when masking `dataset.data` and `dataset.targets` for compatibility with VERONA `create_robustness_dist.py`.
 ---
 [![DOI](https://zenodo.org/badge/923448020.svg)](https://doi.org/10.5281/zenodo.14753527)
 

@@ -134,9 +134,13 @@ class BaselineAccurateTestData(Dataset):
                     batch_size = len(data)
                     mask[batch_nr*batch_size:(batch_nr+1*batch_size)] = torch.eq(preds, labels)
         
-        self.data = dataset.data[mask].copy()
-        self.targets = list(np.array(dataset.targets)[mask]).copy()
-
+        # self.data = dataset.data[mask].copy()
+        self.data = dataset.data[mask].clone() if isinstance(dataset.data, torch.Tensor) else dataset.data[mask].copy()
+        # self.targets = list(np.array(dataset.targets)[mask]).copy()
+        targets = dataset.targets.cpu().numpy() if isinstance(dataset.targets, torch.Tensor) else np.array(dataset.targets)
+        mask_np = mask.cpu().numpy() if isinstance(mask, torch.Tensor) else mask
+        self.targets = torch.tensor(targets[mask_np])
+        
     def __len__(self):
         return len(self.data)
 
