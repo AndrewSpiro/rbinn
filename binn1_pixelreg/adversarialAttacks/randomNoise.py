@@ -3,6 +3,7 @@ from foolbox import accuracy, PyTorchModel
 from adversarialAttacks.adversarialBase import AdversarialAttack
 from utils import timer_func
 from foolbox import accuracy, PyTorchModel
+import os, json
 
 
 class RandomAttack(AdversarialAttack):
@@ -94,9 +95,35 @@ class RandomAttack(AdversarialAttack):
             b += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==0 and a==1)])
             c += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==1 and a==0)])
             d += sum([1 for c,a in zip(corr_clean, corr_adv) if (c==1 and a==1)])
+        results_path = "compare_labels_results.json"
+
+        if os.path.exists(results_path):
+            with open(results_path, "r") as f:
+                results = json.load(f)
+        else:
+            results = {
+                "total_corr_clean": [],
+                "total_corr_adv": [],
+                "a": [],
+                "b": [],
+                "c": [],
+                "d": [],
+            }
+        print(f"total: {a+b+c+d}")
         assert a+b+c+d == 10000
+        results["total_corr_clean"].append(int(total_corr_clean))
+        results["total_corr_adv"].append(int(total_corr_adv))
+        results["a"].append(int(a))
+        results["b"].append(int(b))
+        results["c"].append(int(c))
+        results["d"].append(int(d))
+
+        with open(results_path, "w") as f:
+            json.dump(results, f, indent=2)
+
         print(f"num corr clean: {total_corr_clean}, num corr adv: {total_corr_adv}")
         print(f"a: {a}\nb: {b}\nc: {c}\nd: {d}")
+        print(f"Results saved to {results_path} (now {len(results['a'])} runs total)")
 
     def __call__(
         self, model, loader, epsilons: torch.tensor, epoch_num=0, only_correct=False
