@@ -147,7 +147,8 @@ if __name__ == "__main__":
     attack_config = config[-1]
     attack_type = attack_config['attack_type']
     attack_seed = attack_config['attack_seed']
-    results_path = os.path.join(save_dir, f"attack_{attack_type}_seed_{attack_seed}", "results.json")
+    acc_type = attack_config['acc_type']
+    results_path = os.path.join(save_dir, acc_type, f"attack_{attack_type}_seed_{attack_seed}", "results.json")
 
     with open(results_path, "w") as f:
         json.dump(acc_list,f)
