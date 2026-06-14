@@ -109,11 +109,12 @@ def create_pbc_plot(configs_stats, attack_name, acc_type, pbc_baseline_dict, res
             alpha=0.3, color=color
         )
 
-    ax.semilogx(
-        np.array(pbc_baseline_dict[attack_name]['x'], dtype=float),
-        np.array(pbc_baseline_dict[attack_name]['y'], dtype=float),
-        '--', label="Original", color='C0'
-    )
+    if acc_type == 'relative':
+        ax.semilogx(
+            np.array(pbc_baseline_dict[attack_name]['x'], dtype=float),
+            np.array(pbc_baseline_dict[attack_name]['y'], dtype=float),
+            '--', label="Original", color='C0'
+        )
 
     ax.set_xlabel("Epsilon")
     ax.set_ylabel("Accuracy")
@@ -123,35 +124,37 @@ def create_pbc_plot(configs_stats, attack_name, acc_type, pbc_baseline_dict, res
 
 
 def create_rd_plot(configs_stats, attack_name, acc_type, rd_baseline_dict, result_path, color_map):
-    """
-    Robustness distribution (critical norm) box plot for one attack type and norm type,
-    with one box per train config plus the original baseline.
-    """
-    baseline_vals = np.array(rd_baseline_dict[attack_name]['x'], dtype=float)
-    whislo, q1, median, q3, whishi = (
-        baseline_vals.min(), np.percentile(baseline_vals, 25),
-        np.median(baseline_vals),
-        np.percentile(baseline_vals, 75), baseline_vals.max()
-    )
-    baseline_stats = {
-        'whislo': whislo, 'q1': q1, 'med': median,
-        'q3': q3, 'whishi': whishi, 'fliers': []
-    }
-
     n_configs = len(configs_stats)
-    positions = list(range(2, 2 + n_configs))
-    labels = ['Original'] + list(configs_stats.keys())
+    include_baseline = acc_type == 'relative'
+
+    if include_baseline:
+        baseline_vals = np.array(rd_baseline_dict[attack_name]['x'], dtype=float)
+        baseline_stats = {
+            'whislo': baseline_vals.min(),
+            'q1':     np.percentile(baseline_vals, 25),
+            'med':    np.median(baseline_vals),
+            'q3':     np.percentile(baseline_vals, 75),
+            'whishi': baseline_vals.max(),
+            'fliers': []
+        }
+        positions = list(range(2, 2 + n_configs))
+        labels = ['Original'] + list(configs_stats.keys())
+    else:
+        positions = list(range(1, 1 + n_configs))
+        labels = list(configs_stats.keys())
 
     fig, ax = plt.subplots()
-    ax.bxp([baseline_stats], positions=[1], showfliers=False)
+
+    if include_baseline:
+        ax.bxp([baseline_stats], positions=[1], showfliers=False)
 
     for pos, (cfg, stats) in zip(positions, configs_stats.items()):
         crit_norms = extract_crit_norms(stats)
         ax.boxplot(crit_norms, positions=[pos], showfliers=False)
 
-    ax.set_xticks([1] + positions)
+    ax.set_xticks(([1] + positions) if include_baseline else positions)
     ax.set_xticklabels(labels)
-    ax.set_xlim(0.5, 1.5 + n_configs)
+    ax.set_xlim(0.5, 0.5 + len(labels))
     ax.set_ylabel("Critical norm")
     fig.savefig(result_path / f'{attack_name}_{acc_type}_rd.png')
     plt.close(fig)
