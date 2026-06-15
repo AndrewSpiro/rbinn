@@ -157,8 +157,11 @@ class CETrainer(Trainer):
         self.log["epoch"] = []
         self.log["loss"] = []
         self.log["ce_loss"] = []
-        self.log["eval_acc"] = []
-        
+        self.log["clean_eval_acc"] = []
+        self.log["adv_eval_acc"] = []
+        self.log["fgsm_train_acc"] = []
+        self.log["pgd_train_acc"] = []
+
         #self.JacReg = JacobianReg(self.sPs["n"])
     
     def run(
@@ -234,16 +237,22 @@ class CETrainer(Trainer):
                 if testData is not None:
                     self._epoch_preprocessing_eval()
                     self.model.pred()
-                    eval_freq = 0.0 # evaluation frequency
+                    clean_eval_freq = 0.0 # evaluation frequency
+                    adv_eval_freq = 0.0 # evaluation frequency
                     for batch_no, (features, labels) in enumerate(self.testData):
                         # batch preprocessing
                         features, labels = self._batch_preprocessing(features, labels)
                         
                         # batch evaluation
-                        predictions, hidden_repr = self.model(features)
-                        eval_freq += self._batch_eval(features, labels, predictions, hidden_repr)
+                        clean_predictions, clean_hidden_repr = self.model(features)
+                        clean_eval_freq += self._batch_eval(features, labels, clean_predictions, clean_hidden_repr)
+
+                        perturbed_imgs = attack.create_examples(eps=train_epsilon, data = features, targets = labels, loss_fn = self.ce_loss_fn)
+                        fgsm_predictions, fgsm_hidden_repr = self.model(perturbed_imgs)
+                        adv_eval_freq += self._batch_eval(features, labels, fgsm_predictions, fgsm_hidden_repr)
                     
-                    self.log["eval_acc"].append(eval_freq / len(testData.dataset))
+                    self.log["clean_eval_acc"].append(clean_eval_freq / len(testData.dataset))
+                    self.log["adv_eval_acc"].append(adv_eval_freq / len(testData.dataset))
                     self._epoch_postprocessing_eval()
 
                 scheduler.step()
