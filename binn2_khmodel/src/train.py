@@ -132,6 +132,16 @@ def float_eval(x):
     except:
         raise argparse.ArgumentTypeError(f"Invalid float expression: '{x}'")
     
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+    
 if __name__ == "__main__":
 
     parser=argparse.ArgumentParser()
@@ -146,6 +156,7 @@ if __name__ == "__main__":
     parser.add_argument('--train_seed', type=int, help='seed for training')
     parser.add_argument("--train_attack", choices=['clean', 'fgsm'], default='clean', help="attack to use for adv training or clean training if 'clean'")
     parser.add_argument("--train_epsilon", type=float_eval, default=float(8/255), help='epsilon to use for adv training')
+    parser.add_argument("--co_exp", type=str2bool, help="whether to perform experiments to test for catastrophic overfitting")
 
     args = parser.parse_args()
 
@@ -221,11 +232,36 @@ if __name__ == "__main__":
 
         khmodel.train()
         ce_trainer = CETrainerJac(khmodel, learning_rate=LEARNING_RATE)
-        ce_trainer.run(TrainLoader, TestLoader, no_epochs=NUMBER_OF_EPOCHS, train_attack='fgsm', train_epsilon=args.train_epsilon)
+        pgd_params = {
+            "num_it": 4, # number of iterations,
+            "dl": 1.0, # step size
+            "dl_deps": 1e-1,
+            "norm_p": "inf",
+        }
+        ce_trainer.run(TrainLoader, TestLoader, no_epochs=NUMBER_OF_EPOCHS,
+                        train_attack='fgsm', train_epsilon=args.train_epsilon, 
+                        pgd_params=pgd_params, co_exp=args.co_exp)
         ce_trainer.save(model_path / khmodel_name, model_path / khmodel_log_name)
 
         log = Trainers.Trainer.Logger()
         log.load(model_path / khmodel_log_name)
+
+        if args.co_exp:
+            fig, ax = plt.subplots()
+            ax.plot(log["epoch"], log["clean_eval_acc"], label='Clean', color='C0')
+            ax.plot(log["epoch"], log["adv_eval_acc"], label='FGSM', color='C1')
+            ax.set_xlabel("Epochs")
+            ax.set_ylabel("Test accuracy")
+            ax.legend()
+            plt.savefig(figure_path/"khmodel_test_eval.png")
+
+            fig, ax = plt.subplots()
+            ax.plot(log["pgd_train_epoch"], log["pgd_train_acc"], label='PGD', color='C0')
+            ax.plot(log["epoch"], log["fgsm_train_acc"], label='FGSM', color='C1')
+            ax.set_xlabel("Epochs")
+            ax.set_ylabel(r"Train accuracy")
+            ax.legend()
+            plt.savefig(figure_path/"khmodel_train_eval.png")
 
         fig, axs = plt.subplots(1, 4)
         axs[0].plot(log["epoch"], log["loss"])
@@ -246,7 +282,7 @@ if __name__ == "__main__":
 
         plt.savefig(figure_path/"khmodel_training.png")
 
-        fig = plt.figure(figsize = (12.9, 10))
+        fig = plt.figure(figsize = (14, 10))
         draw_weights(khmodel.local_learning.W.T.detach().cpu().numpy(), 20, 20)
 
         plt.savefig(figure_path/"khmodel_weigths.png")

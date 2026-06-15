@@ -161,6 +161,7 @@ class CETrainer(Trainer):
         self.log["adv_eval_acc"] = []
         self.log["fgsm_train_acc"] = []
         self.log["pgd_train_acc"] = []
+        self.log["pgd_train_epoch"] = []
 
         #self.JacReg = JacobianReg(self.sPs["n"])
     
@@ -187,6 +188,7 @@ class CETrainer(Trainer):
             if pgd_params is None:
                 pgd_params = PGD.params.copy()
             print(f"PGD params: {pgd_params}")
+            pgd_eval_every=5
         with tqdm(range(1, no_epochs + 1), unit="epoch") as tepoch:
             tepoch.set_description(f"Training time [epochs]")
             for epoch in tepoch:
@@ -241,15 +243,23 @@ class CETrainer(Trainer):
                     if co_exp:
                         self.model.eval()
 
-                        fgsm_attack = FGSM(self.model)
-                        fgsm_imgs = fgsm_attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
-                        fgsm_preds, _ = self.model(fgsm_imgs)
+                        # reuse perturbed_imgs from training step if fgsm, otherwise compute
+                        if train_attack == 'fgsm':
+                            fgsm_imgs = perturbed_imgs.detach()
+                        else:
+                            fgsm_attack = FGSM(self.model)
+                            fgsm_imgs = fgsm_attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
+                        
+                        with torch.no_grad():
+                            fgsm_preds, _ = self.model(fgsm_imgs)
                         fgsm_train_acc += float((torch.argmax(fgsm_preds, dim=-1) == labels.to(self.device)).sum())
 
-                        pgd_attack = PGD(self.model, params=pgd_params)
-                        pgd_imgs = pgd_attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
-                        pgd_preds, _ = self.model(pgd_imgs)
-                        pgd_train_acc += float((torch.argmax(pgd_preds, dim=-1) == labels.to(self.device)).sum())
+                        if epoch % pgd_eval_every == 0:
+                            pgd_attack = PGD(self.model, params=pgd_params)
+                            pgd_imgs = pgd_attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
+                            with torch.no_grad():
+                                pgd_preds, _ = self.model(pgd_imgs)
+                            pgd_train_acc += float((torch.argmax(pgd_preds, dim=-1) == labels.to(self.device)).sum())
 
                         self.model.train()
                     
@@ -257,7 +267,9 @@ class CETrainer(Trainer):
                 self.log["loss"].append(cumm_loss)
                 if co_exp:
                     self.log["fgsm_train_acc"].append(fgsm_train_acc / len(trainData.dataset))
-                    self.log["pgd_train_acc"].append(pgd_train_acc / len(trainData.dataset))
+                    if epoch % pgd_eval_every == 0:
+                        self.log["pgd_train_acc"].append(pgd_train_acc / len(trainData.dataset))
+                        self.log["pgd_train_epoch"].append(epoch)
                 self._epoch_postprocessing_train()
                 
                 if testData is not None:
