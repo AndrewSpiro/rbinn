@@ -10,6 +10,11 @@ from matplotlib import pyplot as plt
 
 from LocalLearning.Experiments import PerturbationExperiment, RandomPerturbationExperiment, FGSMExperiment, PGDExperiment
 
+FONT_SIZES = {
+    'axis_label': 14,
+    'ticks':      14,
+    'legend':     14,
+}
 
 def make_stats_dict(exp_dict):
     grouped_dict = defaultdict(list)
@@ -116,9 +121,11 @@ def create_pbc_plot(configs_stats, attack_name, acc_type, pbc_baseline_dict, res
             '--', label="Original", color='C0'
         )
 
-    ax.set_xlabel("Epsilon")
-    ax.set_ylabel("Accuracy")
-    ax.legend(loc='lower left')
+    ax.set_xlabel("Epsilon", fontsize=FONT_SIZES['axis_label'])
+    ax.set_ylabel("Accuracy", fontsize=FONT_SIZES['axis_label'])
+    ax.tick_params(axis='both', labelsize=FONT_SIZES['ticks'])
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc='best', fontsize=FONT_SIZES['legend'])
     fig.savefig(result_path / f'{attack_name}_{acc_type}_pbc.png')
     plt.close(fig)
 
@@ -154,8 +161,9 @@ def create_rd_plot(configs_stats, attack_name, acc_type, rd_baseline_dict, resul
 
     ax.set_xticks(([1] + positions) if include_baseline else positions)
     ax.set_xticklabels(labels)
+    ax.tick_params(axis='both', labelsize=FONT_SIZES['ticks'])
     ax.set_xlim(0.5, 0.5 + len(labels))
-    ax.set_ylabel("Critical norm")
+    ax.set_ylabel("Critical norm", fontsize=FONT_SIZES['axis_label'])
     fig.savefig(result_path / f'{attack_name}_{acc_type}_rd.png')
     plt.close(fig)
 
