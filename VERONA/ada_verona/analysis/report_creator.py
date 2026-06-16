@@ -31,85 +31,105 @@ sns.set_theme(rc={
     "legend.title_fontsize": 18,
     })
 sns.set_palette(sns.color_palette("Paired"))
-# matplotlib.rcParams["figure.figsize"]=(11.7, 8.27)
 
 class ReportCreator:
     def __init__(self, df: pd.DataFrame):
         self.df = df
 
     def create_hist_figure(self, log_scale: bool = False, base = 10) -> plt.Figure:
-        # hist_plot = sns.histplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
-        hist_plot = sns.histplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack")
-        hist_plot.set_xlabel("Epsilon value")
+        fig, ax = plt.subplots()
+        sns.histplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack", ax=ax)
+        ax.set_xlabel("Epsilon value")
         
         if log_scale:
-            hist_plot.set_yscale("log", base=base)
+            ax.set_yscale("log", base=base)
         
-        plt.tight_layout()
-        figure = hist_plot.get_figure()
-
-        plt.close()
-
-        return figure
+        fig.tight_layout()
+        return fig
 
     def create_box_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
-        # box_plot = sns.boxplot(data=self.df, x="network", y="epsilon_value")
-        box_plot = sns.boxplot(data=self.df, x="network", y="smallest_sat_value")
-        box_plot.set_xticklabels(box_plot.get_xticklabels(), rotation=23)
-        box_plot.set_xlabel("Network")
-        box_plot.set_ylabel("Epsilon values")
+        sort_order = [
+            "pixelreg", 
+            "khmodel", 
+            "cnnf", 
+            "eat",        
+            "vonenet", 
+            "cifar_7_1024", 
+            "convbig"
+        ]
+
+        def get_sort_key(network_name):
+            net_lower = str(network_name).lower()
+            for idx, prefix in enumerate(sort_order):
+                if prefix in net_lower:
+                    return idx
+            return len(sort_order)
+
+        unique_networks = sorted(self.df["network"].unique(), key=get_sort_key)
+        
+        data = [
+            self.df[self.df["network"] == net]["smallest_sat_value"].dropna().values 
+            for net in unique_networks
+        ]
+        positions = list(range(1, len(unique_networks) + 1))
+
+        fig, ax = plt.subplots()
+        
+        ax.set_facecolor("white")
+        ax.grid(False)
+        for spine in ax.spines.values():
+            spine.set_color('black') 
+            spine.set_visible(True)
+
+        ax.boxplot(data, positions=positions, showfliers=True, medianprops={'color': 'orange', 'linewidth': 1.5})
+
+        ax.set_xticks(positions)
+        ax.set_xticklabels(unique_networks, rotation=23, ha='right')
+        ax.set_xlim(0.5, len(unique_networks) + 0.5)
+        
+        ax.set_xlabel("Network")
+        ax.set_ylabel("Epsilon values")
 
         if log_scale:
-            box_plot.set_yscale("log", base=base)
+            ax.set_yscale("log", base=base)
     
-        plt.tight_layout()
-        figure = box_plot.get_figure()
-
-        plt.close()
-
-        return figure
+        fig.tight_layout()
+        return fig
 
     def create_kde_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
-        # kde_plot = sns.kdeplot(data=self.df, x="epsilon_value", hue="network", multiple="stack")
-        kde_plot = sns.kdeplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack")
-        kde_plot.set_xlabel("Epsilon value")
+        fig, ax = plt.subplots()
+        sns.kdeplot(data=self.df, x="smallest_sat_value", hue="network", multiple="stack", ax=ax)
+        ax.set_xlabel("Epsilon value")
         
         if log_scale:
-            # kde_plot.set_yscale("log", base=base)
-            kde_plot.set_xscale("log", base=base)
+            ax.set_xscale("log", base=base)
 
-        plt.tight_layout()
-        figure = kde_plot.get_figure()
-
-        plt.close()
-
-        return figure
+        fig.tight_layout()
+        return fig
 
     def create_ecdf_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
-        # ecdf_plot = sns.ecdfplot(data=self.df, x="epsilon_value", hue="network")
-        ecdf_plot = sns.ecdfplot(data=self.df, x="smallest_sat_value", hue="network")
-        ecdf_plot.set_xlabel("Epsilon value")
+        fig, ax = plt.subplots()
+        sns.ecdfplot(data=self.df, x="smallest_sat_value", hue="network", ax=ax)
+        ax.set_xlabel("Epsilon value")
         
         if log_scale:
-            ecdf_plot.set_xscale("log", base=base)
+            ax.set_xscale("log", base=base)
 
-        plt.tight_layout()
-        figure = ecdf_plot.get_figure()
+        fig.tight_layout()
+        return fig
 
-        plt.close()
-
-        return figure
-
-    def create_anneplot(self):
+    def create_anneplot(self) -> plt.Figure:
+        fig, ax = plt.subplots()
         df = self.df
         for network in df.network.unique():
             df = df.sort_values(by="epsilon_value")
             cdf_x = np.linspace(0, 1, len(df))
-            plt.plot(df.epsilon_value, cdf_x, label=network)
-            plt.fill_betweenx(cdf_x, df.epsilon_value, df.smallest_sat_value, alpha=0.3)
-            plt.xlim(0, 0.35)
-            plt.xlabel("Epsilon values")
-            plt.ylabel("Fraction critical epsilon values found")
-            plt.legend()
+            ax.plot(df.epsilon_value, cdf_x, label=network)
+            ax.fill_betweenx(cdf_x, df.epsilon_value, df.smallest_sat_value, alpha=0.3)
+            ax.set_xlim(0, 0.35)
+            ax.set_xlabel("Epsilon values")
+            ax.set_ylabel("Fraction critical epsilon values found")
+            ax.legend()
 
-        return plt.gca()
+        fig.tight_layout()
+        return fig
