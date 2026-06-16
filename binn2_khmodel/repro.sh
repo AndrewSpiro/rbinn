@@ -13,16 +13,16 @@ DATA_DIR="${ROOT_DIR}/data"
 echo "[$SHELL] ## Home data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 
-DEBUG=true
+DEBUG=false
 TRAIN_LAYER=false
-TRAIN_MODEL=true
+TRAIN_MODEL=false
 RUN_ATTACKS=true
 AGG_RESULTS=false
 TRAIN_MODELS=(khmodel)
-TRAIN_ATTACK=clean # set to clean for clean training
-TRAIN_EPSILON_NUMERATOR=4
+TRAIN_ATTACK=fgsm # set to clean for clean training
+TRAIN_EPSILON_NUMERATOR=16
 TRAIN_EPSILON="${TRAIN_EPSILON_NUMERATOR}/255"
-ACC_TYPE=absolute # either absolute or relative
+ACC_TYPE=relative # either absolute or relative
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
@@ -33,8 +33,8 @@ if [ "$DEBUG" = true ]; then
     echo "[$SHELL] ## --- RUNNING IN DEBUG MODE ---"
 else
     RESULT_DIR="${SCRIPT_DIR}/data/repro"
-    TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(102 103)
+    TRAIN_SEEDS=(0 1 2)
+    ATTACK_SEEDS=(101 102 103)
     EPOCHS=1000
     NUM_EPS=400
 fi

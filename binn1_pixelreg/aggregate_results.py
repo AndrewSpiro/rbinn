@@ -16,7 +16,7 @@ def aggregate_hierarchical(root_dir):
         hierarchy[t_seed] = {}
 
         for trial_dir in os.listdir(model_path):
-            trial_path = os.path.join(model_path, trial_dir)
+            trial_path = os.path.join(model_path, acc_type, trial_dir)
             if os.path.isdir(trial_path) and trial_dir.startswith("attack_"):
                 attack_type = trial_dir.split("_")[1]
                 json_path = os.path.join(trial_path, "results.json")
@@ -69,7 +69,7 @@ def aggregate_both(save_dir):
     return results["clean"], results["fgsm"]
 
 
-def plot_results(baselines, clean_results, adv_results, attack_name,
+def plot_results(baselines, clean_results, adv_results, attack_name, acc_type,
                  eps_min, eps_max, save_dir, seed_string):
     plt.figure(figsize=(8, 5))
 
@@ -107,7 +107,7 @@ def plot_results(baselines, clean_results, adv_results, attack_name,
     plt.legend()
     plt.grid(True, alpha=0.3)
 
-    out_path = os.path.join(save_dir, f"binn1_{attack_name}_train_seeds_{seed_string}.png")
+    out_path = os.path.join(save_dir, f"binn1_{acc_type}_{attack_name}_train_seeds_{seed_string}.png")
     plt.savefig(out_path)
     plt.close()
     print(f'Plot saved for {attack_name} to {out_path}')
@@ -130,10 +130,14 @@ if __name__ == "__main__":
     eps_max = float(sys.argv[2])
     save_dir = sys.argv[3]
     seed_string = sys.argv[4]
+    acc_type = sys.argv[5]
 
     clean_dict, adv_dict = aggregate_both(save_dir)
-
+    
     all_attacks = set(clean_dict.keys()) | set(adv_dict.keys())
+    print(set(clean_dict.keys()))
+    print(set(adv_dict.keys()))
+    print(all_attacks)
     for attack_name in all_attacks:
-        plot_results(baselines, clean_dict, adv_dict, attack_name,
-                     eps_min, eps_max, save_dir, seed_string)
+        plot_results(baselines=baselines, clean_results=clean_dict, adv_results=adv_dict, attack_name=attack_name, acc_type=acc_type,
+                     eps_min=eps_min, eps_max=eps_max, save_dir=save_dir, seed_string=seed_string)

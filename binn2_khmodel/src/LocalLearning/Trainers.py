@@ -199,12 +199,12 @@ class CETrainer(Trainer):
                     optimizer.zero_grad()
                     if train_attack in ['clean', 'fgsm']:
                         if train_attack == 'clean':
-                            if batch_nr == 0:
+                            if batch_nr == 0 and epoch == 1:
                                 print("Performing clean training")
                             outputs, hidden_repr = self.model(features)
                             loss = self._batch_loss(features, labels, outputs, hidden_repr)
                         else:
-                            if batch_nr == 0:
+                            if batch_nr == 0 and epoch == 1:
                                 print(f"Adversarially training with attack {train_attack} and epsilon {train_epsilon}")
                             attack = FGSM(self.model)
                             perturbed_imgs = attack.create_examples(eps=train_epsilon, data = features, targets = labels, loss_fn = self.ce_loss_fn)

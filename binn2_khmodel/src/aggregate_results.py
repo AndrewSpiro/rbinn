@@ -51,16 +51,18 @@ def get_orig_results(result_path):
         with open(result_path / fn, 'r') as file:
             reader = csv.reader(file, delimiter=',')
             for row in reader:
-                x.append(row[1])  # row with id 1 because of csv saving from webplot digi
+                x.append(row[1])
         rd_baseline_dict[name] = {'x': x}
 
     return pbc_baseline_dict, rd_baseline_dict
 
 
-def collect_pkl_paths(root):
-    """Walk directory and return lists of pkl paths for each attack type"""
+def collect_pkl_paths(root, acc_type=None):
+    """Walk directory and return lists of pkl paths for each attack type."""
     rp_paths, fgsm_paths, pgd_paths = [], [], []
     for subdir, dirs, files in os.walk(root):
+        if acc_type and f"experiments/{acc_type}" not in subdir:
+            continue
         if "random_perturbation_results.pkl" in files:
             rp_paths.append(Path(subdir) / "random_perturbation_results.pkl")
         if "fgsm_results.pkl" in files:
@@ -87,97 +89,115 @@ def extract_crit_norms(stats_dict):
         all_crit_norm.append(crit_norm[~nan_mask])
     return np.concatenate(all_crit_norm)
 
+def create_pbc_plot(configs_stats, attack_name, acc_type, pbc_baseline_dict, result_path, color_map):
+    """
+    Accuracy vs epsilon (perturbation budget curve) plot for one attack type and norm type,
+    with one line per train config plus the original baseline.
+    """
+    fig, ax = plt.subplots()
 
-def make_boxplots(repro_clean, repro_adv, baseline_rd, name, result_path):
-    """Box plot with three groups: original baseline, clean repro, fgsm trained model."""
-    whislo, q1, median, q3, whishi = baseline_rd
+    for cfg, stats in configs_stats.items():
+        eps = np.array(stats["eps"], dtype=float)
+        mean = stats["acc"]["mean"]
+        std  = stats["acc"]["std"]
+        color = color_map[cfg]
+        ax.semilogx(eps, mean, label=cfg, color=color)
+        ax.fill_between(
+            eps,
+            [m - s for m, s in zip(mean, std)],
+            [m + s for m, s in zip(mean, std)],
+            alpha=0.3, color=color
+        )
+
+    ax.semilogx(
+        np.array(pbc_baseline_dict[attack_name]['x'], dtype=float),
+        np.array(pbc_baseline_dict[attack_name]['y'], dtype=float),
+        '--', label="Original", color='C0'
+    )
+
+    ax.set_xlabel("Epsilon")
+    ax.set_ylabel("Accuracy")
+    ax.legend(loc='lower left')
+    fig.savefig(result_path / f'{attack_name}_{acc_type}_pbc.png')
+    plt.close(fig)
+
+
+def create_rd_plot(configs_stats, attack_name, acc_type, rd_baseline_dict, result_path, color_map):
+    """
+    Robustness distribution (critical norm) box plot for one attack type and norm type,
+    with one box per train config plus the original baseline.
+    """
+    baseline_vals = np.array(rd_baseline_dict[attack_name]['x'], dtype=float)
+    whislo, q1, median, q3, whishi = (
+        baseline_vals.min(), np.percentile(baseline_vals, 25),
+        np.median(baseline_vals),
+        np.percentile(baseline_vals, 75), baseline_vals.max()
+    )
     baseline_stats = {
         'whislo': whislo, 'q1': q1, 'med': median,
         'q3': q3, 'whishi': whishi, 'fliers': []
     }
 
+    n_configs = len(configs_stats)
+    positions = list(range(2, 2 + n_configs))
+    labels = ['Original'] + list(configs_stats.keys())
+
     fig, ax = plt.subplots()
     ax.bxp([baseline_stats], positions=[1], showfliers=False)
-    ax.boxplot(repro_clean, positions=[2], showfliers=False)
-    ax.boxplot(repro_adv,   positions=[3], showfliers=False)
 
-    ax.set_xticks([1, 2, 3])
-    ax.set_xticklabels(['Original', 'Repro (clean)', 'FGSM'])
-    ax.set_xlim(0.5, 3.5)
-    ax.set_ylabel("critical norm")
+    for pos, (cfg, stats) in zip(positions, configs_stats.items()):
+        crit_norms = extract_crit_norms(stats)
+        ax.boxplot(crit_norms, positions=[pos], showfliers=False)
 
-    fig.savefig(result_path / f'{name}_rd.png')
+    ax.set_xticks([1] + positions)
+    ax.set_xticklabels(labels)
+    ax.set_xlim(0.5, 1.5 + n_configs)
+    ax.set_ylabel("Critical norm")
+    fig.savefig(result_path / f'{attack_name}_{acc_type}_rd.png')
     plt.close(fig)
 
 
-def create_plots(clean_stats, adv_stats, name, result_path):
+def create_plots(configs_stats, attack_name, acc_type, result_path, color_map):
     pbc_baseline_dict, rd_baseline_dict = get_orig_results(result_path)
-
-    # pbc plot
-    eps_clean = np.array(clean_stats["eps"], dtype=float)
-    eps_adv   = np.array(adv_stats["eps"],   dtype=float)
-
-    fig, ax = plt.subplots()
-    ax.semilogx(eps_clean, clean_stats["acc"]["mean"], label="Repro (clean)", color='C1')
-    ax.fill_between(
-        eps_clean,
-        [m - s for m, s in zip(clean_stats["acc"]["mean"], clean_stats["acc"]["std"])],
-        [m + s for m, s in zip(clean_stats["acc"]["mean"], clean_stats["acc"]["std"])],
-        alpha=0.3,
-        color='C1'
-    )
-    ax.semilogx(
-        np.array(pbc_baseline_dict[name]['x'], dtype=float),
-        np.array(pbc_baseline_dict[name]['y'], dtype=float),
-        '--',
-        label="Original",
-        color='C0'
-    )
-    ax.semilogx(eps_adv, adv_stats["acc"]["mean"], label="FGSM", color='C2')
-    ax.fill_between(
-        eps_adv,
-        [m - s for m, s in zip(adv_stats["acc"]["mean"], adv_stats["acc"]["std"])],
-        [m + s for m, s in zip(adv_stats["acc"]["mean"], adv_stats["acc"]["std"])],
-        alpha=0.3,
-        color='C2'
-    )
-    ax.set_xlabel("Epsilon")
-    ax.set_ylabel("Accuracy")
-    ax.legend(loc='lower left')
-    fig.savefig(result_path / f'{name}_pbc.png')
-    plt.close(fig)
-
-    # rd box plot
-    repro_clean = extract_crit_norms(clean_stats)
-    repro_adv   = extract_crit_norms(adv_stats)
-    baseline_rd = np.array(rd_baseline_dict[name]['x'], dtype=float)
-
-    make_boxplots(repro_clean, repro_adv, baseline_rd, name, result_path)
+    create_pbc_plot(configs_stats, attack_name, acc_type, pbc_baseline_dict, result_path, color_map)
+    create_rd_plot(configs_stats, attack_name, acc_type, rd_baseline_dict, result_path, color_map)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         '--result_path', type=str,
-        help="Root path containing 'clean/' and 'fgsm/' subdirectories, "
-             "e.g. 'root/binn2_khmodel/data/repro/experiments'"
+        help="Root path containing train-config subdirectories each with 'experiments/absolute' and 'experiments/relative' sub-subdirectories."
+    )
+    parser.add_argument(
+        '--train_configs', nargs='+',
+        help="List of train config folder names, e.g. clean fgsm_4 fgsm_8 fgsm_16"
     )
     args = parser.parse_args()
+    print(f"Processing train configs: {args.train_configs}")
 
-    result_path = Path(args.result_path)
-    clean_root  = result_path / "clean"
-    adv_root    = result_path / "fgsm"
+    result_path  = Path(args.result_path)
+    ce_loss      = torch.nn.CrossEntropyLoss()
+    color_map = {cfg: f'C{i+1}' for i, cfg in enumerate(args.train_configs)}
+    acc_types   = ('absolute', 'relative')
+    attack_names = ('rp', 'fgsm', 'pgd')
 
-    ce_loss = torch.nn.CrossEntropyLoss()
+    all_stats = {acc_type: {} for acc_type in acc_types}
 
-    clean_rp, clean_fgsm, clean_pgd = collect_pkl_paths(clean_root)
-    adv_rp,   adv_fgsm,   adv_pgd   = collect_pkl_paths(adv_root)
+    for cfg in args.train_configs:
+        for acc_type in acc_types:
+            rp_paths, fgsm_paths, pgd_paths = collect_pkl_paths(result_path / cfg, acc_type)
+            experiments = build_experiments(rp_paths, fgsm_paths, pgd_paths, ce_loss)
 
-    clean_experiments = build_experiments(clean_rp, clean_fgsm, clean_pgd, ce_loss)
-    adv_experiments   = build_experiments(adv_rp,   adv_fgsm,   adv_pgd,   ce_loss)
+            for attack_name in attack_names:
+                stats = make_stats_dict(experiments[attack_name])
+                all_stats[acc_type].setdefault(attack_name, {})[cfg] = stats
 
-    for name in ('rp', 'fgsm', 'pgd'):
-        print(f"Processing: {name}")
-        clean_stats = make_stats_dict(clean_experiments[name])
-        adv_stats   = make_stats_dict(adv_experiments[name])
-        create_plots(clean_stats, adv_stats, name, result_path)
+    # One plot per (attack_name, acc_type) pair, all train configs on the same axes.
+    for acc_type in acc_types:
+        for attack_name in attack_names:
+            if attack_name not in all_stats[acc_type]:
+                continue
+            print(f"Plotting {attack_name} / {acc_type}")
+            configs_stats = all_stats[acc_type][attack_name]
+            create_plots(configs_stats, attack_name, acc_type, result_path, color_map)

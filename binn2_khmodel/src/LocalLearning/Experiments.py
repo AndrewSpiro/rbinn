@@ -35,12 +35,14 @@ class PerturbationExperiment(ABC):
             
             if acc_type == 'relative':
                 # generate data subset for baseline testing
+                print("Performing relative attacks")
                 aTestData = BaselineAccurateTestData(model, dataSet)
             elif acc_type == 'absolute':
-                aTestData = dataset
+                print("Performing absolute attacks")
+                aTestData = dataSet
             else:
                 raise Exception(f"acc_type must be 'relative' or 'absolute', got {acc_type} instead")
-            breakpoint()
+            # breakpoint()
             aTestLoader = DeviceDataLoader(
                 aTestData,
                 device=device,

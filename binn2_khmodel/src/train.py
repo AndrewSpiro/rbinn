@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
         khmodel.train()
         ce_trainer = CETrainerJac(khmodel, learning_rate=LEARNING_RATE)
-        ce_trainer.run(TrainLoader, TestLoader, no_epochs=NUMBER_OF_EPOCHS, train_attack='fgsm', train_epsilon=train_epsilon)
+        ce_trainer.run(TrainLoader, TestLoader, no_epochs=NUMBER_OF_EPOCHS, train_attack='fgsm', train_epsilon=args.train_epsilon)
         ce_trainer.save(model_path / khmodel_name, model_path / khmodel_log_name)
 
         log = Trainers.Trainer.Logger()

@@ -98,7 +98,7 @@ def attack_resnet(
     elif attack_config['acc_type'] == 'absolute':
         only_correct = False
     else:
-        raise Exception(f"'acc_type' must be either 'relative or absolute', got {attack_config[acc_type]}")
+        raise Exception(f"'acc_type' must be either 'relative or absolute', got {attack_config['acc_type']}")
     if only_correct and (attack_config["attack_type"] not in ["Gaussian", "Uniform", "SaltPepper"]):
         raise Exception(f"Relative metrics currently only implemented for random attacks. Got {attack_config["attack_type"]}.")
 

@@ -9,9 +9,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${ROOT_DIR}:${PYTHONPATH}"
 
-DEBUG=true
+DEBUG=false
 RUN_TRAINING=false
-TRAIN_ATTACK=clean # set to clean for clean training
+TRAIN_ATTACK=fgsm # set to clean for clean training
 TRAIN_EPSILON=8/255 # only matters if performing adversarial training
 RUN_ATTACKS=true
 ACC_TYPE=relative # relative or absolute accuracies for attacks
@@ -29,7 +29,7 @@ GAUSSIAN_RANGE="0.0 0.3"
 if [ "$DEBUG" = true ]; then
     EPOCHS=0
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(101)
+    ATTACK_SEEDS=(102)
     SAVE_DIR="${SCRIPT_DIR}/save/debug"
     echo "--- RUNNING IN DEBUG MODE ---"
 else
@@ -79,7 +79,7 @@ do
         do
             for TYPE in "${ATTACK_TYPES[@]}"
             do
-                TRIAL_DICT="${MODEL_DIR}/${ACC_TYPE}_attack_${TYPE}_seed_${A_SEED}"
+                TRIAL_DICT="${MODEL_DIR}/${ACC_TYPE}/attack_${TYPE}_seed_${A_SEED}"
                 mkdir -p "$TRIAL_DICT"
 
                 echo "Running $ACC_TYPE $TYPE attack with attack seed $A_SEED on model $T_SEED"
@@ -121,10 +121,8 @@ do
                 --acc_type $ACC_TYPE \
                 --epsilon_range $RANGE \
                 --train_attack "$TRAIN_ATTACK" \
-                --train_epsilon "$TRAIN_EPSILON" \
                 >> "${TRIAL_DICT}/train.log" 2>&1
             done
-
         done
     else
         echo "Skipping attacks"
@@ -133,5 +131,5 @@ done
 
 echo "Aggregating results..."
 SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')_${ACC_TYPE}
-python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
+python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING $ACC_TYPE > "${SAVE_DIR}/results_${SEED_STRING}.txt"
 echo "Finished aggregating"
