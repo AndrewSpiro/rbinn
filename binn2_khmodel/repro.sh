@@ -13,22 +13,23 @@ DATA_DIR="${ROOT_DIR}/data"
 echo "[$SHELL] ## Home data dir is here: ${DATA_DIR}"
 mkdir -p "$DATA_DIR"
 
-DEBUG=false
+DEBUG=true
 TRAIN_LAYER=false
-TRAIN_MODEL=false
-RUN_ATTACKS=true
+TRAIN_MODEL=true
+RUN_ATTACKS=false
 AGG_RESULTS=false
 TRAIN_MODELS=(khmodel)
 TRAIN_ATTACK=fgsm # set to clean for clean training
-TRAIN_EPSILON_NUMERATOR=16
+TRAIN_EPSILON_NUMERATOR=8
 TRAIN_EPSILON="${TRAIN_EPSILON_NUMERATOR}/255"
-ACC_TYPE=relative # either absolute or relative
+ACC_TYPE=absolute # either absolute or relative
+CO_EXP=true # perform experiments to test for catastrophic overfitting. Model trains much slower when true due to added evals
 
 if [ "$DEBUG" = true ]; then
     RESULT_DIR="${SCRIPT_DIR}/data/repro/debug"
     TRAIN_SEEDS=(0)
-    ATTACK_SEEDS=(102 103)
-    EPOCHS=100
+    ATTACK_SEEDS=(102)
+    EPOCHS=50
     NUM_EPS=5
     echo "[$SHELL] ## --- RUNNING IN DEBUG MODE ---"
 else
@@ -83,7 +84,8 @@ do
         --num_workers 1 \
         --train_models "${TRAIN_MODELS[@]}" \
         --train_attack $TRAIN_ATTACK \
-        --train_epsilon $TRAIN_EPSILON
+        --train_epsilon $TRAIN_EPSILON \
+        --co_exp $CO_EXP
     else
         echo "[$SHELL] ## Skipping model training"
     fi
@@ -111,7 +113,8 @@ do
 
     if [ "$AGG_RESULTS" = true ]; then
         python src/aggregate_results.py \
-            --result_path $RESULT_DIR
+            --result_path $RESULT_DIR \
+            --train_configs clean fgsm_4 fgsm_8 fgsm_16
     else
         echo "[$SHELL] ## Skipping aggregating results"
     fi

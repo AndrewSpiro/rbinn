@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 import sys
 import numpy as np
 
-def aggregate_hierarchical(root_dir):
+def aggregate_hierarchical(root_dir, acc_type):
     hierarchy = {}
     for model_dir in os.listdir(root_dir):
         model_path = os.path.join(root_dir, model_dir)
@@ -15,7 +15,7 @@ def aggregate_hierarchical(root_dir):
         t_seed = model_dir.split("_")[-1]
         hierarchy[t_seed] = {}
 
-        for trial_dir in os.listdir(model_path):
+        for trial_dir in os.listdir(os.path.join(model_path, acc_type)):  # <-- added acc_type
             trial_path = os.path.join(model_path, acc_type, trial_dir)
             if os.path.isdir(trial_path) and trial_dir.startswith("attack_"):
                 attack_type = trial_dir.split("_")[1]
@@ -56,13 +56,13 @@ def aggregate_hierarchical(root_dir):
     return attack_results
 
 
-def aggregate_both(save_dir):
+def aggregate_both(save_dir, acc_type):
     results = {}
     for split in ("clean", "fgsm"):
         subdir = os.path.join(save_dir, split)
         if os.path.isdir(subdir):
             print(f"\nAggregating {split} models")
-            results[split] = aggregate_hierarchical(subdir)
+            results[split] = aggregate_hierarchical(subdir, acc_type)  # <-- passed through
         else:
             print(f"Warning: {subdir} not found, skipping.")
             results[split] = {}
@@ -90,16 +90,17 @@ def plot_results(baselines, clean_results, adv_results, attack_name, acc_type,
         plt.fill_between(x, means - stds, means + stds, alpha=0.2, color='C2')
 
     # baselines
-    for b_name, b_data in baselines.items():
-        b_type = b_data['attack_config']['type']
-        b_range_min = b_data['attack_config']['range'][0]
-        b_range_max = b_data['attack_config']['range'][1]
+    if acc_type=='absolute':
+        for b_name, b_data in baselines.items():
+            b_type = b_data['attack_config']['type']
+            b_range_min = b_data['attack_config']['range'][0]
+            b_range_max = b_data['attack_config']['range'][1]
 
-        if (b_type.lower() == attack_name.lower()
-                and np.isclose(b_range_min, eps_min)
-                and np.isclose(b_range_max, eps_max)):
-            bx = np.linspace(eps_min, eps_max, len(b_data['means']))
-            plt.plot(bx, b_data['means'], '--', label=b_data['label'], color='C0')
+            if (b_type.lower() == attack_name.lower()
+                    and np.isclose(b_range_min, eps_min)
+                    and np.isclose(b_range_max, eps_max)):
+                bx = np.linspace(eps_min, eps_max, len(b_data['means']))
+                plt.plot(bx, b_data['means'], '--', label=b_data['label'], color='C0')
 
     plt.xlabel('Epsilon')
     plt.ylabel('Accuracy')
@@ -130,9 +131,14 @@ if __name__ == "__main__":
     eps_max = float(sys.argv[2])
     save_dir = sys.argv[3]
     seed_string = sys.argv[4]
-    acc_type = sys.argv[5]
-
-    clean_dict, adv_dict = aggregate_both(save_dir)
+    
+    for acc_type in ['absolute', 'relative']:
+        clean_dict, adv_dict = aggregate_both(save_dir, acc_type)
+        all_attacks = set(clean_dict.keys()) | set(adv_dict.keys())
+        for attack_name in all_attacks:
+            plot_results(baselines=baselines, clean_results=clean_dict, adv_results=adv_dict,
+                         attack_name=attack_name, acc_type=acc_type,
+                         eps_min=eps_min, eps_max=eps_max, save_dir=save_dir, seed_string=seed_string)
     
     all_attacks = set(clean_dict.keys()) | set(adv_dict.keys())
     print(set(clean_dict.keys()))

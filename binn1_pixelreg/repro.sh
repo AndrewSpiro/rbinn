@@ -130,6 +130,6 @@ do
 done
 
 echo "Aggregating results..."
-SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')_${ACC_TYPE}
-python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING $ACC_TYPE > "${SAVE_DIR}/results_${SEED_STRING}.txt"
+SEED_STRING=$(echo "${TRAIN_SEEDS[*]}" | tr ' ' '_')
+python "${SCRIPT_DIR}/aggregate_results.py" $GAUSSIAN_RANGE $SAVE_DIR $SEED_STRING > "${SAVE_DIR}/results_${SEED_STRING}.txt"
 echo "Finished aggregating"

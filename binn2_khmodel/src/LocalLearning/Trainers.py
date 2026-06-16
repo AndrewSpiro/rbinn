@@ -157,18 +157,24 @@ class CETrainer(Trainer):
         self.log["epoch"] = []
         self.log["loss"] = []
         self.log["ce_loss"] = []
-        self.log["eval_acc"] = []
-        
+        self.log["clean_eval_acc"] = []
+        self.log["adv_eval_acc"] = []
+        self.log["fgsm_train_acc"] = []
+        self.log["pgd_train_acc"] = []
+        self.log["pgd_train_epoch"] = []
+
         #self.JacReg = JacobianReg(self.sPs["n"])
     
     def run(
-            self, 
-            trainData: DataLoader,
-            testData: DataLoader=None,
-            no_epochs: int=5,
-            train_attack: str='clean',
-            train_epsilon: float=8/255
-                ):
+        self, 
+        trainData: DataLoader,
+        testData: DataLoader=None,
+        no_epochs: int=5,
+        train_attack: str='clean',
+        train_epsilon: float=8/255,
+        pgd_params: dict=None,
+        co_exp: bool=False
+            ):
 
         print(f"Train epsilon is {train_epsilon}")
         # make dataloader accessible for decorators as well
@@ -176,7 +182,13 @@ class CETrainer(Trainer):
         self.testData = testData
         optimizer = Adam(self.model.parameters(), lr=1.0)
         scheduler = LambdaLR(optimizer, lr_lambda=[self.learning_rate])
-    
+
+        if co_exp:
+            # default PGD params if none provided
+            if pgd_params is None:
+                pgd_params = PGD.params.copy()
+            print(f"PGD params: {pgd_params}")
+            pgd_eval_every=5
         with tqdm(range(1, no_epochs + 1), unit="epoch") as tepoch:
             tepoch.set_description(f"Training time [epochs]")
             for epoch in tepoch:
@@ -188,7 +200,9 @@ class CETrainer(Trainer):
                 self._epoch_preprocessing_train()
                 self.model.to(self.device)
                 self.model.train()
-                cumm_loss = 0.0   
+                cumm_loss = 0.0
+                fgsm_train_acc = 0.0
+                pgd_train_acc = 0.0
 
                 for batch_nr, (features, labels) in enumerate(self.trainData):
 
@@ -225,29 +239,61 @@ class CETrainer(Trainer):
                     
                     # batch post-processing
                     self._batch_postprocessing(features, labels)
-                 
-                # epoch postprocessing
+
+                    if co_exp:
+                        self.model.eval()
+
+                        if train_attack == 'fgsm':
+                            fgsm_imgs = perturbed_imgs.detach()
+                        else:
+                            fgsm_attack = FGSM(self.model)
+                            fgsm_imgs = fgsm_attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
+                        
+                        with torch.no_grad():
+                            fgsm_preds, _ = self.model(fgsm_imgs)
+                        fgsm_train_acc += float((torch.argmax(fgsm_preds, dim=-1) == labels.to(self.device)).sum())
+
+                        if epoch % pgd_eval_every == 0:
+                            pgd_attack = PGD(self.model, params=pgd_params)
+                            pgd_imgs = pgd_attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
+                            with torch.no_grad():
+                                pgd_preds, _ = self.model(pgd_imgs)
+                            pgd_train_acc += float((torch.argmax(pgd_preds, dim=-1) == labels.to(self.device)).sum())
+
+                        self.model.train()
+                    
                 self.log["epoch"].append(epoch)
                 self.log["loss"].append(cumm_loss)
+                if co_exp:
+                    self.log["fgsm_train_acc"].append(fgsm_train_acc / len(trainData.dataset))
+                    if epoch % pgd_eval_every == 0:
+                        self.log["pgd_train_acc"].append(pgd_train_acc / len(trainData.dataset))
+                        self.log["pgd_train_epoch"].append(epoch)
                 self._epoch_postprocessing_train()
                 
                 if testData is not None:
                     self._epoch_preprocessing_eval()
                     self.model.pred()
-                    eval_freq = 0.0 # evaluation frequency
+                    clean_eval_freq = 0.0
+                    adv_eval_freq = 0.0
                     for batch_no, (features, labels) in enumerate(self.testData):
-                        # batch preprocessing
                         features, labels = self._batch_preprocessing(features, labels)
                         
-                        # batch evaluation
-                        predictions, hidden_repr = self.model(features)
-                        eval_freq += self._batch_eval(features, labels, predictions, hidden_repr)
+                        features = features.requires_grad_(True)
+                        clean_predictions, clean_hidden_repr = self.model(features)
+                        clean_eval_freq += self._batch_eval(features, labels, torch.argmax(clean_predictions, dim=-1), clean_hidden_repr)
+
+                        if co_exp:
+                            perturbed_imgs = attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
+                            perturbed_imgs = perturbed_imgs.requires_grad_(True)
+                            fgsm_predictions, fgsm_hidden_repr = self.model(perturbed_imgs)
+                            adv_eval_freq += self._batch_eval(perturbed_imgs, labels, torch.argmax(fgsm_predictions, dim=-1), fgsm_hidden_repr)
                     
-                    self.log["eval_acc"].append(eval_freq / len(testData.dataset))
+                    self.log["clean_eval_acc"].append(clean_eval_freq / len(testData.dataset))
+                    self.log["adv_eval_acc"].append(adv_eval_freq / len(testData.dataset))
                     self._epoch_postprocessing_eval()
 
-                scheduler.step()
-
+            scheduler.step()
     def _epoch_preprocessing_train(
             self,
             ):
