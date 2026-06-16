@@ -20,15 +20,17 @@ import pandas as pd
 import seaborn as sns
 
 matplotlib.use("Agg")
-sns.set_style("darkgrid")
-sns.set_theme(rc={
-    "figure.figsize": (11.7, 8.27),
-    "font.size": 18,
-    "axes.labelsize": 20,
-    "xtick.labelsize":18,
-    "ytick.labelsize": 18,
-    "legend.fontsize": 16,
-    "legend.title_fontsize": 18,
+sns.set_style("white")
+sns.set_theme(
+    style="white",
+    rc={
+        "figure.figsize": (11.7, 8.27),
+        "font.size": 22,
+        "axes.labelsize": 24,
+        "xtick.labelsize": 20,
+        "ytick.labelsize": 20,
+        "legend.fontsize": 18,
+        "legend.title_fontsize": 20,
     })
 sns.set_palette(sns.color_palette("Paired"))
 
@@ -44,6 +46,7 @@ class ReportCreator:
         if log_scale:
             ax.set_yscale("log", base=base)
         
+        sns.despine(ax=ax, top=False, right=False)
         fig.tight_layout()
         return fig
 
@@ -81,7 +84,7 @@ class ReportCreator:
             spine.set_color('black') 
             spine.set_visible(True)
 
-        ax.boxplot(data, positions=positions, showfliers=True, medianprops={'color': 'orange', 'linewidth': 1.5})
+        ax.boxplot(data, positions=positions, showfliers=True, medianprops={'color': 'orange', 'linewidth': 2.0})
 
         ax.set_xticks(positions)
         ax.set_xticklabels(unique_networks, rotation=23, ha='right')
@@ -104,17 +107,19 @@ class ReportCreator:
         if log_scale:
             ax.set_xscale("log", base=base)
 
+        sns.despine(ax=ax, top=False, right=False)
         fig.tight_layout()
         return fig
 
     def create_ecdf_figure(self, log_scale: bool = False, base=10) -> plt.Figure:
         fig, ax = plt.subplots()
-        sns.ecdfplot(data=self.df, x="smallest_sat_value", hue="network", ax=ax)
+        sns.ecdfplot(data=self.df, x="smallest_sat_value", hue="network", ax=ax, linewidth=3.5)
         ax.set_xlabel("Epsilon value")
         
         if log_scale:
             ax.set_xscale("log", base=base)
 
+        sns.despine(ax=ax, top=False, right=False)
         fig.tight_layout()
         return fig
 
@@ -124,12 +129,13 @@ class ReportCreator:
         for network in df.network.unique():
             df = df.sort_values(by="epsilon_value")
             cdf_x = np.linspace(0, 1, len(df))
-            ax.plot(df.epsilon_value, cdf_x, label=network)
+            ax.plot(df.epsilon_value, cdf_x, label=network, linewidth=2.5)
             ax.fill_betweenx(cdf_x, df.epsilon_value, df.smallest_sat_value, alpha=0.3)
             ax.set_xlim(0, 0.35)
             ax.set_xlabel("Epsilon values")
             ax.set_ylabel("Fraction critical epsilon values found")
             ax.legend()
 
+        sns.despine(ax=ax, top=False, right=False)
         fig.tight_layout()
         return fig
