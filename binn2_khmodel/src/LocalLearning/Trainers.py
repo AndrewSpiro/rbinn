@@ -243,7 +243,6 @@ class CETrainer(Trainer):
                     if co_exp:
                         self.model.eval()
 
-                        # reuse perturbed_imgs from training step if fgsm, otherwise compute
                         if train_attack == 'fgsm':
                             fgsm_imgs = perturbed_imgs.detach()
                         else:
@@ -280,13 +279,11 @@ class CETrainer(Trainer):
                     for batch_no, (features, labels) in enumerate(self.testData):
                         features, labels = self._batch_preprocessing(features, labels)
                         
-                        # clean eval - features already has grad context so _batch_eval is fine
                         features = features.requires_grad_(True)
                         clean_predictions, clean_hidden_repr = self.model(features)
                         clean_eval_freq += self._batch_eval(features, labels, torch.argmax(clean_predictions, dim=-1), clean_hidden_repr)
 
                         if co_exp:
-                            # adversarial eval - bypass _batch_eval to avoid JF firing on detached tensor
                             perturbed_imgs = attack.create_examples(eps=train_epsilon, data=features, targets=labels, loss_fn=self.ce_loss_fn)
                             perturbed_imgs = perturbed_imgs.requires_grad_(True)
                             fgsm_predictions, fgsm_hidden_repr = self.model(perturbed_imgs)
