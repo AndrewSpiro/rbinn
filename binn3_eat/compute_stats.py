@@ -102,7 +102,7 @@ def plot_results(aggregated_data, baselines_path, output_path="deep_clustered_pl
     x = np.arange(len(model_types)) 
     width = 0.12  # Individual bar width
     
-    fig, ax = plt.subplots(figsize=(14, 8))
+    fig, ax = plt.subplots(figsize=(14, 4))
 
     offsets = [-2.5*width, -1.5*width, -0.5*width, 0.5*width, 1.5*width, 2.5*width]
 
