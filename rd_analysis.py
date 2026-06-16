@@ -119,14 +119,11 @@ def create_figures(bool_relative: bool):
     absolute includes originally misclassified instances, relative excludes them."""
     if bool_relative:
         print("Obtaining relative figures")
-        zero_shifted = relative_dfs.copy()
+        dfs = relative_dfs.copy()
     else:
         print("Obtaining absolute figures")
-        zero_shifted = absolute_dfs.copy()
-        zero_shifted["smallest_sat_value"] = (
-            zero_shifted["smallest_sat_value"] + 1e-6
-        )  # shifting so that plots are compatible with log-scaling
-    report_creator = ReportCreator(zero_shifted)
+        dfs = absolute_dfs.copy()
+    report_creator = ReportCreator(dfs)
     hist_figure = report_creator.create_hist_figure(log_scale=True)
     box_figure = report_creator.create_box_figure(log_scale=True)
     kde_figure = report_creator.create_kde_figure(log_scale=True, base=2)
@@ -135,10 +132,13 @@ def create_figures(bool_relative: bool):
     # figures = [hist_figure, box_figure, kde_figure, ecdf_figure, anneplot]
     figures = [hist_figure, box_figure, kde_figure, ecdf_figure]
     # figures = [hist_figure, box_figure, ecdf_figure, anneplot]
-
-    for i, figure in enumerate(figures):
-        figure.savefig(f"{args.results_dir}/fig_{i}.png")
-
+    
+    if bool_relative:
+        save_path=f"{args.results_dir}/relative"
+    else:
+        save_path=f"{args.results_dir}/absolute"
+    for i, figure in enumerate(figures):    
+            figure.savefig(f"{save_path}/fig_{i}.png")
     return figures
 
 def stat_test(df, bool_relative):
@@ -274,7 +274,10 @@ if __name__ == "__main__":
     # print(relative_dfs.columns)
     relative_dfs["smallest_sat_value"] = relative_dfs.apply(unscale_eps, axis=1)
     absolute_dfs["smallest_sat_value"] = absolute_dfs.apply(unscale_eps, axis=1)
-    figures = create_figures(bool_relative=args.bool_relative)
+    os.makedirs(f"{args.results_dir}/absolute", exist_ok=True)
+    os.makedirs(f"{args.results_dir}/relative", exist_ok=True)
+    create_figures(bool_relative=False)
+    create_figures(bool_relative=True)
     tables = create_tables(experiments, absolute_dfs, relative_dfs)
     # table_abs = tables[['max_sat_test_abs', 'mean_sat_test_abs','std_sat_test_abs','clean_acc']]
     # table_rel = tables[['max_sat_test_rel', 'mean_sat_test_rel','std_sat_test_rel','num_clean_corr']]
