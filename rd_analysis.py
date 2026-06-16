@@ -149,7 +149,7 @@ def stat_test(df, bool_relative):
         suffix = "absolute"
 
     clean_df = df.dropna(subset=['network', 'smallest_sat_value'])
-    groups = [group['epsilon_value'].values for name, group in clean_df.groupby('network')]
+    groups = [group['smallest_sat_value'].values for name, group in clean_df.groupby('network')]
 
     # ANOVA
     f_stat, p_val = stats.f_oneway(*groups)
