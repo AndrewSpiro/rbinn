@@ -4,7 +4,7 @@ set -e
 
 source $(conda info --base)/etc/profile.d/conda.sh
 
-DEBUG=true
+DEBUG=false
 RUN_VALIDS=false
 GET_RDS=false
 AGG_RESULTS=true
@@ -74,7 +74,7 @@ if [ "${AGG_RESULTS}" = true ]; then
     fi
     mkdir -p $RESULTS_DIR
 
-    python rd_analysis.py --experiments_path debug_experiments.json --results_dir "${RESULTS_DIR}/clean"
+    python rd_analysis.py --experiments_path experiments_orig.json --results_dir "${RESULTS_DIR}/orig"
 else
     echo "[$SHELL] ## Skipping aggregating results"
 fi
