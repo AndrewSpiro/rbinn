@@ -1,5 +1,29 @@
-### Changes
-* Fixed CUDA tensor to NumPy conversion error in `detect_edge_new_cifar()` by adding `.cpu()` before the NumPy cast.
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+
+This repository extends the original implementation to automate multiple seeded training and evaluation runs. (Original README below.)
+
+## Quick Start
+
+```bash
+~/rbinn$ cd binn3_eat
+~/rbinn/binn3_eat$ conda env create -f environment.yml
+~/rbinn/binn3_eat$ conda activate eat
+```
+
+`repro.sh` performs the validation experiments.
+
+Basic variables:
+
+* `RUN_TRAIN`: whether to run training (adversarial attacks are integrated into the training pipeline).
+
+Other parameters, including `NET_TYPE` are described in the original README, we recommend referring to that documentation.
+
+To reproduce the results, run
+
+```bash
+~/rbinn/binn3_eat$ bash repro.sh
+```
+
 ---
 # Shape Defense
 

@@ -1,6 +1,6 @@
 # Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
 
-This repository extends the original implementation to automate multiple seeded training and evaluation runs.
+This repository extends the original implementation to automate multiple seeded training and evaluation runs. (Original README below.)
 
 ## Quick Start
 
@@ -10,21 +10,20 @@ This repository extends the original implementation to automate multiple seeded 
 ~/rbinn/binn1_pixelreg$ conda activate pixelreg
 ```
 
-In repro.sh performs the validation experiments. 
-Main parameters:
-* RUN_TRAINING: whether to perform training, if models have already been trained, this can be false to only perform attacks.
-* TRAIN_ATTACK: adversarial attack used in training. Set this to 'clean' to perform clean training.
-* TRAIN_EPSILON: the epsilon used in adversarial training.
+`repro.sh` performs the validation experiments.
+
+Basic variables:
+
+* `RUN_TRAINING`: whether to perform training, if models have already been trained, this can be `false` to only perform attacks.
+* `TRAIN_ATTACK` (`fgsm`/`clean`): adversarial attack used in training. Set this to `clean` to perform clean training.
+* `TRAIN_EPSILON`: the epsilon used in adversarial training.
+* `RUN_ATTACKS`: whether to perform attacks
 
 To reproduce the results, run
 
 ```bash
-bash repro.sh
+~/rbinn/binn1_pixelreg$ bash repro.sh
 ```
-
-## Main Updates
-
-* Added ```attack``` flag and ```str2bool``` in ```train.py``` to control attacks at the end of the train script.
 
 ---
 

@@ -1,4 +1,30 @@
 # Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+
+This repository extends the original implementation to automate multiple seeded training and evaluation runs. (Original README below.)
+
+## Quick Start
+
+```bash
+~/rbinn$ cd binn4_cnnf
+~/rbinn/binn4_cnnf$ conda env create -f environment.yml
+~/rbinn/binn4_cnnf$ conda activate cnnf
+```
+
+Basic variables:
+
+* `TRAIN_METHOD` (`clean`/`adv`/`supclean`): whether to perform training using only clean instances, only perturbed instances (`adv`), or both (`supclean`).
+* `TRAIN_ATTACK`: attack used in training. if `TRAIN_METHOD` is `clean`, this is ignored; otherwise, should be `fgsm` or `pgd`
+* `RUN_TRAIN`: whether to run training.
+* `RUN_ATTACKS`: whether to perform attacks.
+
+To reproduce the results, run
+
+```bash
+~/rbinn/binn4_cnnf$ bash repro.sh
+```
+
+---
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
 NOTE: 
 ```bash
 <model_name>_seed_<train_seed>-best_model.pt

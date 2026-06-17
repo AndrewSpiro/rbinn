@@ -9,7 +9,7 @@ PARENT_DIR="$(dirname "$SCRIPT_DIR")"
 export PYTHONPATH="${PARENT_DIR}:${PYTHONPATH}"
 
 TRAIN_METHOD=clean # 'clean' 'adv' or anything else for supclean
-TRAIN_ATTACK=clean # if train method is clean, this is ignored; otherwise, should be adv or pgd
+TRAIN_ATTACK=clean # if train method is clean, this is ignored; otherwise, should be fgsm or pgd
 DEBUG=false
 RUN_TRAIN=false
 RUN_ATTACKS=false

@@ -1,8 +1,43 @@
-### Main Changes
-* Fixed `HiddenLayerModel.to()` to return `self`, preventing `model.to(device)` from returning `None` and breaking downstream calls like `model.eval()`
-* Fixed `HiddenLayerModel.eval()` and `KHModel._forward()` to return logits only instead of a `(logits, hidden)` tuple, so the `forward` function unpacks correctly during inference
-* Fixed `LpUnitCIFAR10` to keep normalized data as a float32 tensor instead of converting it back to a numpy array
-* Fixed `BaselineAccurateTestData` to handle both numpy arrays and pytorch tensors when masking `dataset.data` and `dataset.targets` for compatibility with VERONA `create_robustness_dist.py`.
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
+
+This repository extends the original implementation to automate multiple seeded training and evaluation runs. (Original README below.)
+
+## Quick Start
+
+```bash
+~/rbinn$ cd binn2_khmodel
+~/rbinn/binn2_khmodel$ conda env create -f environment.yml
+~/rbinn/binn2_khmodel$ conda activate khmodel
+```
+
+`repro.sh` performs the validation experiments.
+
+Basic variables:
+
+* `TRAIN_LAYER` (`true`/`false`): toggle training of the component learned with unsupervised learning.
+* `TRAIN_MODEL`  (`true`/`false`): whether to train the compoenent learned with supervised learning.
+* `RUN_ATTACKS`: whether to perform adversarial attacks.
+* `AGG_RESULTS` whether to generate figures from attacks.
+* `TRAIN_MODELS`: which model used in the original publication to test. `khmodel` is the only brain-inspired model.
+* `TRAIN_ATTACK` (`fgsm`/`clean`): set to `clean` for clean training.
+* `TRAIN_EPSILON_NUMERATOR`: numerator used in `TRAIN_EPSILON`. Results folders are named based on this value of adversarial training is used.
+* `TRAIN_EPSILON`: epsilon to use in adversarial training.
+* ACC_TYPE (`absolute`/`relative`): whether to compute absolute or relative accuracies.
+* CO_EXP: whether to perform additional evaluations to check for overfitting. When `true`, this significantly slows model training.
+
+To reproduce the results, run
+
+```bash
+~/rbinn/binn2_khmodel$ bash repro.sh
+```
+
+### Some modifications
+
+* Changed `HiddenLayerModel.to()` to return `self`, preventing `model.to(device)` from returning `None` and breaking downstream calls like `model.eval()`
+* Changed `HiddenLayerModel.eval()` and `KHModel._forward()` to return logits only instead of a `(logits, hidden)` tuple, so the `forward` function unpacks correctly during inference
+* Changed `LpUnitCIFAR10` to keep normalized data as a float32 tensor instead of converting it back to a numpy array
+* Changed `BaselineAccurateTestData` to handle both numpy arrays and pytorch tensors when masking `dataset.data` and `dataset.targets` (for compatibility with VERONA `create_robustness_dist.py`).
+
 ---
 [![DOI](https://zenodo.org/badge/923448020.svg)](https://doi.org/10.5281/zenodo.14753527)
 

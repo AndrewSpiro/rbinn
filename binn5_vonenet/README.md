@@ -1,8 +1,22 @@
-# Thesis Repro
-* Note on environment: either dapello or vonenet. Delete the wrong one.
+# Brain-Inspired Mechanisms for Robustness in Artificial Neural Networks: An Analysis via Robustness Distributions
 
-### changes
-* Prevent division by zero during PGD by adding 1e-12 in gabors_f in VOneBlock
+This repository extends the original implementation to automate multiple seeded training and evaluation runs. (Original README below.)
+
+## Quick Start
+
+```bash
+~/rbinn$ cd binn4_cnnf
+~/rbinn/binn4_cnnf$ conda env create -f environment.yml
+~/rbinn/binn4_cnnf$ conda activate cnnf
+```
+
+Basic variables:
+
+* `RUN_TRAIN`: whether to perform training.
+* `RUN_EVAL`: whether to perform model evaluation (clean accuracy)
+* `MODEL_ARCH` (`alexnet`/`resnet50`/`resnet50_at`/`cornets`): CNN backend to use with the VOneBlock.
+* `TRAIN_METHOD` (`clean`/`fgsm`): whether to perform clean training or adversarial training with FGSM.
+
 ---
 # VOneNet: CNNs with a Primary Visual Cortex Front-End
 
