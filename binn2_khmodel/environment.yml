@@ -218,4 +218,3 @@ dependencies:
       - joblib==1.5.3
       - scikit-learn==1.6.1
       - threadpoolctl==3.6.0
-prefix: /home/s4015355/.conda/envs/khmodel

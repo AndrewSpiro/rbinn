@@ -264,4 +264,3 @@ dependencies:
       - requests==2.25.1
       - torchattacks==3.5.1
       - urllib3==1.26.20
-prefix: /home/s4015355/.conda/envs/eat

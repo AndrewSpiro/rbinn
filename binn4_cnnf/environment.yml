@@ -194,4 +194,3 @@ dependencies:
       - tifffile==2023.7.10
       - torchattacks==3.5.1
       - urllib3==1.26.20
-prefix: /home/s4015355/.conda/envs/cnnf
