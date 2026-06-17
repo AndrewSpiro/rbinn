@@ -54,8 +54,8 @@ class ReportCreator:
         sort_order = [
             "pixelreg", 
             "khmodel", 
-            "cnnf", 
             "eat",        
+            "cnnf", 
             "vonenet", 
             "cifar_7_1024", 
             "convbig"
@@ -84,7 +84,19 @@ class ReportCreator:
             spine.set_color('black') 
             spine.set_visible(True)
 
-        ax.boxplot(data, positions=positions, showfliers=True, medianprops={'color': 'orange', 'linewidth': 2.0})
+        ax.boxplot(
+            data, 
+            positions=positions, 
+            showfliers=True, 
+            medianprops={'color': 'orange', 'linewidth': 2.0},
+            showmeans=True,
+            meanprops={
+                'marker': 'D',         
+                'markerfacecolor': 'red',
+                'markeredgecolor': 'black',
+                'markersize': 8           
+            }
+        )
 
         ax.set_xticks(positions)
         ax.set_xticklabels(unique_networks, rotation=23, ha='right')
