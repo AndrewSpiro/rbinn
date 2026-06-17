@@ -8,7 +8,12 @@ DEBUG=false
 RUN_VALIDS=false
 GET_RDS=false
 AGG_RESULTS=true
-BOOL_RELATIVE=false
+EXPS=orig
+MODELS=("convbig")
+TRAIN_TYPE=clean
+EPSILON_SPACE=bosman
+PGD_NUM_ITER=40
+PGD_STEP_SIZE=0.01
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DATA_DIR="${SCRIPT_DIR}/data"
@@ -18,11 +23,6 @@ EXP_REPO_PATH="${SCRIPT_DIR}/experiments"
 echo "[$SHELL] ## Experiment repository is here: ${EXP_REPO_PATH}"
 mkdir -p "$EXP_REPO_PATH"
 declare -A MODEL_IDS=( ["pixelreg"]=1 ["eat"]=3 ["cnnf"]=4 ["vonenet"]=5 ["cifar_7_1024"]=6 ["convbig"]=7)
-MODELS=("convbig")
-TRAIN_TYPE=clean
-EPSILON_SPACE=bosman
-PGD_NUM_ITER=40
-PGD_STEP_SIZE=0.01
 
 echo "[$SHELL] ## Starting full pipeline..."
 
@@ -74,7 +74,7 @@ if [ "${AGG_RESULTS}" = true ]; then
     fi
     mkdir -p $RESULTS_DIR
 
-    python rd_analysis.py --experiments_path experiments_orig.json --results_dir "${RESULTS_DIR}/orig"
+    python rd_analysis.py --experiments_path "experiments_${EXPS}.json" --results_dir "${RESULTS_DIR}/${EXPS}"
 else
     echo "[$SHELL] ## Skipping aggregating results"
 fi
