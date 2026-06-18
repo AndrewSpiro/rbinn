@@ -96,7 +96,7 @@ def extract_crit_norms(stats_dict):
 
 def create_pbc_plot(configs_stats, attack_name, acc_type, pbc_baseline_dict, result_path, color_map):
     """
-    Accuracy vs epsilon (perturbation budget curve) plot for one attack type and norm type,
+    pbc plot for one attack type and acc type,
     with one line per train config plus the original baseline.
     """
     fig, ax = plt.subplots()
@@ -204,7 +204,7 @@ if __name__ == "__main__":
                 stats = make_stats_dict(experiments[attack_name])
                 all_stats[acc_type].setdefault(attack_name, {})[cfg] = stats
 
-    # One plot per (attack_name, acc_type) pair, all train configs on the same axes.
+    # One plot per (attack_name, acc_type) pair, all train configs on the same plot.
     for acc_type in acc_types:
         for attack_name in attack_names:
             if attack_name not in all_stats[acc_type]:
