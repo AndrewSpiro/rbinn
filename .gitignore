@@ -15,6 +15,7 @@ tests/test_experiment/*
 site/
 examples/example_experiment/results/
 data/
+data
 **/data/
 **/datasets/
 **/MNIST/
