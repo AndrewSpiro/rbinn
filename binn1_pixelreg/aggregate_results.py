@@ -71,6 +71,15 @@ def aggregate_both(save_dir, acc_type):
 
 def plot_results(baselines, clean_results, adv_results, attack_name, acc_type,
                  eps_min, eps_max, save_dir, seed_string):
+    plt.rcParams.update({
+        'font.size': 14,
+        'axes.titlesize': 16,
+        'axes.labelsize': 16,
+        'xtick.labelsize': 14,
+        'ytick.labelsize': 14,
+        'legend.fontsize': 14
+    })
+    
     plt.figure(figsize=(8, 5))
 
     # clean
@@ -104,15 +113,15 @@ def plot_results(baselines, clean_results, adv_results, attack_name, acc_type,
 
     plt.xlabel('Epsilon')
     plt.ylabel('Accuracy')
-    # plt.title(f'BINN1 Pixelreg Comparison: {attack_name.capitalize()} Attack')
     plt.legend()
-    plt.grid(True, alpha=0.3)
+    # plt.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
 
     out_path = os.path.join(save_dir, f"binn1_{acc_type}_{attack_name}_train_seeds_{seed_string}.png")
     plt.savefig(out_path)
     plt.close()
     print(f'Plot saved for {attack_name} to {out_path}')
-
 
 if __name__ == "__main__":
     baselines = {
