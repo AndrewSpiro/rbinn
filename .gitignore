@@ -3,6 +3,7 @@ experiments/
 *.out
 .VSCodeCounter/
 baselinemodels/
+visualization.py
 
 #### VERONA ####
 __pycache__/
@@ -224,6 +225,7 @@ binn2_khmodel/data/**
 .python-version
 Rescifar10/
 Rescifar10_alpha_0.5/
+Rescifar10_alpha_0/
 Rescifar10_gtsrb/
 Rescifar10_alpha_0_cifar_edge_detect/
 Rescifar10 copy/
