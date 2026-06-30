@@ -252,11 +252,12 @@ binn4_cnnf/data/
 
 
 #### binn6_unsupvvs ####
-data/coco
-data/pretrained_models
-output
-all_label.pkl
-*octave-workspace*
+binn6_unsupvvs/
+# data/coco
+# data/pretrained_models
+# output
+# all_label.pkl
+# *octave-workspace*
 
 
 #### binn7_neurcotrain ####
