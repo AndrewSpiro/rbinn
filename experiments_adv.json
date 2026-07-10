@@ -1,7 +1,7 @@
 {
     "PixelReg FGSM": {"path": "experiments/pixelreg_seed_0_rd_26-05-2026+06_50"},
     "KHModel FGSM": {"path": "experiments/khmodel_seed_0_rd_26-05-2026+19_21"},
-    "CNNF FGSM": {"path": "experiments/convbig_seed_0_rd_30-05-2026+22_15"},
+    "CNNF FGSM": {"path": "experiments/cnnf_seed_0_rd_30-05-2026+18_31"},
     "EAT FGSM": {"path": ...},
     "VOneNet FGSM": {"path": "experiments/vonenet_seed_0_rd_30-05-2026+18_22"},
     "CIFAR_7_1024 FGSM": {"path": "experiments/cifar_7_1024_fgsm_testset_nnenum_one2one_18-02-2026+21_17"},
